@@ -1,20 +1,20 @@
-# Balança Eu - Home Page
+# Balança Eu - Landing Page Refinada
 
-This project is the landing page for **Balança Eu | Escola de Dança e Centro Cultural**, imported from Stitch.
+Esta é a landing page oficial da **Balança Eu | Escola de Dança e Centro Cultural**, refinada para uma experiência de usuário moderna, artística e funcional.
 
-## How to run
+## ✨ Características
+- **Identidade Premium**: Tipografia Syne para títulos e Plus Jakarta Sans para interface.
+- **Estrutura Enxuta**: Seções de Escola, Preços, Professores, Horários (por sala), Eventos e Contato.
+- **Navegação Inteligente**: Menu flutuante e responsivo para mobile.
+- **Alta Performance**: Implementada com HTML5, Tailwind CSS (CDN) e Vanilla JavaScript.
 
-1.  Standard approach: Just open `index.html` in your browser.
-2.  Development server (with Vite):
-    ```bash
-    npm install
-    npm run dev
-    ```
+## 🚀 Como Visualizar
+Basta abrir o arquivo `index.html` em qualquer navegador moderno.
 
-## Design System
+## 🛠️ Tecnologias
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Google Fonts](https://fonts.google.com/) (Syne, Plus Jakarta Sans)
+- [Material Symbols](https://fonts.google.com/icons)
 
-The project uses a custom design system "The Living Gallery" with the following characteristcs:
-- **Primary Color**: Terracotta (#9f3023)
-- **Secondary Color**: Deep Wine (#a13c3f)
-- **Typography**: Newsreader (Serif) for headlines, Plus Jakarta Sans (Sans-Serif) for body.
-- **Vibe**: High-end editorial publication, human, rhythmic, and warm.
+---
+*Projeto desenvolvido com foco em ritmo, movimento e conexão.*
