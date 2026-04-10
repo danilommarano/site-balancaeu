@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth overflow-x-hidden" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Balança Eu | Escola de Dança e Centro Cultural</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,600;0,700;1,400;1,600&amp;family=Plus+Jakarta+Sans:wght@300;400;500;600;700&amp;family=Syne:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "secondary-fixed": "#ffdad8",
+              "error-container": "#ffdad6",
+              "surface-tint": "#a83729",
+              "primary-fixed-dim": "#ffb4a8",
+              "secondary-fixed-dim": "#ffb3b1",
+              "on-surface": "#1c1c19",
+              "surface": "#fcf9f4",
+              "secondary": "#a13c3f",
+              "on-error-container": "#93000a",
+              "on-primary": "#ffffff",
+              "outline-variant": "#dfbfba",
+              "surface-container-low": "#f6f3ee",
+              "surface-bright": "#fcf9f4",
+              "surface-dim": "#dcdad5",
+              "inverse-primary": "#ffb4a8",
+              "inverse-on-surface": "#f3f0eb",
+              "on-error": "#ffffff",
+              "error": "#ba1a1a",
+              "on-background": "#1c1c19",
+              "secondary-container": "#ff8484",
+              "tertiary-fixed": "#ffdcc5",
+              "outline": "#8b716d",
+              "surface-container-highest": "#e5e2dd",
+              "primary-fixed": "#ffdad4",
+              "on-tertiary": "#ffffff",
+              "on-tertiary-container": "#fff3ed",
+              "tertiary-fixed-dim": "#f4bb92",
+              "on-primary-fixed": "#410000",
+              "primary-container": "#c04838",
+              "on-surface-variant": "#58413e",
+              "on-tertiary-fixed": "#301400",
+              "on-secondary-fixed-variant": "#82252a",
+              "surface-container": "#f0ede8",
+              "on-primary-fixed-variant": "#881f14",
+              "background": "#fcf9f4",
+              "on-primary-container": "#fff2f0",
+              "surface-container-high": "#ebe8e3",
+              "tertiary-container": "#946643",
+              "tertiary": "#784e2d",
+              "surface-variant": "#e5e2dd",
+              "primary": "#9f3023",
+              "inverse-surface": "#31302d",
+              "on-secondary": "#ffffff",
+              "on-secondary-container": "#751c22",
+              "on-secondary-fixed": "#410007",
+              "surface-container-lowest": "#ffffff",
+              "on-tertiary-fixed-variant": "#653d1e"
+            },
+            fontFamily: {
+              "headline": ["Syne", "sans-serif"],
+              "body": ["Plus Jakarta Sans", "sans-serif"],
+              "label": ["Plus Jakarta Sans", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+      }
+      .editorial-shadow {
+        box-shadow: 0 10px 40px -10px rgba(159, 48, 35, 0.06);
+      }
+      .glass-header {
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+      }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary-fixed selection:text-on-primary-fixed overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#fcf9f4]/80 dark:bg-stone-900/80 backdrop-blur-xl">
+<div class="flex justify-between items-center px-8 py-6 max-w-screen-2xl mx-auto">
+<a class="flex items-center gap-2" href="#">
+<svg class="h-8 w-auto text-primary dark:text-[#c04838]" fill="none" height="197" viewBox="0 0 889 197" width="889" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M127.033 2.62966C143.167 7.96299 157.3 16.6297 169.433 28.8964C202.767 62.6297 206.9 115.696 179.167 156.096C172.233 166.096 155.7 180.23 143.833 186.096C127.167 194.63 113.967 197.296 94.5 196.63C82.1 196.096 75.9667 195.163 67.9667 192.496C36.1 182.096 9.83333 154.096 2.1 122.496C-0.7 110.63 -0.7 85.8297 2.1 74.0964C10.5 39.5631 38.6334 11.0297 73.0333 2.09633C84.5 -0.970332 117.167 -0.57034 127.033 2.62966ZM56.7667 28.2298C61.3 22.7631 72.6334 16.7631 81.7 14.7631C90.7667 12.7631 107.167 12.4965 115.833 14.0965C145.567 19.6965 169.7 41.8298 180.5 72.8964C182.9 79.9631 183.433 84.4965 183.433 97.5631C183.567 115.163 182.367 120.763 175.7 134.896C148.1 192.763 67.7 200.63 29.7 149.163C10.1 122.763 7.56668 86.3631 23.1667 56.8964C25.3 52.8964 28.3667 47.8298 30.1 45.8298L33.0333 42.0965V57.1631C33.0333 70.6298 33.4334 73.0298 36.3667 78.8964C40.2334 86.7631 51.5667 98.3631 57.5667 100.896C60.7667 102.096 61.5667 103.163 60.9 104.763C60.3667 105.963 59.7 112.23 59.3 118.763C58.5 135.163 61.3 144.63 69.9667 153.296C77.5667 160.896 85.9667 164.896 96.2334 165.83C119.167 167.83 139.567 147.03 137.3 123.963C135.833 110.23 127.167 97.8298 115.3 92.6298L109.433 89.9631L114.633 84.4964C129.833 68.3631 137.3 46.4964 131.3 35.5631C126.1 25.9631 116.367 22.6298 106.233 26.8964C95.4334 31.4298 81.3 50.2298 70.7667 74.3631C67.8334 81.2965 64.9 87.2964 64.5 87.9631C63.1667 89.2964 55.1667 83.1631 51.7 77.9631C47.0334 71.0298 45.3 63.9631 46.1 54.8964C46.7667 45.8298 51.1667 34.6298 56.7667 28.2298ZM98.9 51.5631C101.833 47.5631 106.233 42.8964 108.633 41.163C113.967 37.563 115.3 37.5631 118.367 40.8964C121.3 44.0964 120.5 48.763 115.033 60.2297C109.433 71.963 99.8334 82.0964 89.1667 87.5631C84.2334 89.9631 80.1001 91.6964 79.7001 91.2964C77.7001 89.2964 90.6334 62.6297 98.9 51.5631ZM81.5667 110.23C85.1667 106.63 89.4334 103.43 91.1667 103.163C92.9 102.763 97.5667 102.63 101.567 102.896C114.367 103.83 123.7 114.23 123.567 127.563C123.433 140.23 116.767 148.63 104.633 151.563C87.0334 155.696 71.5667 141.03 74.3667 122.896C75.0334 117.696 76.5001 115.296 81.5667 110.23Z" fill="currentColor" fill-rule="evenodd"/>
+<path clip-rule="evenodd" d="M268.367 66.4964C268.367 82.363 268.367 82.6297 270.9 80.3631C277.033 74.7631 288.767 72.8964 300.1 75.8297C308.767 77.9631 319.167 88.3631 321.7 97.5631C323.967 105.563 323.967 116.63 321.833 124.763C319.7 132.363 308.5 143.696 300.9 145.963C289.967 149.163 273.833 146.496 270.233 140.763C269.433 139.43 268.9 139.83 268.367 142.23C267.7 145.296 267.033 145.563 257.967 145.963L248.367 146.363V50.2297H268.367V66.4964ZM267.967 111.03C267.967 102.63 270.367 98.0964 276.767 94.2298C289.033 86.7631 304.367 95.9631 304.367 110.896C304.367 125.696 290.633 134.496 277.833 127.83C270.767 124.23 267.967 119.563 267.967 111.03Z" fill="currentColor" fill-rule="evenodd"/>
+<path clip-rule="evenodd" d="M385.833 77.4297C392.1 80.363 398.5 86.763 402.1 93.4297C404.633 98.363 405.033 101.563 405.433 122.496L405.967 146.23H395.833C386.5 146.23 385.7 145.963 385.7 143.43C385.7 141.963 385.3 140.896 384.767 141.163C373.033 147.163 370.367 147.83 361.567 147.296C354.633 146.763 351.167 145.696 346.367 142.763C331.567 133.43 325.833 112.496 333.3 94.0964C335.7 87.9631 346.233 77.9631 352.633 75.8297C359.167 73.5631 379.967 74.6297 385.833 77.4297ZM352.767 122.363C346.367 113.03 349.967 97.6964 359.433 93.5631C368.233 89.6964 378.367 92.3631 383.033 99.8297C385.3 103.43 385.7 105.83 385.3 112.763C384.9 120.363 384.367 121.696 380.633 125.03C372.233 132.496 358.767 131.296 352.767 122.363Z" fill="currentColor" fill-rule="evenodd"/>
+<path d="M432.367 50.2297V146.23H413.7V50.2297H432.367Z" fill="currentColor"/>
+<path clip-rule="evenodd" d="M492.633 76.0964C500.233 78.8964 507.567 85.4297 511.433 93.163C514.9 100.096 515.033 100.896 515.033 123.296V146.23H505.7C498.5 146.23 496.367 145.83 496.367 144.363C496.367 140.896 494.367 140.896 487.7 144.23C479.033 148.63 468.767 148.63 459.7 144.363C446.633 138.23 440.1 127.03 440.1 110.896C440.1 93.0297 448.9 80.2297 464.367 75.4297C469.833 73.8297 487.3 74.2297 492.633 76.0964ZM468.5 127.83C456.1 121.563 455.967 100.763 468.233 94.2297C474.767 90.763 481.7 90.8964 487.167 94.6297C496.1 100.63 498.9 112.63 493.3 121.03C487.7 129.563 477.3 132.363 468.5 127.83Z" fill="currentColor" fill-rule="evenodd"/>
+<path d="M575.167 75.6964C580.5 77.563 586.367 82.6297 589.433 88.2297C591.3 91.4297 591.7 97.2964 592.1 119.163L592.633 146.23H573.7V127.163C573.567 97.6964 571.3 92.2297 559.033 92.2297C553.967 92.2297 551.7 92.8963 549.433 95.2963C546.5 98.0964 546.367 99.563 545.7 121.963L545.033 145.563L525.7 146.363V75.4297L535.433 75.8297C544.367 76.2297 545.033 76.4963 545.433 79.2963L545.967 82.4964L549.033 79.563C554.367 74.4963 566.233 72.763 575.167 75.6964Z" fill="currentColor"/>
+<path d="M647.967 75.8297C654.767 77.4297 667.833 88.6297 666.767 91.6964C666.5 92.6297 663.3 95.163 659.833 97.2963C653.567 101.163 653.433 101.163 651.7 98.6297C650.633 97.1631 647.7 94.8964 645.167 93.6964C632.367 87.6964 619.033 96.3631 619.033 110.896C619.033 122.63 625.833 129.43 637.3 129.43C643.033 129.43 645.033 128.763 649.433 125.296L654.633 121.163L660.767 125.163C664.233 127.43 667.033 129.696 667.033 130.363C667.033 133.296 657.567 141.696 649.967 145.43C641.967 149.296 641.167 150.096 638.5 156.896C635.833 163.83 635.433 164.23 630.5 164.63C627.567 164.896 623.967 164.763 622.233 164.363L619.3 163.563L621.833 156.763C624.9 148.763 624.367 145.696 619.033 143.563C613.7 141.296 605.833 133.163 602.9 126.896C599.833 120.23 599.433 102.896 602.367 96.0964C609.433 79.2964 628.367 70.7631 647.967 75.8297Z" fill="currentColor"/>
+<path clip-rule="evenodd" d="M722.5 76.2297C726.9 77.563 730.767 79.9631 734.633 83.8297C744.5 94.0964 745.033 95.963 745.433 122.496L745.967 146.23H736.367C727.833 146.23 726.767 145.963 726.1 143.563C725.7 141.963 725.033 141.03 724.5 141.296C714.633 146.763 710.1 147.83 701.433 147.296C687.567 146.23 677.3 138.496 672.367 125.163C665.167 105.963 674.367 82.7631 691.7 76.3631C698.633 73.8297 714.233 73.6964 722.5 76.2297ZM703.567 129.696C686.9 126.496 683.967 100.23 699.433 93.563C712.9 87.6963 726.233 96.363 726.233 111.03C726.233 123.563 716.1 131.963 703.567 129.696Z" fill="currentColor" fill-rule="evenodd"/>
+<path clip-rule="evenodd" d="M805.833 78.3631C816.367 84.2297 823.7 97.2964 822.767 108.63L822.367 113.563L791.967 113.963L761.433 114.23L762.367 118.63C763.7 125.03 769.833 133.163 775.967 136.63C786.5 142.496 798.767 141.83 809.033 134.763C813.567 131.83 814.367 131.563 816.1 133.43C817.833 135.163 817.7 135.696 814.5 138.63C808.9 143.83 801.7 146.763 793.033 147.296C782.767 147.963 775.3 145.963 768.1 140.496C751.567 127.83 749.7 100.096 764.233 84.4964C771.033 77.0297 779.167 74.0964 791.167 74.763C797.433 75.0297 801.7 76.0964 805.833 78.3631ZM768.767 90.6297C771.033 87.963 775.433 84.763 778.367 83.4297C793.833 76.363 812.1 86.0964 815.7 103.163L816.633 107.563H790.767C776.633 107.563 764.233 107.03 763.433 106.496C760.9 104.896 763.7 96.363 768.767 90.6297Z" fill="currentColor" fill-rule="evenodd"/>
+<path d="M836.367 96.4964C836.5 108.096 837.033 120.096 837.567 123.296C839.967 135.296 852.9 143.03 865.033 139.563C878.9 135.696 881.7 128.496 881.7 96.2297V75.563H888.367V101.563C888.367 129.83 887.567 133.563 880.1 140.496C869.567 150.363 846.367 149.83 836.767 139.43C830.767 132.763 829.833 128.096 829.7 102.096C829.7 88.6297 829.567 77.163 829.7 76.4964C829.7 75.963 831.167 75.563 833.033 75.563H836.367V96.4964Z" fill="currentColor"/>
+</svg>
+</a>
+<nav class="hidden xl:flex gap-8 items-center">
+<a class="text-primary dark:text-[#c04838] font-['Plus_Jakarta_Sans'] text-sm uppercase tracking-widest decoration-primary/30 decoration-2 underline underline-offset-8" href="#escola">Sobre a escola</a>
+<a class="text-stone-600 dark:text-stone-400 font-['Plus_Jakarta_Sans'] text-sm uppercase tracking-widest hover:text-[#a13c3f] transition-colors duration-300" href="#precos">Preços</a>
+<a class="text-stone-600 dark:text-stone-400 font-['Plus_Jakarta_Sans'] text-sm uppercase tracking-widest hover:text-[#a13c3f] transition-colors duration-300" href="#professores">Professores</a>
+<a class="text-stone-600 dark:text-stone-400 font-['Plus_Jakarta_Sans'] text-sm uppercase tracking-widest hover:text-[#a13c3f] transition-colors duration-300" href="#horarios">Horários</a>
+<a class="text-stone-600 dark:text-stone-400 font-['Plus_Jakarta_Sans'] text-sm uppercase tracking-widest hover:text-[#a13c3f] transition-colors duration-300" href="#eventos">Eventos</a>
+<a class="text-stone-600 dark:text-stone-400 font-['Plus_Jakarta_Sans'] text-sm uppercase tracking-widest hover:text-[#a13c3f] transition-colors duration-300" href="#contato">Contato</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="bg-primary text-on-primary px-6 py-2 rounded-lg label-md font-medium hover:opacity-90 transition-opacity hidden sm:block">
+                Agendar Visita
+            </button>
+<button class="xl:hidden text-primary p-2" id="menu-toggle">
+<span class="material-symbols-outlined text-3xl">menu</span>
+</button>
+</div>
+</div>
+</header>
+<main class="pt-24">
+<!-- 1. Hero Principal -->
+<section class="relative min-h-[921px] flex items-center px-8 md:px-20 overflow-hidden">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-12 items-center w-full max-w-screen-2xl mx-auto">
+<div class="md:col-span-7 z-10">
+<h1 class="font-headline text-5xl md:text-8xl text-primary leading-[1.1] tracking-tighter mb-8">
+                        Balança Eu: Muito mais que uma <span class="italic font-normal">escola de dança</span>.
+                    </h1>
+<p class="font-body text-xl md:text-2xl text-on-surface-variant max-w-xl leading-relaxed">
+                        Um movimento que começa no corpo e transforma quem você é.
+                    </p>
+<div class="mt-12 flex gap-6 items-center">
+<button class="bg-primary text-on-primary px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-lg transition-all">Começar Jornada</button>
+<a class="font-headline italic text-xl text-secondary flex items-center gap-2 group" href="#essencia">
+                            Nossa Filosofia 
+                            <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+</div>
+<div class="md:col-span-5 relative">
+<div class="aspect-[4/5] w-full rounded-xl overflow-hidden editorial-shadow bg-surface-container-high">
+<img alt="Professional dancer in a fluid motion" class="w-full h-full object-cover grayscale-[0.2]" data-alt="cinematic shot of a contemporary dancer in a sunlit studio with flowing fabric and dramatic architectural shadows" src="assets/hero-dance.png"/>
+</div>
+<!-- Asymmetric Decorative Element -->
+<div class="absolute -bottom-8 -left-8 bg-secondary-container p-8 rounded-xl hidden md:block">
+<p class="font-headline italic text-on-secondary-container text-2xl">Movimento é cura.</p>
+</div>
+</div>
+</div>
+<!-- Background Texture Ticker -->
+</section>
+<!-- 2. Essência da Marca -->
+<!-- Wavy Divider Top -->
+<div class="w-full overflow-hidden bg-background">
+<svg class="w-full h-16 text-primary/10" fill="none" preserveAspectRatio="none" viewBox="0 0 1440 64" xmlns="http://www.w3.org/2000/svg">
+<path d="M-100 32C0 32 50 10 100 10C150 10 200 54 250 54C300 54 350 10 400 10C450 10 500 54 550 54C600 54 650 10 700 10C750 10 800 54 850 54C900 54 950 10 1000 10C1050 10 1100 54 1150 54C1200 54 1250 10 1300 10C1350 10 1400 54 1540 54" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"></path>
+</svg>
+</div>
+<section class="py-24 px-8 md:px-20 bg-[#fcf9f4] dark:bg-stone-900/50" id="escola">
+<div class="max-w-screen-xl mx-auto text-center">
+<span class="font-label text-sm uppercase tracking-[0.3em] text-primary mb-6 block">Balança Eu</span>
+<h2 class="font-headline text-5xl md:text-7xl text-on-surface mb-12 leading-tight">Um espaço de encontro, arte e identidade.</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-16 text-left max-w-4xl mx-auto">
+<p class="font-body text-xl text-on-surface-variant leading-relaxed opacity-90">
+                        No Balança Eu, acreditamos que o corpo é o nosso primeiro território. Não ensinamos apenas passos; cultivamos a percepção de si através do ritmo e da expressão artística.
+                    </p>
+<p class="font-body text-xl text-on-surface-variant leading-relaxed opacity-90">
+                        Nossa casa é um refúgio contemporâneo onde a tradição e a inovação se abraçam para criar novas linguagens corporais e conexões humanas profundas.
+                    </p>
+</div>
+</div>
+</section>
+<!-- Wavy Divider (Transition to Red) -->
+<div class="w-full overflow-hidden bg-background leading-[0]">
+<svg class="w-full h-16 text-primary" fill="currentColor" preserveAspectRatio="none" viewBox="0 0 1440 64" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 32C240 0 480 64 720 32C960 0 1200 64 1440 32V64H0Z"></path>
+</svg>
+</div>
+<!-- 3. Nossos Preços -->
+<section class="py-24 px-8 bg-primary text-white" id="precos">
+<div class="max-w-screen-2xl mx-auto">
+<div class="text-center mb-20">
+<span class="font-label text-sm uppercase tracking-[0.3em] text-white/70 mb-6 block">Investimento</span>
+<h2 class="font-headline text-5xl md:text-7xl mb-6 text-white">Nossos Preços</h2>
+<p class="font-body text-xl text-white/80 max-w-2xl mx-auto">Escolha o ritmo que combina com seu estilo de vida. Valores mensais por modalidade.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+<!-- Forró -->
+<div class="group bg-white/10 backdrop-blur-sm p-10 rounded-3xl border border-white/10 hover:border-white/30 hover:shadow-xl transition-all duration-500 flex flex-col items-center text-center">
+<h3 class="font-headline text-3xl mb-2 text-white italic">Forró Roots</h3>
+<p class="text-white/60 text-sm mb-8">Pé de Serra & Conexão</p>
+<div class="mb-8 relative">
+<span class="text-5xl font-bold">R$ 150</span>
+<span class="text-white/60 text-sm">/mês</span>
+</div>
+<ul class="space-y-4 mb-10 text-sm opacity-80">
+<li>1x por semana</li>
+<li>Acesso aos treinos livres</li>
+<li>Desconto em Bailes</li>
+</ul>
+<button class="w-full bg-white text-primary py-4 rounded-xl font-bold hover:scale-105 transition-all shadow-lg">Matricular-se</button>
+</div>
+<!-- Samba -->
+<div class="group bg-white/10 backdrop-blur-sm p-10 rounded-3xl border border-white/10 hover:border-white/30 hover:shadow-xl transition-all duration-500 flex flex-col items-center text-center">
+<h3 class="font-headline text-3xl mb-2 text-white italic">Samba</h3>
+<p class="text-white/60 text-sm mb-8">Gafieira & Elegância</p>
+<div class="mb-8 relative">
+<span class="text-5xl font-bold">R$ 150</span>
+<span class="text-white/60 text-sm">/mês</span>
+</div>
+<ul class="space-y-4 mb-10 text-sm opacity-80">
+<li>1x por semana</li>
+<li>Acesso aos treinos livres</li>
+<li>Desconto em Workshops</li>
+</ul>
+<button class="w-full bg-white text-primary py-4 rounded-xl font-bold hover:scale-105 transition-all shadow-lg">Matricular-se</button>
+</div>
+<!-- Zumba -->
+<div class="group bg-white/10 backdrop-blur-sm p-10 rounded-3xl border border-white/10 hover:border-white/30 hover:shadow-xl transition-all duration-500 flex flex-col items-center text-center">
+<h3 class="font-headline text-3xl mb-2 text-white italic">Zumba</h3>
+<p class="text-white/60 text-sm mb-8">Energia & Diversão</p>
+<div class="mb-8 relative">
+<span class="text-5xl font-bold">R$ 120</span>
+<span class="text-white/60 text-sm">/mês</span>
+</div>
+<ul class="space-y-4 mb-10 text-sm opacity-80">
+<li>1x por semana</li>
+<li>Acesso aos treinos livres</li>
+<li>Energia contagiante</li>
+</ul>
+<button class="w-full bg-white text-primary py-4 rounded-xl font-bold hover:scale-105 transition-all shadow-lg">Matricular-se</button>
+</div>
+<!-- Yoga -->
+<div class="group bg-white/10 backdrop-blur-sm p-10 rounded-3xl border border-white/10 hover:border-white/30 hover:shadow-xl transition-all duration-500 flex flex-col items-center text-center">
+<h3 class="font-headline text-3xl mb-2 text-white italic">Yoga</h3>
+<p class="text-white/60 text-sm mb-8">Equilíbrio & Paz</p>
+<div class="mb-8 relative">
+<span class="text-5xl font-bold">R$ 180</span>
+<span class="text-white/60 text-sm">/mês</span>
+</div>
+<ul class="space-y-4 mb-10 text-sm opacity-80">
+<li>1x por semana</li>
+<li>Treino livre incluso</li>
+<li>Equipamentos inclusos</li>
+</ul>
+<button class="w-full bg-white text-primary py-4 rounded-xl font-bold hover:scale-105 transition-all shadow-lg">Matricular-se</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Wavy Divider (Transition from Red to White) -->
+<div class="w-full overflow-hidden bg-primary leading-[0]">
+<svg class="w-full h-16 text-background" fill="currentColor" preserveAspectRatio="none" viewBox="0 0 1440 64" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 32C240 0 480 64 720 32C960 0 1200 64 1440 32V64H0Z"></path>
+</svg>
+</div>
+<!-- 4. Nossos Professores -->
+<section class="py-32 px-8" id="professores">
+<div class="max-w-screen-2xl mx-auto">
+<div class="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
+<div class="max-w-3xl">
+<span class="font-label text-sm uppercase tracking-[0.3em] text-primary mb-6 block">Mestres do Movimento</span>
+<h2 class="font-headline text-5xl md:text-7xl text-on-surface leading-tight">Quem conduz sua evolução</h2>
+</div>
+<p class="font-body text-xl text-on-surface-variant md:w-1/3 italic">Nossa equipe é formada por artistas apaixonados e profissionais sensíveis ao seu tempo e ritmo.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+<!-- Professores Forró -->
+<div class="space-y-6">
+<div class="aspect-[4/5] rounded-[2rem] overflow-hidden editorial-shadow group cursor-pointer relative">
+<img alt="Time de Forró" class="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700" src="assets/forro-teachers.png"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-8">
+<p class="text-white font-headline text-2xl italic leading-tight">Conexão & Raiz</p>
+</div>
+</div>
+<div>
+<h4 class="font-headline text-3xl text-primary mb-2">Equipe Forró</h4>
+<p class="text-on-surface-variant font-medium uppercase tracking-widest text-xs mb-4">Dois Homens & Uma Mulher</p>
+<p class="text-on-surface-variant leading-relaxed">Referência no estilo Roots, nossa equipe traz o balanço autêntico e a técnica apurada para você dominar a pista.</p>
+</div>
+</div>
+<!-- Professor Samba -->
+<div class="space-y-6 lg:mt-12">
+<div class="aspect-[4/5] rounded-[2rem] overflow-hidden editorial-shadow group cursor-pointer relative">
+<img alt="Casal Samba" class="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700" src="assets/samba-teachers.png"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-8">
+<p class="text-white font-headline text-2xl italic leading-tight">Elegância & Malandragem</p>
+</div>
+</div>
+<div>
+<h4 class="font-headline text-3xl text-primary mb-2">Casal Samba</h4>
+<p class="text-on-surface-variant font-medium uppercase tracking-widest text-xs mb-4">Um Casal</p>
+<p class="text-on-surface-variant leading-relaxed">Mestres da Gafieira, ensinam que o segredo está no diálogo entre os corpos e na precisão dos passos.</p>
+</div>
+</div>
+<!-- Professor Zumba -->
+<div class="space-y-6">
+<div class="aspect-[4/5] rounded-[2rem] overflow-hidden editorial-shadow group cursor-pointer relative">
+<img alt="Professor Zumba" class="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700" src="assets/zumba-teacher.png"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-8">
+<p class="text-white font-headline text-2xl italic leading-tight">Energia Pura</p>
+</div>
+</div>
+<div>
+<h4 class="font-headline text-3xl text-primary mb-2">Professor Zumba</h4>
+<p class="text-on-surface-variant font-medium uppercase tracking-widest text-xs mb-4">Um Homem</p>
+<p class="text-on-surface-variant leading-relaxed">Alta intensidade e muita diversão com ritmos latinos que tiram qualquer um do sofá.</p>
+</div>
+</div>
+<!-- Professor Yoga -->
+<div class="space-y-6 lg:mt-12">
+<div class="aspect-[4/5] rounded-[2rem] overflow-hidden editorial-shadow group cursor-pointer relative">
+<img alt="Professora Yoga" class="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700" src="assets/yoga-teacher.png"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-8">
+<p class="text-white font-headline text-2xl italic leading-tight">Equilíbrio Central</p>
+</div>
+</div>
+<div>
+<h4 class="font-headline text-3xl text-primary mb-2">Professora Yoga</h4>
+<p class="text-on-surface-variant font-medium uppercase tracking-widest text-xs mb-4">Uma Mulher</p>
+<p class="text-on-surface-variant leading-relaxed">Uma jornada de autoconhecimento e paz através de posturas ancestrais e meditação guiada.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 5. Horários -->
+<section class="py-32 px-8 bg-surface-container-highest" id="horarios">
+<div class="max-w-screen-2xl mx-auto">
+<div class="text-center mb-16">
+<span class="font-label text-sm uppercase tracking-[0.3em] text-primary mb-6 block">Nossa Agenda</span>
+<h2 class="font-headline text-5xl md:text-7xl">Grade de Aulas</h2>
+</div>
+<!-- Day Tabs -->
+<div class="flex flex-wrap justify-center gap-2 mb-12">
+<button class="day-tab px-6 py-3 rounded-full font-bold text-sm uppercase tracking-widest transition-all bg-primary text-white border-2 border-primary" data-day="seg">Segunda</button>
+<button class="day-tab px-6 py-3 rounded-full font-bold text-sm uppercase tracking-widest transition-all bg-white text-on-surface-variant border-2 border-stone-200 hover:border-primary/30" data-day="ter">Terça</button>
+<button class="day-tab px-6 py-3 rounded-full font-bold text-sm uppercase tracking-widest transition-all bg-white text-on-surface-variant border-2 border-stone-200 hover:border-primary/30" data-day="qua">Quarta</button>
+<button class="day-tab px-6 py-3 rounded-full font-bold text-sm uppercase tracking-widest transition-all bg-white text-on-surface-variant border-2 border-stone-200 hover:border-primary/30" data-day="qui">Quinta</button>
+<button class="day-tab px-6 py-3 rounded-full font-bold text-sm uppercase tracking-widest transition-all bg-white text-on-surface-variant border-2 border-stone-200 hover:border-primary/30" data-day="sex">Sexta</button>
+<button class="day-tab px-6 py-3 rounded-full font-bold text-sm uppercase tracking-widest transition-all bg-white text-on-surface-variant border-2 border-stone-200 hover:border-primary/30" data-day="sab">Sábado</button>
+</div>
+<!-- Schedule Grid (Monday - default) -->
+<div class="schedule-content" id="schedule-seg">
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+<!-- 19h -->
+<div class="space-y-4">
+<div class="bg-primary/5 p-4 rounded-xl text-center border-b-2 border-primary/20">
+<span class="font-headline text-2xl text-primary">19:00 - 20:00</span>
+</div>
+<div class="bg-white p-6 rounded-2xl editorial-shadow border border-stone-100">
+<span class="text-[10px] uppercase font-bold tracking-tighter text-stone-400 mb-1 block">Sala 1</span>
+<h4 class="font-headline text-xl">Forró Roots</h4>
+<p class="text-xs text-on-surface-variant">Iniciante</p>
+</div>
+<div class="bg-white p-6 rounded-2xl editorial-shadow border border-stone-100">
+<span class="text-[10px] uppercase font-bold tracking-tighter text-stone-400 mb-1 block">Sala 2</span>
+<h4 class="font-headline text-xl">Yoga</h4>
+<p class="text-xs text-on-surface-variant">Flow Suave</p>
+</div>
+<div class="bg-white p-6 rounded-2xl editorial-shadow border border-stone-100">
+<span class="text-[10px] uppercase font-bold tracking-tighter text-stone-400 mb-1 block">Sala 3</span>
+<h4 class="font-headline text-xl">Zumba</h4>
+<p class="text-xs text-on-surface-variant">Energia Max</p>
+</div>
+</div>
+<!-- 20h -->
+<div class="space-y-4">
+<div class="bg-primary/5 p-4 rounded-xl text-center border-b-2 border-primary/20">
+<span class="font-headline text-2xl text-primary">20:00 - 21:00</span>
+</div>
+<div class="bg-white p-6 rounded-2xl editorial-shadow border border-stone-100">
+<span class="text-[10px] uppercase font-bold tracking-tighter text-stone-400 mb-1 block">Sala 1</span>
+<h4 class="font-headline text-xl">Forró Roots</h4>
+<p class="text-xs text-on-surface-variant">Intermediário</p>
+</div>
+<div class="bg-white p-6 rounded-2xl editorial-shadow border border-stone-100">
+<span class="text-[10px] uppercase font-bold tracking-tighter text-stone-400 mb-1 block">Sala 2</span>
+<h4 class="font-headline text-xl">Samba de Gafieira</h4>
+<p class="text-xs text-on-surface-variant">Iniciante</p>
+</div>
+<div class="bg-white p-6 rounded-2xl editorial-shadow border border-stone-100 opacity-60">
+<span class="text-[10px] uppercase font-bold tracking-tighter text-stone-400 mb-1 block">Sala 3</span>
+<h4 class="font-headline text-xl italic text-stone-400">Sala Reservada</h4>
+</div>
+</div>
+<!-- 21h -->
+<div class="space-y-4">
+<div class="bg-primary/5 p-4 rounded-xl text-center border-b-2 border-primary/20">
+<span class="font-headline text-2xl text-primary">21:00 - 22:00</span>
+</div>
+<div class="bg-white p-6 rounded-2xl editorial-shadow border border-stone-100">
+<span class="text-[10px] uppercase font-bold tracking-tighter text-stone-400 mb-1 block">Sala 1</span>
+<h4 class="font-headline text-xl">Forró Roots</h4>
+<p class="text-xs text-on-surface-variant">Avançado</p>
+</div>
+<div class="bg-white p-6 rounded-2xl editorial-shadow border border-stone-100">
+<span class="text-[10px] uppercase font-bold tracking-tighter text-stone-400 mb-1 block">Sala 2</span>
+<h4 class="font-headline text-xl">Samba de Gafieira</h4>
+<p class="text-xs text-on-surface-variant">Intermediário</p>
+</div>
+<div class="bg-white p-6 rounded-2xl editorial-shadow border border-stone-100">
+<span class="text-[10px] uppercase font-bold tracking-tighter text-stone-400 mb-1 block">Sala 3</span>
+<h4 class="font-headline text-xl">Yoga</h4>
+<p class="text-xs text-on-surface-variant">Meditação</p>
+</div>
+</div>
+<div class="space-y-4 lg:pt-0">
+<div class="bg-primary text-white p-4 rounded-xl text-center shadow-lg">
+<span class="font-headline text-2xl">22:00 - 23:00</span>
+<p class="text-[10px] uppercase tracking-widest mt-1 opacity-80">Treino Livre</p>
+</div>
+<div class="flex flex-col gap-4">
+<div class="bg-primary-fixed/30 border border-primary/20 p-4 rounded-2xl text-center">
+<span class="text-[10px] uppercase font-bold tracking-tighter text-primary mb-1 block">Sala 1</span>
+<h4 class="font-headline text-lg">Forró Roots</h4>
+</div>
+<div class="bg-primary-fixed/30 border border-primary/20 p-4 rounded-2xl text-center">
+<span class="text-[10px] uppercase font-bold tracking-tighter text-primary mb-1 block">Sala 2</span>
+<h4 class="font-headline text-lg">Samba</h4>
+</div>
+<div class="bg-primary-fixed/30 border border-primary/20 p-4 rounded-2xl text-center">
+<span class="text-[10px] uppercase font-bold tracking-tighter text-primary mb-1 block">Sala 3</span>
+<h4 class="font-headline text-lg italic text-on-surface-variant">Prática Zen / Zumba</h4>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- For simplicity, I'll update other tabs placeholders to look consistent if they are ever used -->
+<!-- Dynamic contents for other days -->
+<div class="schedule-content hidden" id="schedule-ter">
+<div class="text-center py-20 bg-white/50 rounded-3xl border-2 border-dashed border-stone-200 font-headline text-2xl italic text-on-surface-variant opacity-70">Agenda de Terça semelhante à Segunda (Variando modalidades por sala)</div>
+</div>
+<div class="schedule-content hidden" id="schedule-qua">
+<div class="text-center py-20 bg-white/50 rounded-3xl border-2 border-dashed border-stone-200 font-headline text-2xl italic text-on-surface-variant opacity-70">Agenda de Quarta semelhante à Segunda (Variando modalidades por sala)</div>
+</div>
+<div class="schedule-content hidden" id="schedule-qui">
+<div class="text-center py-20 bg-white/50 rounded-3xl border-2 border-dashed border-stone-200 font-headline text-2xl italic text-on-surface-variant opacity-70">Agenda de Quinta semelhante à Segunda (Variando modalidades por sala)</div>
+</div>
+<div class="schedule-content hidden" id="schedule-sex">
+<div class="text-center py-20 bg-white/50 rounded-3xl border-2 border-dashed border-stone-200 font-headline text-2xl italic text-on-surface-variant opacity-70">Agenda de Sexta semelhante à Segunda (Variando modalidades por sala)</div>
+</div>
+<div class="schedule-content hidden" id="schedule-sab">
+<div class="text-center py-20 bg-white/50 rounded-3xl border-2 border-dashed border-stone-200 font-headline text-2xl italic text-on-surface-variant opacity-70">Agenda de Sábado: Horários Especiais e Workshops</div>
+</div>
+</div>
+</section>
+<!-- 6. Próximos Eventos -->
+<section class="py-32 px-8 bg-background" id="eventos">
+<div class="max-w-screen-2xl mx-auto">
+<div class="flex flex-col md:flex-row justify-between items-end mb-20">
+<div>
+<span class="font-label text-sm uppercase tracking-[0.3em] text-primary mb-6 block">Agenda Cultural</span>
+<h2 class="font-headline text-5xl md:text-7xl">Próximos Eventos</h2>
+</div>
+<p class="font-body text-xl text-on-surface-variant max-w-md md:text-right mt-6 md:mt-0">Vibrações que transcendem as aulas regulares. Conheça nossa programação especial.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Evento 1 -->
+<div class="group bg-surface-container-low rounded-3xl overflow-hidden hover:shadow-2xl transition-all duration-500 border border-stone-100 italic">
+<div class="relative h-64 overflow-hidden">
+<div class="absolute top-6 left-6 z-10 bg-primary text-white p-4 rounded-2xl text-center min-w-[80px]">
+<span class="block text-2xl font-bold leading-none">12</span>
+<span class="text-[10px] uppercase tracking-tighter">ABR</span>
+</div>
+<img alt="Baile de Forró" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" src="assets/event-baile.png"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-8">
+<span class="text-white bg-white/20 backdrop-blur-md px-4 py-1 rounded-full text-xs uppercase tracking-widest">Baile & Social</span>
+</div>
+</div>
+<div class="p-8">
+<h3 class="font-headline text-3xl mb-4">Baile do Balança</h3>
+<p class="text-on-surface-variant mb-8 leading-relaxed">Nossa tradicional noite de socialização. O melhor do Forró e Samba em um ambiente feito para dançar e se conectar.</p>
+<div class="flex items-center justify-between border-t border-stone-200 pt-8">
+<div class="flex items-center gap-2 text-stone-500">
+<span class="material-symbols-outlined text-sm">schedule</span>
+<span class="text-sm">21:00 às 02:00</span>
+</div>
+<button class="text-primary font-bold flex items-center gap-2 group/btn">
+                            Agendar <span class="material-symbols-outlined group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Evento 2 -->
+<div class="group bg-surface-container-low rounded-3xl overflow-hidden hover:shadow-2xl transition-all duration-500 border border-stone-100">
+<div class="relative h-64 overflow-hidden">
+<div class="absolute top-6 left-6 z-10 bg-primary text-white p-4 rounded-2xl text-center min-w-[80px]">
+<span class="block text-2xl font-bold leading-none">20</span>
+<span class="text-[10px] uppercase tracking-tighter">ABR</span>
+</div>
+<img alt="Workshop de Samba" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" src="assets/event-workshop.png"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-8">
+<span class="text-white bg-white/20 backdrop-blur-md px-4 py-1 rounded-full text-xs uppercase tracking-widest">Workshop</span>
+</div>
+</div>
+<div class="p-8">
+<h3 class="font-headline text-3xl mb-4 italic">O Malandro na Gafieira</h3>
+<p class="text-on-surface-variant mb-8 leading-relaxed">Um intensivo focado na elegância e malandragem do Samba de Gafieira. Técnica refinada com o mestre convidado.</p>
+<div class="flex items-center justify-between border-t border-stone-200 pt-8">
+<div class="flex items-center gap-2 text-stone-500">
+<span class="material-symbols-outlined text-sm">schedule</span>
+<span class="text-sm">14:00 às 17:00</span>
+</div>
+<button class="text-primary font-bold flex items-center gap-2 group/btn">
+                            Saber mais <span class="material-symbols-outlined group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Evento 3 -->
+<div class="group bg-surface-container-low rounded-3xl overflow-hidden hover:shadow-2xl transition-all duration-500 border border-stone-100 italic">
+<div class="relative h-64 overflow-hidden">
+<div class="absolute top-6 left-6 z-10 bg-primary text-white p-4 rounded-2xl text-center min-w-[80px]">
+<span class="block text-2xl font-bold leading-none">05</span>
+<span class="text-[10px] uppercase tracking-tighter">MAI</span>
+</div>
+<img alt="Zumba Party" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" src="assets/event-neon-zumba.png"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-8">
+<span class="text-white bg-white/20 backdrop-blur-md px-4 py-1 rounded-full text-xs uppercase tracking-widest">Themed Party</span>
+</div>
+</div>
+<div class="p-8">
+<h3 class="font-headline text-3xl mb-4">Zumba Neon Night</h3>
+<p class="text-on-surface-variant mb-8 leading-relaxed">Uma explosão de cores e ritmos latinos sob luz negra. Traga seu look neon e prepare-se para suar e se divertir!</p>
+<div class="flex items-center justify-between border-t border-stone-200 pt-8">
+<div class="flex items-center gap-2 text-stone-500">
+<span class="material-symbols-outlined text-sm">schedule</span>
+<span class="text-sm">20:00 às 22:00</span>
+</div>
+<button class="text-primary font-bold flex items-center gap-2 group/btn">
+                            Agendar <span class="material-symbols-outlined group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 10. CTA Final -->
+<section class="py-40 px-8 relative overflow-hidden">
+<div class="max-w-4xl mx-auto text-center z-10 relative">
+<h2 class="font-headline text-5xl md:text-7xl text-on-surface mb-10 leading-tight">
+                    Seja parte do movimento. <br/>
+<span class="italic text-primary">Venha viver a experiência Balança Eu.</span>
+</h2>
+<div class="flex flex-col md:flex-row gap-6 justify-center mt-12">
+<button class="bg-primary text-on-primary px-10 py-5 rounded-xl font-bold text-xl hover:scale-105 transition-all editorial-shadow">Agendar Aula Experimental</button>
+<button class="bg-surface-container-high text-on-surface px-10 py-5 rounded-xl font-bold text-xl hover:bg-surface-container-highest transition-all">Falar com Consultor</button>
+</div>
+</div>
+<!-- Artistic Background Element -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-primary-fixed/20 blur-[120px] rounded-full -z-10"></div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-[#fcf9f4] dark:bg-stone-950 border-t border-[#9f3023]/10">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 px-12 py-20 max-w-screen-2xl mx-auto">
+<div class="md:col-span-2">
+<span class="mb-4 block">
+<svg class="h-10 w-auto text-secondary dark:text-[#c04838]" fill="none" height="197" viewBox="0 0 889 197" width="889" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M127.033 2.62966C143.167 7.96299 157.3 16.6297 169.433 28.8964C202.767 62.6297 206.9 115.696 179.167 156.096C172.233 166.096 155.7 180.23 143.833 186.096C127.167 194.63 113.967 197.296 94.5 196.63C82.1 196.096 75.9667 195.163 67.9667 192.496C36.1 182.096 9.83333 154.096 2.1 122.496C-0.7 110.63 -0.7 85.8297 2.1 74.0964C10.5 39.5631 38.6334 11.0297 73.0333 2.09633C84.5 -0.970332 117.167 -0.57034 127.033 2.62966ZM56.7667 28.2298C61.3 22.7631 72.6334 16.7631 81.7 14.7631C90.7667 12.7631 107.167 12.4965 115.833 14.0965C145.567 19.6965 169.7 41.8298 180.5 72.8964C182.9 79.9631 183.433 84.4965 183.433 97.5631C183.567 115.163 182.367 120.763 175.7 134.896C148.1 192.763 67.7 200.63 29.7 149.163C10.1 122.763 7.56668 86.3631 23.1667 56.8964C25.3 52.8964 28.3667 47.8298 30.1 45.8298L33.0333 42.0965V57.1631C33.0333 70.6298 33.4334 73.0298 36.3667 78.8964C40.2334 86.7631 51.5667 98.3631 57.5667 100.896C60.7667 102.096 61.5667 103.163 60.9 104.763C60.3667 105.963 59.7 112.23 59.3 118.763C58.5 135.163 61.3 144.63 69.9667 153.296C77.5667 160.896 85.9667 164.896 96.2334 165.83C119.167 167.83 139.567 147.03 137.3 123.963C135.833 110.23 127.167 97.8298 115.3 92.6298L109.433 89.9631L114.633 84.4964C129.833 68.3631 137.3 46.4964 131.3 35.5631C126.1 25.9631 116.367 22.6298 106.233 26.8964C95.4334 31.4298 81.3 50.2298 70.7667 74.3631C67.8334 81.2965 64.9 87.2964 64.5 87.9631C63.1667 89.2964 55.1667 83.1631 51.7 77.9631C47.0334 71.0298 45.3 63.9631 46.1 54.8964C46.7667 45.8298 51.1667 34.6298 56.7667 28.2298ZM98.9 51.5631C101.833 47.5631 106.233 42.8964 108.633 41.163C113.967 37.563 115.3 37.5631 118.367 40.8964C121.3 44.0964 120.5 48.763 115.033 60.2297C109.433 71.963 99.8334 82.0964 89.1667 87.5631C84.2334 89.9631 80.1001 91.6964 79.7001 91.2964C77.7001 89.2964 90.6334 62.6297 98.9 51.5631ZM81.5667 110.23C85.1667 106.63 89.4334 103.43 91.1667 103.163C92.9 102.763 97.5667 102.63 101.567 102.896C114.367 103.83 123.7 114.23 123.567 127.563C123.433 140.23 116.767 148.63 104.633 151.563C87.0334 155.696 71.5667 141.03 74.3667 122.896C75.0334 117.696 76.5001 115.296 81.5667 110.23Z" fill="currentColor" fill-rule="evenodd"/>
+<path clip-rule="evenodd" d="M268.367 66.4964C268.367 82.363 268.367 82.6297 270.9 80.3631C277.033 74.7631 288.767 72.8964 300.1 75.8297C308.767 77.9631 319.167 88.3631 321.7 97.5631C323.967 105.563 323.967 116.63 321.833 124.763C319.7 132.363 308.5 143.696 300.9 145.963C289.967 149.163 273.833 146.496 270.233 140.763C269.433 139.43 268.9 139.83 268.367 142.23C267.7 145.296 267.033 145.563 257.967 145.963L248.367 146.363V50.2297H268.367V66.4964ZM267.967 111.03C267.967 102.63 270.367 98.0964 276.767 94.2298C289.033 86.7631 304.367 95.9631 304.367 110.896C304.367 125.696 290.633 134.496 277.833 127.83C270.767 124.23 267.967 119.563 267.967 111.03Z" fill="currentColor" fill-rule="evenodd"/>
+<path clip-rule="evenodd" d="M385.833 77.4297C392.1 80.363 398.5 86.763 402.1 93.4297C404.633 98.363 405.033 101.563 405.433 122.496L405.967 146.23H395.833C386.5 146.23 385.7 145.963 385.7 143.43C385.7 141.963 385.3 140.896 384.767 141.163C373.033 147.163 370.367 147.83 361.567 147.296C354.633 146.763 351.167 145.696 346.367 142.763C331.567 133.43 325.833 112.496 333.3 94.0964C335.7 87.9631 346.233 77.9631 352.633 75.8297C359.167 73.5631 379.967 74.6297 385.833 77.4297ZM352.767 122.363C346.367 113.03 349.967 97.6964 359.433 93.5631C368.233 89.6964 378.367 92.3631 383.033 99.8297C385.3 103.43 385.7 105.83 385.3 112.763C384.9 120.363 384.367 121.696 380.633 125.03C372.233 132.496 358.767 131.296 352.767 122.363Z" fill="currentColor" fill-rule="evenodd"/>
+<path d="M432.367 50.2297V146.23H413.7V50.2297H432.367Z" fill="currentColor"/>
+<path clip-rule="evenodd" d="M492.633 76.0964C500.233 78.8964 507.567 85.4297 511.433 93.163C514.9 100.096 515.033 100.896 515.033 123.296V146.23H505.7C498.5 146.23 496.367 145.83 496.367 144.363C496.367 140.896 494.367 140.896 487.7 144.23C479.033 148.63 468.767 148.63 459.7 144.363C446.633 138.23 440.1 127.03 440.1 110.896C440.1 93.0297 448.9 80.2297 464.367 75.4297C469.833 73.8297 487.3 74.2297 492.633 76.0964ZM468.5 127.83C456.1 121.563 455.967 100.763 468.233 94.2297C474.767 90.763 481.7 90.8964 487.167 94.6297C496.1 100.63 498.9 112.63 493.3 121.03C487.7 129.563 477.3 132.363 468.5 127.83Z" fill="currentColor" fill-rule="evenodd"/>
+<path d="M575.167 75.6964C580.5 77.563 586.367 82.6297 589.433 88.2297C591.3 91.4297 591.7 97.2964 592.1 119.163L592.633 146.23H573.7V127.163C573.567 97.6964 571.3 92.2297 559.033 92.2297C553.967 92.2297 551.7 92.8963 549.433 95.2963C546.5 98.0964 546.367 99.563 545.7 121.963L545.033 145.563L525.7 146.363V75.4297L535.433 75.8297C544.367 76.2297 545.033 76.4963 545.433 79.2963L545.967 82.4964L549.033 79.563C554.367 74.4963 566.233 72.763 575.167 75.6964Z" fill="currentColor"/>
+<path d="M647.967 75.8297C654.767 77.4297 667.833 88.6297 666.767 91.6964C666.5 92.6297 663.3 95.163 659.833 97.2963C653.567 101.163 653.433 101.163 651.7 98.6297C650.633 97.1631 647.7 94.8964 645.167 93.6964C632.367 87.6964 619.033 96.3631 619.033 110.896C619.033 122.63 625.833 129.43 637.3 129.43C643.033 129.43 645.033 128.763 649.433 125.296L654.633 121.163L660.767 125.163C664.233 127.43 667.033 129.696 667.033 130.363C667.033 133.296 657.567 141.696 649.967 145.43C641.967 149.296 641.167 150.096 638.5 156.896C635.833 163.83 635.433 164.23 630.5 164.63C627.567 164.896 623.967 164.763 622.233 164.363L619.3 163.563L621.833 156.763C624.9 148.763 624.367 145.696 619.033 143.563C613.7 141.296 605.833 133.163 602.9 126.896C599.833 120.23 599.433 102.896 602.367 96.0964C609.433 79.2964 628.367 70.7631 647.967 75.8297Z" fill="currentColor"/>
+<path clip-rule="evenodd" d="M722.5 76.2297C726.9 77.563 730.767 79.9631 734.633 83.8297C744.5 94.0964 745.033 95.963 745.433 122.496L745.967 146.23H736.367C727.833 146.23 726.767 145.963 726.1 143.563C725.7 141.963 725.033 141.03 724.5 141.296C714.633 146.763 710.1 147.83 701.433 147.296C687.567 146.23 677.3 138.496 672.367 125.163C665.167 105.963 674.367 82.7631 691.7 76.3631C698.633 73.8297 714.233 73.6964 722.5 76.2297ZM703.567 129.696C686.9 126.496 683.967 100.23 699.433 93.563C712.9 87.6963 726.233 96.363 726.233 111.03C726.233 123.563 716.1 131.963 703.567 129.696Z" fill="currentColor" fill-rule="evenodd"/>
+<path clip-rule="evenodd" d="M805.833 78.3631C816.367 84.2297 823.7 97.2964 822.767 108.63L822.367 113.563L791.967 113.963L761.433 114.23L762.367 118.63C763.7 125.03 769.833 133.163 775.967 136.63C786.5 142.496 798.767 141.83 809.033 134.763C813.567 131.83 814.367 131.563 816.1 133.43C817.833 135.163 817.7 135.696 814.5 138.63C808.9 143.83 801.7 146.763 793.033 147.296C782.767 147.963 775.3 145.963 768.1 140.496C751.567 127.83 749.7 100.096 764.233 84.4964C771.033 77.0297 779.167 74.0964 791.167 74.763C797.433 75.0297 801.7 76.0964 805.833 78.3631ZM768.767 90.6297C771.033 87.963 775.433 84.763 778.367 83.4297C793.833 76.363 812.1 86.0964 815.7 103.163L816.633 107.563H790.767C776.633 107.563 764.233 107.03 763.433 106.496C760.9 104.896 763.7 96.363 768.767 90.6297Z" fill="currentColor" fill-rule="evenodd"/>
+<path d="M836.367 96.4964C836.5 108.096 837.033 120.096 837.567 123.296C839.967 135.296 852.9 143.03 865.033 139.563C878.9 135.696 881.7 128.496 881.7 96.2297V75.563H888.367V101.563C888.367 129.83 887.567 133.563 880.1 140.496C869.567 150.363 846.367 149.83 836.767 139.43C830.767 132.763 829.833 128.096 829.7 102.096C829.7 88.6297 829.567 77.163 829.7 76.4964C829.7 75.963 831.167 75.563 833.033 75.563H836.367V96.4964Z" fill="currentColor"/>
+</svg>
+</span>
+<p class="text-stone-500 dark:text-stone-500 font-['Plus_Jakarta_Sans'] text-sm leading-relaxed max-w-sm mb-8">
+                    Um centro cultural dedicado ao movimento consciente, à arte performática e ao florescimento humano através do corpo.
+                </p>
+<div class="flex gap-6">
+<a class="text-stone-500 hover:text-[#9f3023] transition-colors" href="#"><span class="material-symbols-outlined" data-icon="share">share</span></a>
+<a class="text-stone-500 hover:text-[#9f3023] transition-colors" href="#"><span class="material-symbols-outlined" data-icon="language">language</span></a>
+</div>
+</div>
+<div>
+<h4 class="font-bold text-on-surface mb-6 uppercase tracking-widest text-xs">Explore</h4>
+<nav class="flex flex-col gap-4">
+<a class="text-stone-500 dark:text-stone-500 hover:text-[#9f3023] underline decoration-from-font transition-all font-['Plus_Jakarta_Sans'] text-sm" href="#escola">Sobre a escola</a>
+<a class="text-stone-500 dark:text-stone-500 hover:text-[#9f3023] underline decoration-from-font transition-all font-['Plus_Jakarta_Sans'] text-sm" href="#precos">Preços</a>
+<a class="text-stone-500 dark:text-stone-500 hover:text-[#9f3023] underline decoration-from-font transition-all font-['Plus_Jakarta_Sans'] text-sm" href="#professores">Professores</a>
+<a class="text-stone-500 dark:text-stone-500 hover:text-[#9f3023] underline decoration-from-font transition-all font-['Plus_Jakarta_Sans'] text-sm" href="#horarios">Horários</a>
+<a class="text-stone-500 dark:text-stone-500 hover:text-[#9f3023] underline decoration-from-font transition-all font-['Plus_Jakarta_Sans'] text-sm" href="#eventos">Eventos</a>
+<a class="text-stone-500 dark:text-stone-500 hover:text-[#9f3023] underline decoration-from-font transition-all font-['Plus_Jakarta_Sans'] text-sm" href="#contato">Contato</a>
+</nav>
+</div>
+<div>
+<h4 class="font-bold text-on-surface mb-6 uppercase tracking-widest text-xs">Conecte-se</h4>
+<nav class="flex flex-col gap-4">
+<a class="text-stone-500 dark:text-stone-500 hover:text-[#9f3023] transition-all font-['Plus_Jakarta_Sans'] text-sm" href="#">Instagram</a>
+<a class="text-stone-500 dark:text-stone-500 hover:text-[#9f3023] transition-all font-['Plus_Jakarta_Sans'] text-sm" href="#">WhatsApp</a>
+<a class="text-stone-500 dark:text-stone-500 hover:text-[#9f3023] transition-all font-['Plus_Jakarta_Sans'] text-sm" href="#">Newsletter da Comunidade</a>
+<a class="text-stone-500 dark:text-stone-500 hover:text-[#9f3023] transition-all font-['Plus_Jakarta_Sans'] text-sm" href="#">Políticas</a>
+</nav>
+</div>
+</div>
+<div class="px-12 py-8 border-t border-primary/5 text-center">
+<p class="text-stone-500 dark:text-stone-500 font-['Plus_Jakarta_Sans'] text-sm">© 2024 Balança Eu. Onde o movimento encontra a alma.</p>
+</div>
+</footer>
+<!-- Mobile Menu Drawer -->
+<div class="fixed inset-0 z-[100] bg-background/95 backdrop-blur-lg translate-x-full transition-transform duration-300 xl:hidden" id="mobile-menu">
+<div class="flex flex-col h-full p-8">
+<div class="flex justify-between items-center mb-12">
+<a class="flex items-center gap-2" href="#">
+<svg class="h-8 w-auto text-primary dark:text-[#c04838]" fill="none" height="197" viewBox="0 0 889 197" width="889" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M127.033 2.62966C143.167 7.96299 157.3 16.6297 169.433 28.8964C202.767 62.6297 206.9 115.696 179.167 156.096C172.233 166.096 155.7 180.23 143.833 186.096C127.167 194.63 113.967 197.296 94.5 196.63C82.1 196.096 75.9667 195.163 67.9667 192.496C36.1 182.096 9.83333 154.096 2.1 122.496C-0.7 110.63 -0.7 85.8297 2.1 74.0964C10.5 39.5631 38.6334 11.0297 73.0333 2.09633C84.5 -0.970332 117.167 -0.57034 127.033 2.62966ZM56.7667 28.2298C61.3 22.7631 72.6334 16.7631 81.7 14.7631C90.7667 12.7631 107.167 12.4965 115.833 14.0965C145.567 19.6965 169.7 41.8298 180.5 72.8964C182.9 79.9631 183.433 84.4965 183.433 97.5631C183.567 115.163 182.367 120.763 175.7 134.896C148.1 192.763 67.7 200.63 29.7 149.163C10.1 122.763 7.56668 86.3631 23.1667 56.8964C25.3 52.8964 28.3667 47.8298 30.1 45.8298L33.0333 42.0965V57.1631C33.0333 70.6298 33.4334 73.0298 36.3667 78.8964C40.2334 86.7631 51.5667 98.3631 57.5667 100.896C60.7667 102.096 61.5667 103.163 60.9 104.763C60.3667 105.963 59.7 112.23 59.3 118.763C58.5 135.163 61.3 144.63 69.9667 153.296C77.5667 160.896 85.9667 164.896 96.2334 165.83C119.167 167.83 139.567 147.03 137.3 123.963C135.833 110.23 127.167 97.8298 115.3 92.6298L109.433 89.9631L114.633 84.4964C129.833 68.3631 137.3 46.4964 131.3 35.5631C126.1 25.9631 116.367 22.6298 106.233 26.8964C95.4334 31.4298 81.3 50.2298 70.7667 74.3631C67.8334 81.2965 64.9 87.2964 64.5 87.9631C63.1667 89.2964 55.1667 83.1631 51.7 77.9631C47.0334 71.0298 45.3 63.9631 46.1 54.8964C46.7667 45.8298 51.1667 34.6298 56.7667 28.2298ZM98.9 51.5631C101.833 47.5631 106.233 42.8964 108.633 41.163C113.967 37.563 115.3 37.5631 118.367 40.8964C121.3 44.0964 120.5 48.763 115.033 60.2297C109.433 71.963 99.8334 82.0964 89.1667 87.5631C84.2334 89.9631 80.1001 91.6964 79.7001 91.2964C77.7001 89.2964 90.6334 62.6297 98.9 51.5631ZM81.5667 110.23C85.1667 106.63 89.4334 103.43 91.1667 103.163C92.9 102.763 97.5667 102.63 101.567 102.896C114.367 103.83 123.7 114.23 123.567 127.563C123.433 140.23 116.767 148.63 104.633 151.563C87.0334 155.696 71.5667 141.03 74.3667 122.896C75.0334 117.696 76.5001 115.296 81.5667 110.23Z" fill="currentColor" fill-rule="evenodd"/>
+<path clip-rule="evenodd" d="M268.367 66.4964C268.367 82.363 268.367 82.6297 270.9 80.3631C277.033 74.7631 288.767 72.8964 300.1 75.8297C308.767 77.9631 319.167 88.3631 321.7 97.5631C323.967 105.563 323.967 116.63 321.833 124.763C319.7 132.363 308.5 143.696 300.9 145.963C289.967 149.163 273.833 146.496 270.233 140.763C269.433 139.43 268.9 139.83 268.367 142.23C267.7 145.296 267.033 145.563 257.967 145.963L248.367 146.363V50.2297H268.367V66.4964ZM267.967 111.03C267.967 102.63 270.367 98.0964 276.767 94.2298C289.033 86.7631 304.367 95.9631 304.367 110.896C304.367 125.696 290.633 134.496 277.833 127.83C270.767 124.23 267.967 119.563 267.967 111.03Z" fill="currentColor" fill-rule="evenodd"/>
+<path clip-rule="evenodd" d="M385.833 77.4297C392.1 80.363 398.5 86.763 402.1 93.4297C404.633 98.363 405.033 101.563 405.433 122.496L405.967 146.23H395.833C386.5 146.23 385.7 145.963 385.7 143.43C385.7 141.963 385.3 140.896 384.767 141.163C373.033 147.163 370.367 147.83 361.567 147.296C354.633 146.763 351.167 145.696 346.367 142.763C331.567 133.43 325.833 112.496 333.3 94.0964C335.7 87.9631 346.233 77.9631 352.633 75.8297C359.167 73.5631 379.967 74.6297 385.833 77.4297ZM352.767 122.363C346.367 113.03 349.967 97.6964 359.433 93.5631C368.233 89.6964 378.367 92.3631 383.033 99.8297C385.3 103.43 385.7 105.83 385.3 112.763C384.9 120.363 384.367 121.696 380.633 125.03C372.233 132.496 358.767 131.296 352.767 122.363Z" fill="currentColor" fill-rule="evenodd"/>
+<path d="M432.367 50.2297V146.23H413.7V50.2297H432.367Z" fill="currentColor"/>
+<path clip-rule="evenodd" d="M492.633 76.0964C500.233 78.8964 507.567 85.4297 511.433 93.163C514.9 100.096 515.033 100.896 515.033 123.296V146.23H505.7C498.5 146.23 496.367 145.83 496.367 144.363C496.367 140.896 494.367 140.896 487.7 144.23C479.033 148.63 468.767 148.63 459.7 144.363C446.633 138.23 440.1 127.03 440.1 110.896C440.1 93.0297 448.9 80.2297 464.367 75.4297C469.833 73.8297 487.3 74.2297 492.633 76.0964ZM468.5 127.83C456.1 121.563 455.967 100.763 468.233 94.2297C474.767 90.763 481.7 90.8964 487.167 94.6297C496.1 100.63 498.9 112.63 493.3 121.03C487.7 129.563 477.3 132.363 468.5 127.83Z" fill="currentColor" fill-rule="evenodd"/>
+<path d="M575.167 75.6964C580.5 77.563 586.367 82.6297 589.433 88.2297C591.3 91.4297 591.7 97.2964 592.1 119.163L592.633 146.23H573.7V127.163C573.567 97.6964 571.3 92.2297 559.033 92.2297C553.967 92.2297 551.7 92.8963 549.433 95.2963C546.5 98.0964 546.367 99.563 545.7 121.963L545.033 145.563L525.7 146.363V75.4297L535.433 75.8297C544.367 76.2297 545.033 76.4963 545.433 79.2963L545.967 82.4964L549.033 79.563C554.367 74.4963 566.233 72.763 575.167 75.6964Z" fill="currentColor"/>
+<path d="M647.967 75.8297C654.767 77.4297 667.833 88.6297 666.767 91.6964C666.5 92.6297 663.3 95.163 659.833 97.2963C653.567 101.163 653.433 101.163 651.7 98.6297C650.633 97.1631 647.7 94.8964 645.167 93.6964C632.367 87.6964 619.033 96.3631 619.033 110.896C619.033 122.63 625.833 129.43 637.3 129.43C643.033 129.43 645.033 128.763 649.433 125.296L654.633 121.163L660.767 125.163C664.233 127.43 667.033 129.696 667.033 130.363C667.033 133.296 657.567 141.696 649.967 145.43C641.967 149.296 641.167 150.096 638.5 156.896C635.833 163.83 635.433 164.23 630.5 164.63C627.567 164.896 623.967 164.763 622.233 164.363L619.3 163.563L621.833 156.763C624.9 148.763 624.367 145.696 619.033 143.563C613.7 141.296 605.833 133.163 602.9 126.896C599.833 120.23 599.433 102.896 602.367 96.0964C609.433 79.2964 628.367 70.7631 647.967 75.8297Z" fill="currentColor"/>
+<path clip-rule="evenodd" d="M722.5 76.2297C726.9 77.563 730.767 79.9631 734.633 83.8297C744.5 94.0964 745.033 95.963 745.433 122.496L745.967 146.23H736.367C727.833 146.23 726.767 145.963 726.1 143.563C725.7 141.963 725.033 141.03 724.5 141.296C714.633 146.763 710.1 147.83 701.433 147.296C687.567 146.23 677.3 138.496 672.367 125.163C665.167 105.963 674.367 82.7631 691.7 76.3631C698.633 73.8297 714.233 73.6964 722.5 76.2297ZM703.567 129.696C686.9 126.496 683.967 100.23 699.433 93.563C712.9 87.6963 726.233 96.363 726.233 111.03C726.233 123.563 716.1 131.963 703.567 129.696Z" fill="currentColor" fill-rule="evenodd"/>
+<path clip-rule="evenodd" d="M805.833 78.3631C816.367 84.2297 823.7 97.2964 822.767 108.63L822.367 113.563L791.967 113.963L761.433 114.23L762.367 118.63C763.7 125.03 769.833 133.163 775.967 136.63C786.5 142.496 798.767 141.83 809.033 134.763C813.567 131.83 814.367 131.563 816.1 133.43C817.833 135.163 817.7 135.696 814.5 138.63C808.9 143.83 801.7 146.763 793.033 147.296C782.767 147.963 775.3 145.963 768.1 140.496C751.567 127.83 749.7 100.096 764.233 84.4964C771.033 77.0297 779.167 74.0964 791.167 74.763C797.433 75.0297 801.7 76.0964 805.833 78.3631ZM768.767 90.6297C771.033 87.963 775.433 84.763 778.367 83.4297C793.833 76.363 812.1 86.0964 815.7 103.163L816.633 107.563H790.767C776.633 107.563 764.233 107.03 763.433 106.496C760.9 104.896 763.7 96.363 768.767 90.6297Z" fill="currentColor" fill-rule="evenodd"/>
+<path d="M836.367 96.4964C836.5 108.096 837.033 120.096 837.567 123.296C839.967 135.296 852.9 143.03 865.033 139.563C878.9 135.696 881.7 128.496 881.7 96.2297V75.563H888.367V101.563C888.367 129.83 887.567 133.563 880.1 140.496C869.567 150.363 846.367 149.83 836.767 139.43C830.767 132.763 829.833 128.096 829.7 102.096C829.7 88.6297 829.567 77.163 829.7 76.4964C829.7 75.963 831.167 75.563 833.033 75.563H836.367V96.4964Z" fill="currentColor"/>
+</svg>
+</a>
+<button class="text-primary p-2" id="menu-close">
+<span class="material-symbols-outlined text-3xl">close</span>
+</button>
+</div>
+<nav class="flex flex-col gap-4">
+<a class="w-full py-4 px-6 border-2 border-stone-200 dark:border-stone-800 rounded-2xl font-headline text-xl text-primary flex justify-between items-center group active:border-primary" href="#escola">
+                        Sobre a escola
+                        <span class="material-symbols-outlined opacity-0 group-active:opacity-100 transition-opacity">arrow_forward</span>
+</a>
+<a class="w-full py-4 px-6 border-2 border-stone-200 dark:border-stone-800 rounded-2xl font-headline text-xl text-on-surface flex justify-between items-center group active:border-primary" href="#precos">
+                        Preços
+                        <span class="material-symbols-outlined opacity-0 group-active:opacity-100 transition-opacity">arrow_forward</span>
+</a>
+<a class="w-full py-4 px-6 border-2 border-stone-200 dark:border-stone-800 rounded-2xl font-headline text-xl text-on-surface flex justify-between items-center group active:border-primary" href="#professores">
+                        Professores
+                        <span class="material-symbols-outlined opacity-0 group-active:opacity-100 transition-opacity">arrow_forward</span>
+</a>
+<a class="w-full py-4 px-6 border-2 border-stone-200 dark:border-stone-800 rounded-2xl font-headline text-xl text-on-surface flex justify-between items-center group active:border-primary" href="#horarios">
+                        Horários
+                        <span class="material-symbols-outlined opacity-0 group-active:opacity-100 transition-opacity">arrow_forward</span>
+</a>
+<a class="w-full py-4 px-6 border-2 border-stone-200 dark:border-stone-800 rounded-2xl font-headline text-xl text-on-surface flex justify-between items-center group active:border-primary" href="#eventos">
+                        Eventos
+                        <span class="material-symbols-outlined opacity-0 group-active:opacity-100 transition-opacity">arrow_forward</span>
+</a>
+<a class="w-full py-4 px-6 border-2 border-stone-200 dark:border-stone-800 rounded-2xl font-headline text-xl text-on-surface flex justify-between items-center group active:border-primary" href="#contato">
+                        Contato
+                        <span class="material-symbols-outlined opacity-0 group-active:opacity-100 transition-opacity">arrow_forward</span>
+</a>
+</nav>
+<div class="mt-auto py-8">
+<button class="w-full bg-primary text-on-primary py-4 rounded-2xl font-bold text-lg">Agendar Visita</button>
+</div>
+</div>
+</div>
+<script>
+    const menuToggle = document.getElementById('menu-toggle');
+    const menuClose = document.getElementById('menu-close');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    menuToggle.onclick = () => mobileMenu.classList.remove('translate-x-full');
+    menuClose.onclick = () => mobileMenu.classList.add('translate-x-full');
+    
+    // Close menu when clicking a link
+    mobileMenu.querySelectorAll('a').forEach(link => {
+        link.onclick = () => mobileMenu.classList.add('translate-x-full');
+    });
+
+    // Horários Tabs Logic
+    const dayTabs = document.querySelectorAll('.day-tab');
+    const scheduleContents = document.querySelectorAll('.schedule-content');
+
+    dayTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const day = tab.getAttribute('data-day');
+            
+            dayTabs.forEach(t => {
+                t.classList.remove('bg-primary', 'text-white', 'border-primary');
+                t.classList.add('bg-white', 'text-on-surface-variant', 'border-stone-200');
+            });
+            tab.classList.add('bg-primary', 'text-white', 'border-primary');
+            tab.classList.remove('bg-white', 'text-on-surface-variant', 'border-stone-200');
+
+            scheduleContents.forEach(content => {
+                if(content.id === `schedule-${day}`) {
+                    content.classList.remove('hidden');
+                } else {
+                    content.classList.add('hidden');
+                }
+            });
+        });
+    });
+</script>
+</body></html>
