@@ -1,0 +1,440 @@
+// ===========================================
+// Pulso — Schema do Banco de Dados
+// ===========================================
+// Plataforma SaaS white-label para escolas de dança
+// Multi-tenant: todas as entidades possuem tenantId
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  PROFESSOR
+  ALUNO
+}
+
+enum SubscriptionStatus {
+  ATIVA
+  CANCELADA
+  PAUSADA
+  EXPIRADA
+}
+
+enum DayOfWeek {
+  SEG
+  TER
+  QUA
+  QUI
+  SEX
+  SAB
+  DOM
+}
+
+enum EnrollmentStatus {
+  ATIVA
+  CANCELADA
+  LISTA_ESPERA
+}
+
+enum LessonStatus {
+  AGENDADA
+  CONFIRMADA
+  CONCLUIDA
+  CANCELADA
+}
+
+enum TransactionType {
+  MENSALIDADE
+  PARTICULAR
+  EVENTO
+  OUTRO
+}
+
+enum TransactionStatus {
+  PAGO
+  PENDENTE
+  CANCELADO
+}
+
+enum CheckInMethod {
+  QR_CODE
+  MANUAL
+  FACIAL
+}
+
+// ─── Tenant (Escola / Cliente) ───────────────────────
+
+model Tenant {
+  id                 String   @id @default(uuid())
+  nome               String
+  slug               String   @unique
+  dominioCustomizado String?  @map("dominio_customizado")
+  logoUrl            String?  @map("logo_url")
+  cores              Json     @default("{}")
+  emailContato       String   @map("email_contato")
+  telefone           String?
+  endereco           String?
+  stripeAccountId    String?  @map("stripe_account_id")
+  ativo              Boolean  @default(true)
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  users          User[]
+  plans          Plan[]
+  subscriptions  Subscription[]
+  modalities     Modality[]
+  classGroups    ClassGroup[]
+  enrollments    Enrollment[]
+  attendances    Attendance[]
+  checkIns       CheckIn[]
+  privateLessons PrivateLesson[]
+  transactions   Transaction[]
+  cmsContents    CmsContent[]
+  events         Event[]
+  teachers        Teacher[]
+  faceDescriptors FaceDescriptor[]
+
+  @@map("tenants")
+}
+
+// ─── User ────────────────────────────────────────────
+
+model User {
+  id               String    @id @default(uuid())
+  tenantId         String    @map("tenant_id")
+  nome             String
+  email            String
+  senhaHash        String    @map("senha_hash")
+  role             Role      @default(ALUNO)
+  avatarUrl        String?   @map("avatar_url")
+  telefone         String?
+  dataNasc         DateTime? @map("data_nasc")
+  stripeCustomerId String?   @map("stripe_customer_id")
+  ativo            Boolean   @default(true)
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  tenant           Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  sessions         Session[]
+  subscriptions    Subscription[]
+  enrollments      Enrollment[]
+  attendances      Attendance[]
+  checkIns         CheckIn[]
+  privateLessons   PrivateLesson[] @relation("StudentLessons")
+  professorClasses ClassGroup[]    @relation("ProfessorClasses")
+  professorLessons PrivateLesson[] @relation("ProfessorLessons")
+  transactions     Transaction[]
+  teacher          Teacher?
+  faceDescriptors  FaceDescriptor[]
+
+  @@unique([tenantId, email])
+  @@index([tenantId])
+  @@map("users")
+}
+
+// ─── Session (Sessão de Autenticação) ────────────────
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  token     String   @unique
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+  @@map("sessions")
+}
+
+// ─── Plan (Plano de Assinatura) ──────────────────────
+
+model Plan {
+  id                String   @id @default(uuid())
+  tenantId          String   @map("tenant_id")
+  nome              String
+  descricao         String
+  preco             Decimal  @db.Decimal(10, 2)
+  maxAulasSemana    Int      @map("max_aulas_semana")
+  permiteParticular Boolean  @default(false) @map("permite_particular")
+  stripePriceId     String?  @map("stripe_price_id")
+  ativo             Boolean  @default(true)
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  tenant        Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  subscriptions Subscription[]
+
+  @@index([tenantId])
+  @@map("plans")
+}
+
+// ─── Subscription (Assinatura) ───────────────────────
+
+model Subscription {
+  id                   String             @id @default(uuid())
+  tenantId             String             @map("tenant_id")
+  userId               String             @map("user_id")
+  planId               String             @map("plan_id")
+  status               SubscriptionStatus @default(ATIVA)
+  stripeSubscriptionId String?            @map("stripe_subscription_id")
+  inicio               DateTime
+  fim                  DateTime?
+  createdAt            DateTime           @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan   Plan   @relation(fields: [planId], references: [id], onDelete: Restrict)
+
+  @@index([tenantId])
+  @@index([userId])
+  @@map("subscriptions")
+}
+
+// ─── Modality (Modalidade de Dança) ──────────────────
+
+model Modality {
+  id        String  @id @default(uuid())
+  tenantId  String  @map("tenant_id")
+  nome      String
+  descricao String
+  imagemUrl String? @map("imagem_url")
+  ativo     Boolean @default(true)
+
+  tenant         Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  classGroups    ClassGroup[]
+  privateLessons PrivateLesson[]
+  teachers       Teacher[]       @relation("TeacherModalities")
+
+  @@index([tenantId])
+  @@map("modalities")
+}
+
+// ─── ClassGroup (Turma) ──────────────────────────────
+
+model ClassGroup {
+  id            String    @id @default(uuid())
+  tenantId      String    @map("tenant_id")
+  modalityId    String    @map("modality_id")
+  professorId   String    @map("professor_id")
+  nivel         String
+  diaSemana     DayOfWeek @map("dia_semana")
+  horarioInicio String    @map("horario_inicio")
+  horarioFim    String    @map("horario_fim")
+  sala          String
+  maxAlunos     Int       @map("max_alunos")
+  ativo         Boolean   @default(true)
+
+  tenant      Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  modality    Modality     @relation(fields: [modalityId], references: [id], onDelete: Restrict)
+  professor   User         @relation("ProfessorClasses", fields: [professorId], references: [id], onDelete: Restrict)
+  enrollments Enrollment[]
+  attendances Attendance[]
+
+  @@index([tenantId])
+  @@index([professorId])
+  @@map("class_groups")
+}
+
+// ─── Enrollment (Inscrição em Turma) ─────────────────
+
+model Enrollment {
+  id            String           @id @default(uuid())
+  tenantId      String           @map("tenant_id")
+  userId        String           @map("user_id")
+  classGroupId  String           @map("class_group_id")
+  status        EnrollmentStatus @default(ATIVA)
+  dataInscricao DateTime         @default(now()) @map("data_inscricao")
+
+  tenant     Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  classGroup ClassGroup @relation(fields: [classGroupId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, classGroupId])
+  @@index([tenantId])
+  @@map("enrollments")
+}
+
+// ─── Attendance (Presença) ───────────────────────────
+
+model Attendance {
+  id           String   @id @default(uuid())
+  tenantId     String   @map("tenant_id")
+  userId       String   @map("user_id")
+  classGroupId String   @map("class_group_id")
+  data         DateTime
+  presente     Boolean
+  observacao   String?
+
+  tenant     Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  classGroup ClassGroup @relation(fields: [classGroupId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, classGroupId, data])
+  @@index([tenantId])
+  @@index([classGroupId, data])
+  @@map("attendances")
+}
+
+// ─── CheckIn (Controle de Acesso) ────────────────────
+
+model CheckIn {
+  id        String        @id @default(uuid())
+  tenantId  String        @map("tenant_id")
+  userId    String        @map("user_id")
+  timestamp DateTime      @default(now())
+  metodo    CheckInMethod
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([userId, timestamp])
+  @@map("check_ins")
+}
+
+// ─── FaceDescriptor (Reconhecimento Facial) ──────────
+
+model FaceDescriptor {
+  id         String   @id @default(uuid())
+  tenantId   String   @map("tenant_id")
+  userId     String   @map("user_id")
+  descriptor String   @db.Text // JSON array of Float32 descriptor (128 values)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([userId])
+  @@map("face_descriptors")
+}
+
+// ─── PrivateLesson (Aula Particular) ─────────────────
+
+model PrivateLesson {
+  id          String       @id @default(uuid())
+  tenantId    String       @map("tenant_id")
+  userId      String       @map("user_id")
+  professorId String       @map("professor_id")
+  modalityId  String       @map("modality_id")
+  dataHora    DateTime     @map("data_hora")
+  duracao     Int
+  status      LessonStatus @default(AGENDADA)
+  observacao  String?
+  createdAt   DateTime     @default(now()) @map("created_at")
+
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user      User     @relation("StudentLessons", fields: [userId], references: [id], onDelete: Cascade)
+  professor User     @relation("ProfessorLessons", fields: [professorId], references: [id], onDelete: Restrict)
+  modality  Modality @relation(fields: [modalityId], references: [id], onDelete: Restrict)
+
+  @@index([tenantId])
+  @@index([professorId, dataHora])
+  @@map("private_lessons")
+}
+
+// ─── Transaction (Transação Financeira) ──────────────
+
+model Transaction {
+  id                    String            @id @default(uuid())
+  tenantId              String            @map("tenant_id")
+  userId                String            @map("user_id")
+  tipo                  TransactionType
+  valor                 Decimal           @db.Decimal(10, 2)
+  descricao             String
+  data                  DateTime
+  stripePaymentIntentId String?           @map("stripe_payment_intent_id")
+  status                TransactionStatus @default(PENDENTE)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([userId])
+  @@index([tenantId, data])
+  @@map("transactions")
+}
+
+// ─── CmsContent (Conteúdo do CMS) ────────────────────
+
+model CmsContent {
+  id             String   @id @default(uuid())
+  tenantId       String   @map("tenant_id")
+  secao          String
+  chave          String
+  valorTexto     String?  @map("valor_texto")
+  valorImagemUrl String?  @map("valor_imagem_url")
+  ordem          Int      @default(0)
+  ativo          Boolean  @default(true)
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, secao, chave])
+  @@index([tenantId])
+  @@map("cms_contents")
+}
+
+// ─── Event (Evento) ──────────────────────────────────
+
+model Event {
+  id        String   @id @default(uuid())
+  tenantId  String   @map("tenant_id")
+  titulo    String
+  descricao String
+  data      DateTime
+  horario   String
+  imagemUrl String?  @map("imagem_url")
+  local     String
+  preco     Decimal? @db.Decimal(10, 2)
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([tenantId, data])
+  @@map("events")
+}
+
+// ─── Teacher (Dados do Professor) ────────────────────
+
+model Teacher {
+  id             String   @id @default(uuid())
+  tenantId       String   @map("tenant_id")
+  userId         String   @unique @map("user_id")
+  bio            String
+  especialidades String[]
+  imagemUrl      String?  @map("imagem_url")
+
+  tenant         Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user           User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  modalities     Modality[]            @relation("TeacherModalities")
+  availabilities TeacherAvailability[]
+
+  @@index([tenantId])
+  @@map("teachers")
+}
+
+// ─── TeacherAvailability (Disponibilidade do Professor) ─
+
+model TeacherAvailability {
+  id          String    @id @default(uuid())
+  teacherId   String    @map("teacher_id")
+  diaSemana   DayOfWeek @map("dia_semana")
+  horarioInicio String  @map("horario_inicio")
+  horarioFim    String  @map("horario_fim")
+
+  teacher Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  @@index([teacherId])
+  @@map("teacher_availabilities")
+}
