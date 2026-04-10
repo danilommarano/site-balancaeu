@@ -1,0 +1,63 @@
+{
+  "family": "ritmo",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "arn:aws:iam::824415050749:role/ritmo-ecs-execution-role",
+  "taskRoleArn": "arn:aws:iam::824415050749:role/ritmo-ecs-task-role",
+  "containerDefinitions": [
+    {
+      "name": "ritmo-app",
+      "image": "824415050749.dkr.ecr.sa-east-1.amazonaws.com/ritmo:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 3000,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        { "name": "NODE_ENV", "value": "production" },
+        { "name": "PORT", "value": "3000" }
+      ],
+      "secrets": [
+        {
+          "name": "DATABASE_URL",
+          "valueFrom": "arn:aws:ssm:sa-east-1:824415050749:parameter/ritmo/DATABASE_URL"
+        },
+        {
+          "name": "AUTH_SECRET",
+          "valueFrom": "arn:aws:ssm:sa-east-1:824415050749:parameter/ritmo/AUTH_SECRET"
+        },
+        {
+          "name": "ORIGIN",
+          "valueFrom": "arn:aws:ssm:sa-east-1:824415050749:parameter/ritmo/ORIGIN"
+        },
+        {
+          "name": "RESEND_API_KEY",
+          "valueFrom": "arn:aws:ssm:sa-east-1:824415050749:parameter/ritmo/RESEND_API_KEY"
+        },
+        {
+          "name": "EMAIL_FROM",
+          "valueFrom": "arn:aws:ssm:sa-east-1:824415050749:parameter/ritmo/EMAIL_FROM"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/ritmo",
+          "awslogs-region": "sa-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "healthCheck": {
+        "command": ["CMD-SHELL", "wget -qO- http://localhost:3000/ || exit 1"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      }
+    }
+  ]
+}

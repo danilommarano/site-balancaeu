@@ -1,0 +1,63 @@
+# ===========================================
+# Pulso — Docker Compose (dev + prod)
+# ===========================================
+
+services:
+  # ── PostgreSQL ───────────────────────────
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-pulso}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pulso}
+      POSTGRES_DB: ${POSTGRES_DB:-pulso}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-pulso}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ── App (dev) ────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-pulso}:${POSTGRES_PASSWORD:-pulso}@db:5432/${POSTGRES_DB:-pulso}
+      NODE_ENV: production
+      PORT: 3000
+      ORIGIN: ${ORIGIN:-http://localhost:3000}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      EMAIL_FROM: ${EMAIL_FROM:-}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ── App Dev (dev mode com hot-reload) ────
+  app-dev:
+    image: node:22-alpine
+    working_dir: /app
+    command: sh -c "npm install && npx prisma generate && npx prisma db push --skip-generate && npm run dev -- --host 0.0.0.0 --port 5173"
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-pulso}:${POSTGRES_PASSWORD:-pulso}@db:5432/${POSTGRES_DB:-pulso}
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles:
+      - dev
+
+volumes:
+  pgdata:
+  node_modules:
