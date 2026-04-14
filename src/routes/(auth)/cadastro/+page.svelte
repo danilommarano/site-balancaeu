@@ -1,4 +1,4 @@
-<!-- Pulso — Página de Cadastro -->
+<!-- BalancaEu — Página de Cadastro -->
 <script lang="ts">
   import { enhance } from '$app/forms';
 
@@ -7,13 +7,13 @@
 </script>
 
 <svelte:head>
-  <title>Cadastro — Pulso</title>
+  <title>Cadastro — BalancaEu</title>
 </svelte:head>
 
 <div class="min-h-screen bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 flex items-center justify-center px-4">
   <div class="w-full max-w-md">
     <div class="text-center mb-8">
-      <h1 class="text-4xl font-bold text-white tracking-tight">Pulso</h1>
+      <h1 class="text-4xl font-bold text-white tracking-tight">BalancaEu</h1>
       <p class="text-zinc-400 mt-2">Crie sua conta</p>
     </div>
 

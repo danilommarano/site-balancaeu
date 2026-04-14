@@ -1,4 +1,4 @@
-<!-- Pulso — Professor: Chamada (Fase 13) -->
+<!-- BalancaEu — Professor: Chamada (Fase 13) -->
 <script lang="ts">
   import { enhance } from '$app/forms';
   import { goto } from '$app/navigation';
@@ -70,7 +70,7 @@
 </script>
 
 <svelte:head>
-  <title>Chamada — Professor — Pulso</title>
+  <title>Chamada — Professor — BalancaEu</title>
 </svelte:head>
 
 <div>

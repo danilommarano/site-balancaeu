@@ -1,4 +1,4 @@
-<!-- Pulso — Professor: Agenda Semanal (Fase 15) -->
+<!-- BalancaEu — Professor: Agenda Semanal (Fase 15) -->
 <script lang="ts">
   let { data } = $props();
 
@@ -9,7 +9,7 @@
 </script>
 
 <svelte:head>
-  <title>Agenda — Professor — Pulso</title>
+  <title>Agenda — Professor — BalancaEu</title>
 </svelte:head>
 
 <div>

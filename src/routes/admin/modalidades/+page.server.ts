@@ -1,6 +1,7 @@
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
+import { slugify } from '$lib/utils/slug';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const tenantId = locals.tenant?.id;
@@ -30,8 +31,18 @@ export const actions: Actions = {
 			return fail(400, { error: 'Nome e descrição são obrigatórios', nome, descricao });
 		}
 
+		const id = slugify(nome);
+		if (!id) {
+			return fail(400, { error: 'Nome inválido para gerar identificador', nome, descricao });
+		}
+
+		const existing = await db.modality.findUnique({ where: { id } });
+		if (existing) {
+			return fail(400, { error: `Já existe uma modalidade com o identificador "${id}"`, nome, descricao });
+		}
+
 		await db.modality.create({
-			data: { tenantId, nome, descricao }
+			data: { id, tenantId, nome, descricao }
 		});
 
 		return { success: true };

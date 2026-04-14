@@ -1,5 +1,5 @@
 // ===========================================
-// Pulso — Serviço de Email (Resend)
+// BalancaEu — Serviço de Email (Resend)
 // ===========================================
 // Fase 16 — Envio de emails transacionais
 
@@ -23,7 +23,7 @@ interface EmailResult {
  */
 export async function sendEmail(options: SendEmailOptions): Promise<EmailResult> {
 	const { to, subject, html } = options;
-	const from = env.EMAIL_FROM || 'Pulso <noreply@pulso.app>';
+	const from = env.EMAIL_FROM || 'BalancaEu <noreply@pulso.app>';
 
 	// Fallback: sem API key, apenas logar no console
 	if (!env.RESEND_API_KEY || env.RESEND_API_KEY === 're_...') {

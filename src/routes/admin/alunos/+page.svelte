@@ -1,4 +1,4 @@
-<!-- Pulso — Admin: Alunos -->
+<!-- BalancaEu — Admin: Alunos -->
 <script lang="ts">
   import { enhance } from '$app/forms';
   import FormFeedback from '$lib/components/admin/FormFeedback.svelte';
@@ -17,7 +17,7 @@
 </script>
 
 <svelte:head>
-  <title>Alunos — Admin — Pulso</title>
+  <title>Alunos — Admin — BalancaEu</title>
 </svelte:head>
 
 <div>

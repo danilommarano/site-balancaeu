@@ -1,5 +1,5 @@
 // ===========================================
-// Pulso — Server Hooks
+// BalancaEu — Server Hooks
 // ===========================================
 
 import type { Handle } from '@sveltejs/kit';

@@ -1,4 +1,4 @@
-<!-- Pulso — Dashboard do Professor (Fase 15) -->
+<!-- BalancaEu — Dashboard do Professor (Fase 15) -->
 <script lang="ts">
   let { data } = $props();
 
@@ -20,7 +20,7 @@
 </script>
 
 <svelte:head>
-  <title>Painel — Professor — Pulso</title>
+  <title>Painel — Professor — BalancaEu</title>
 </svelte:head>
 
 <div>

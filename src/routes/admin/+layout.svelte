@@ -1,4 +1,4 @@
-<!-- Pulso — Layout do Painel Administrativo -->
+<!-- BalancaEu — Layout do Painel Administrativo -->
 <script lang="ts">
   import { enhance } from '$app/forms';
   import { page } from '$app/stores';
@@ -6,12 +6,20 @@
   let { children, data } = $props();
   let sidebarOpen = $state(false);
 
-  const navSections = [
+  // Dropdown: abre automaticamente ao navegar para uma rota /admin/cms
+  let cmsOpen = $state(false);
+  $effect(() => {
+    if ($page.url.pathname.startsWith('/admin/cms')) cmsOpen = true;
+  });
+
+  type NavItem = { href: string; label: string; icon: string };
+  type NavSection = { title: string; items: NavItem[] };
+
+  const navSections: NavSection[] = $derived([
     {
       title: 'Principal',
       items: [
         { href: '/admin', label: 'Dashboard', icon: 'dashboard' },
-        { href: '/admin/cms', label: 'Conteúdo (CMS)', icon: 'edit_note' },
       ]
     },
     {
@@ -33,10 +41,19 @@
         { href: '/admin/presenca', label: 'Presença', icon: 'fact_check' },
       ]
     }
-  ];
+  ]);
+
+  const cmsPages = $derived([
+    { href: '/admin/cms', label: 'Landing Page' },
+    ...((data.modalidadesNav ?? []) as { id: string; nome: string }[]).map(m => ({
+      href: `/admin/cms/modulo/${m.id}`,
+      label: m.nome
+    }))
+  ]);
 
   function isActive(href: string, pathname: string): boolean {
     if (href === '/admin') return pathname === '/admin';
+    if (href === '/admin/cms') return pathname === '/admin/cms';
     return pathname.startsWith(href);
   }
 </script>
@@ -60,14 +77,14 @@
           <span class="material-symbols-outlined text-white text-lg">bolt</span>
         </div>
         <div>
-          <span class="text-sm font-bold text-white block leading-none">Pulso</span>
+          <span class="text-sm font-bold text-white block leading-none">BalancaEu</span>
           <span class="text-[10px] text-zinc-500 uppercase tracking-widest">{data.tenant?.nome ?? 'Admin'}</span>
         </div>
       </a>
     </div>
 
     <nav class="flex-1 overflow-y-auto p-3 space-y-6">
-      {#each navSections as section}
+      {#each navSections as section, sectionIdx}
         <div>
           <p class="px-3 mb-2 text-[10px] font-bold uppercase tracking-widest text-zinc-600">{section.title}</p>
           <div class="space-y-0.5">
@@ -82,6 +99,38 @@
                 <span>{item.label}</span>
               </a>
             {/each}
+
+            <!-- Dropdown CMS logo abaixo do Dashboard -->
+            {#if sectionIdx === 0}
+              {@const cmsActive = $page.url.pathname.startsWith('/admin/cms')}
+              <button
+                type="button"
+                onclick={() => cmsOpen = !cmsOpen}
+                class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all {cmsActive ? 'bg-primary/15 text-primary font-medium' : 'text-zinc-400 hover:text-white hover:bg-white/5'}"
+              >
+                <span class="material-symbols-outlined text-[20px]">edit_note</span>
+                <span class="flex-1 text-left">Conteúdo (CMS)</span>
+                <span class="material-symbols-outlined text-[16px] transition-transform {cmsOpen ? 'rotate-180' : ''}">expand_more</span>
+              </button>
+
+              {#if cmsOpen}
+                <div class="ml-4 mt-1 pl-3 border-l border-zinc-800 space-y-0.5">
+                  {#each cmsPages as sub}
+                    {@const subActive = $page.url.pathname === sub.href}
+                    <a
+                      href={sub.href}
+                      onclick={() => sidebarOpen = false}
+                      class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-all {subActive ? 'bg-primary/15 text-primary font-medium' : 'text-zinc-500 hover:text-white hover:bg-white/5'}"
+                    >
+                      <span class="material-symbols-outlined text-[14px]">
+                        {sub.href === '/admin/cms' ? 'home' : 'sports_martial_arts'}
+                      </span>
+                      <span class="truncate">{sub.label}</span>
+                    </a>
+                  {/each}
+                </div>
+              {/if}
+            {/if}
           </div>
         </div>
       {/each}
@@ -113,7 +162,7 @@
       <button onclick={() => sidebarOpen = true} class="text-zinc-400 hover:text-white">
         <span class="material-symbols-outlined">menu</span>
       </button>
-      <span class="text-sm font-bold text-white">Pulso</span>
+      <span class="text-sm font-bold text-white">BalancaEu</span>
       <div class="w-6"></div>
     </header>
 

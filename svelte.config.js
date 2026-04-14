@@ -13,6 +13,11 @@ const config = {
 			$stores: 'src/lib/stores',
 			$types: 'src/lib/types',
 			$utils: 'src/lib/utils'
+		},
+		// Apple OAuth envia o callback como POST de apple.com (form_post mode).
+		// Liberamos só esta origem no CSRF check; demais POSTs cross-origin ficam bloqueados.
+		csrf: {
+			trustedOrigins: ['https://appleid.apple.com']
 		}
 	}
 };

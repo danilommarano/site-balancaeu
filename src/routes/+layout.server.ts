@@ -1,5 +1,5 @@
 // ===========================================
-// Pulso — Root Layout Server Load
+// BalancaEu — Root Layout Server Load
 // ===========================================
 
 import type { LayoutServerLoad } from './$types';

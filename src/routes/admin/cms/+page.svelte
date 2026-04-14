@@ -1,4 +1,4 @@
-<!-- Pulso — Admin: CMS (Gerenciador de Conteúdo) -->
+<!-- BalancaEu — Admin: CMS (Gerenciador de Conteúdo) -->
 <script lang="ts">
   import { enhance } from '$app/forms';
 
@@ -61,7 +61,7 @@
 </script>
 
 <svelte:head>
-  <title>CMS — Admin — Pulso</title>
+  <title>CMS — Admin — BalancaEu</title>
 </svelte:head>
 
 <div>

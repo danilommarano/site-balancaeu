@@ -1,4 +1,4 @@
-<!-- Pulso — Dashboard Admin (Fase 14) -->
+<!-- BalancaEu — Dashboard Admin (Fase 14) -->
 <script lang="ts">
   let { data } = $props();
 
@@ -28,7 +28,7 @@
 </script>
 
 <svelte:head>
-  <title>Dashboard — Admin — Pulso</title>
+  <title>Dashboard — Admin — BalancaEu</title>
 </svelte:head>
 
 <div>

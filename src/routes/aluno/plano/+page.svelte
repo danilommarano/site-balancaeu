@@ -1,4 +1,4 @@
-<!-- Pulso — Meu Plano (Fase 10) -->
+<!-- BalancaEu — Meu Plano (Fase 10) -->
 <script lang="ts">
   import { enhance } from '$app/forms';
 
@@ -30,7 +30,7 @@
 </script>
 
 <svelte:head>
-  <title>Meu Plano — Pulso</title>
+  <title>Meu Plano — BalancaEu</title>
 </svelte:head>
 
 <div>

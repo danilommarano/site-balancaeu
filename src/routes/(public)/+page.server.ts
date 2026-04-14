@@ -4,17 +4,17 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ locals }) => {
 	const tenantId = locals.tenant?.id;
 	if (!tenantId) {
-		return { cms: {}, planos: [], professores: [], turmas: [], eventos: [] };
+		return { cms: {}, modalidades: [], professores: [], turmas: [], eventos: [] };
 	}
 
-	const [cmsContents, planos, professores, turmas, eventos] = await Promise.all([
+	const [cmsContents, modalidades, professores, turmas, eventos] = await Promise.all([
 		db.cmsContent.findMany({
 			where: { tenantId, ativo: true },
 			orderBy: [{ secao: 'asc' }, { ordem: 'asc' }]
 		}),
-		db.plan.findMany({
+		db.modality.findMany({
 			where: { tenantId, ativo: true },
-			orderBy: { preco: 'asc' }
+			orderBy: { nome: 'asc' }
 		}),
 		db.user.findMany({
 			where: { tenantId, role: 'PROFESSOR', ativo: true },
@@ -52,11 +52,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	return {
 		cms,
-		planos: planos.map(p => ({
-			...p,
-			preco: Number(p.preco),
-			createdAt: p.createdAt.toISOString()
-		})),
+		modalidades,
 		professores,
 		turmas,
 		eventos: eventos.map(e => ({

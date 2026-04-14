@@ -1,5 +1,5 @@
 /**
- * Pulso — Validação server-side reutilizável
+ * BalancaEu — Validação server-side reutilizável
  */
 
 export function isValidEmail(email: string): boolean {

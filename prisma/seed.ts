@@ -1,4 +1,10 @@
-import { PrismaClient } from '@prisma/client';
+// ===========================================
+// Pulso — Seed do banco de dados (idempotente)
+// ===========================================
+// Cria tenant, admin, planos, CMS e popula modalidades/professores/turmas.
+// Roda também como reset: apaga dados de modalidades/turmas/alunos não-admin.
+
+import { PrismaClient, DayOfWeek } from '@prisma/client';
 import { randomUUID } from 'crypto';
 import bcrypt from 'bcrypt';
 
@@ -11,8 +17,7 @@ async function hashPassword(password: string): Promise<string> {
 async function main() {
 	console.log('🌱 Iniciando seed...');
 
-	// ─── Tenant: Balança Eu ──────────────────────────
-
+	// ─── Tenant ──────────────────────────────────────
 	const tenant = await prisma.tenant.upsert({
 		where: { slug: 'balancaeu' },
 		update: {},
@@ -31,16 +36,16 @@ async function main() {
 			}
 		}
 	});
+	console.log(`✅ Tenant: ${tenant.nome}`);
 
-	console.log(`✅ Tenant criado: ${tenant.nome} (${tenant.slug})`);
+	const tenantId = tenant.id;
 
-	// ─── Admin ───────────────────────────────────────
-
-	const admin = await prisma.user.upsert({
-		where: { tenantId_email: { tenantId: tenant.id, email: 'admin@balancaeu.com.br' } },
+	// ─── Admin (upsert) ──────────────────────────────
+	await prisma.user.upsert({
+		where: { tenantId_email: { tenantId, email: 'admin@balancaeu.com.br' } },
 		update: {},
 		create: {
-			tenantId: tenant.id,
+			tenantId,
 			nome: 'Administrador',
 			email: 'admin@balancaeu.com.br',
 			senhaHash: await hashPassword('admin123'),
@@ -48,153 +53,200 @@ async function main() {
 			telefone: '(11) 99999-0001'
 		}
 	});
+	console.log('✅ Admin pronto');
 
-	console.log(`✅ Admin criado: ${admin.email}`);
-
-	// ─── Professores ─────────────────────────────────
-
-	const prof1 = await prisma.user.upsert({
-		where: { tenantId_email: { tenantId: tenant.id, email: 'carlos@balancaeu.com.br' } },
-		update: {},
-		create: {
-			tenantId: tenant.id,
-			nome: 'Carlos Silva',
-			email: 'carlos@balancaeu.com.br',
-			senhaHash: await hashPassword('prof123'),
-			role: 'PROFESSOR',
-			telefone: '(11) 98888-0001'
-		}
+	// ─── Reset: apaga modalidades, turmas, alunos não-admin, professores ─
+	console.log('🧹 Limpando dados antigos...');
+	await prisma.placementBooking.deleteMany({ where: { tenantId } });
+	await prisma.attendance.deleteMany({ where: { tenantId } });
+	await prisma.checkIn.deleteMany({ where: { tenantId } });
+	await prisma.enrollment.deleteMany({ where: { tenantId } });
+	await prisma.privateLesson.deleteMany({ where: { tenantId } });
+	await prisma.classGroup.deleteMany({ where: { tenantId } });
+	await prisma.teacherAvailability.deleteMany({ where: { teacher: { tenantId } } });
+	await prisma.teacher.deleteMany({ where: { tenantId } });
+	await prisma.modality.deleteMany({ where: { tenantId } });
+	await prisma.subscription.deleteMany({ where: { tenantId } });
+	await prisma.faceDescriptor.deleteMany({ where: { tenantId } });
+	await prisma.user.deleteMany({
+		where: { tenantId, role: { in: ['PROFESSOR', 'ALUNO'] } }
 	});
-
-	const prof2 = await prisma.user.upsert({
-		where: { tenantId_email: { tenantId: tenant.id, email: 'ana@balancaeu.com.br' } },
-		update: {},
-		create: {
-			tenantId: tenant.id,
-			nome: 'Ana Santos',
-			email: 'ana@balancaeu.com.br',
-			senhaHash: await hashPassword('prof123'),
-			role: 'PROFESSOR',
-			telefone: '(11) 98888-0002'
-		}
-	});
-
-	console.log(`✅ Professores criados: ${prof1.nome}, ${prof2.nome}`);
-
-	// ─── Teacher profiles ────────────────────────────
-
-	await prisma.teacher.upsert({
-		where: { userId: prof1.id },
-		update: {},
-		create: {
-			tenantId: tenant.id,
-			userId: prof1.id,
-			bio: 'Dançarino profissional com 15 anos de experiência em forró e samba.',
-			especialidades: ['Forró Roots', 'Forró Universitário', 'Samba de Gafieira']
-		}
-	});
-
-	await prisma.teacher.upsert({
-		where: { userId: prof2.id },
-		update: {},
-		create: {
-			tenantId: tenant.id,
-			userId: prof2.id,
-			bio: 'Formada em dança contemporânea, especialista em zouk e bachata.',
-			especialidades: ['Zouk', 'Bachata', 'Dança Contemporânea']
-		}
-	});
-
-	console.log('✅ Perfis de professores criados');
-
-	// ─── Alunos ──────────────────────────────────────
-
-	const aluno1 = await prisma.user.upsert({
-		where: { tenantId_email: { tenantId: tenant.id, email: 'joao@email.com' } },
-		update: {},
-		create: {
-			tenantId: tenant.id,
-			nome: 'João Oliveira',
-			email: 'joao@email.com',
-			senhaHash: await hashPassword('aluno123'),
-			role: 'ALUNO',
-			telefone: '(11) 97777-0001'
-		}
-	});
-
-	const aluno2 = await prisma.user.upsert({
-		where: { tenantId_email: { tenantId: tenant.id, email: 'maria@email.com' } },
-		update: {},
-		create: {
-			tenantId: tenant.id,
-			nome: 'Maria Fernandes',
-			email: 'maria@email.com',
-			senhaHash: await hashPassword('aluno123'),
-			role: 'ALUNO',
-			telefone: '(11) 97777-0002'
-		}
-	});
-
-	const aluno3 = await prisma.user.upsert({
-		where: { tenantId_email: { tenantId: tenant.id, email: 'pedro@email.com' } },
-		update: {},
-		create: {
-			tenantId: tenant.id,
-			nome: 'Pedro Costa',
-			email: 'pedro@email.com',
-			senhaHash: await hashPassword('aluno123'),
-			role: 'ALUNO',
-			telefone: '(11) 97777-0003'
-		}
-	});
-
-	console.log(`✅ Alunos criados: ${aluno1.nome}, ${aluno2.nome}, ${aluno3.nome}`);
+	console.log('✅ Base limpa');
 
 	// ─── Modalidades ─────────────────────────────────
-
-	const forro = await prisma.modality.upsert({
-		where: { id: 'forro-seed' },
-		update: {},
-		create: {
-			id: 'forro-seed',
-			tenantId: tenant.id,
-			nome: 'Forró',
-			descricao: 'Forró raiz, universitário e pé de serra. Aprenda a dançar com alegria e tradição nordestina.'
-		}
-	});
-
-	const samba = await prisma.modality.upsert({
-		where: { id: 'samba-seed' },
-		update: {},
-		create: {
-			id: 'samba-seed',
-			tenantId: tenant.id,
+	const modalityData = [
+		{
+			id: 'forro-roots',
+			nome: 'Forró Roots',
+			descricao: 'Forró tradicional nordestino, com passo marcado, giros e caminhadas. A raiz que move o corpo.'
+		},
+		{
+			id: 'samba-de-gafieira',
 			nome: 'Samba de Gafieira',
-			descricao: 'O samba elegante dos salões cariocas. Técnica, musicalidade e conexão.'
+			descricao: 'O samba elegante dos salões cariocas. Técnica, musicalidade e conexão em dupla.'
+		},
+		{
+			id: 'yoga',
+			nome: 'Yoga',
+			descricao: 'Prática milenar que une corpo, respiração e mente. Força, flexibilidade e presença.'
+		},
+		{
+			id: 'zumba',
+			nome: 'Zumba',
+			descricao: 'Dança-fitness com ritmos latinos. Queima calorias enquanto você se diverte.'
 		}
-	});
+	];
 
-	const zouk = await prisma.modality.upsert({
-		where: { id: 'zouk-seed' },
-		update: {},
-		create: {
-			id: 'zouk-seed',
-			tenantId: tenant.id,
-			nome: 'Zouk',
-			descricao: 'Dança sensual e fluida com movimentos corporais ondulantes.'
-		}
-	});
+	const modalidades = await Promise.all(
+		modalityData.map(m =>
+			prisma.modality.create({ data: { ...m, tenantId } })
+		)
+	);
+	console.log(`✅ Modalidades: ${modalidades.map(m => m.nome).join(', ')}`);
 
-	console.log(`✅ Modalidades criadas: ${forro.nome}, ${samba.nome}, ${zouk.nome}`);
+	// ─── Professores ─────────────────────────────────
+	async function createProfessor(
+		nome: string,
+		email: string,
+		bio: string,
+		modalityIds: string[],
+		especialidades: string[]
+	) {
+		const user = await prisma.user.create({
+			data: {
+				tenantId,
+				nome,
+				email,
+				senhaHash: await hashPassword('prof123'),
+				role: 'PROFESSOR'
+			}
+		});
+		await prisma.teacher.create({
+			data: {
+				tenantId,
+				userId: user.id,
+				bio,
+				especialidades,
+				modalities: { connect: modalityIds.map(id => ({ id })) }
+			}
+		});
+		return user;
+	}
 
-	// ─── Planos ──────────────────────────────────────
+	const danilo = await createProfessor(
+		'Danilo Marano',
+		'danilo@balancaeu.com.br',
+		'Professor de Forró Roots, apaixonado pela tradição nordestina e pela dança enraizada na cultura popular.',
+		['forro-roots'],
+		['Forró Roots', 'Forró Pé de Serra']
+	);
+	const mari = await createProfessor(
+		'Mari Meireles',
+		'mari@balancaeu.com.br',
+		'Dançarina de forró há mais de uma década. Especialista em footwork e técnica feminina.',
+		['forro-roots'],
+		['Forró Roots', 'Footwork']
+	);
+	const ani = await createProfessor(
+		'Ani Gâlíoti',
+		'ani@balancaeu.com.br',
+		'Profissional de samba de gafieira com forte formação em dança de salão brasileira.',
+		['samba-de-gafieira'],
+		['Samba de Gafieira', 'Dança de Salão']
+	);
+	const renato = await createProfessor(
+		'Renato Almeida (Renatinho)',
+		'renato@balancaeu.com.br',
+		'Mestre de samba de gafieira, herdeiro da escola carioca tradicional dos salões.',
+		['samba-de-gafieira'],
+		['Samba de Gafieira', 'Samba de Salão']
+	);
+	const maria = await createProfessor(
+		'Maria Eduarda Balestro',
+		'maria@balancaeu.com.br',
+		'Professora de yoga certificada em Hatha e Vinyasa. Conduz práticas suaves e transformadoras.',
+		['yoga'],
+		['Hatha Yoga', 'Vinyasa Flow', 'Yin Yoga']
+	);
+	const caio = await createProfessor(
+		'Caio Amorim (Supimpa)',
+		'caio@balancaeu.com.br',
+		'Instrutor oficial de Zumba. Energia total, ritmos latinos e muita diversão.',
+		['zumba'],
+		['Zumba Fitness', 'Ritmos Latinos']
+	);
 
-	const planoBasico = await prisma.plan.upsert({
+	console.log('✅ Professores criados');
+
+	const professorMap = {
+		danilo: danilo.id,
+		mari: mari.id,
+		ani: ani.id,
+		renato: renato.id,
+		maria: maria.id,
+		caio: caio.id
+	};
+
+	// ─── Turmas ──────────────────────────────────────
+	type ClassDef = {
+		modalityId: string;
+		professorId: string;
+		nivel: string;
+		diaSemana: DayOfWeek;
+		horarioInicio: string;
+		horarioFim: string;
+		sala: string;
+		maxAlunos: number;
+	};
+
+	const classes: ClassDef[] = [
+		// ─── Forró Roots — cronograma oficial ──────────
+		// Quarta → Sala 3
+		{ modalityId: 'forro-roots', professorId: professorMap.danilo, nivel: 'Introdução ao Roots', diaSemana: 'QUA', horarioInicio: '19:00', horarioFim: '20:00', sala: 'Sala 3', maxAlunos: 20 },
+		{ modalityId: 'forro-roots', professorId: professorMap.mari, nivel: 'Caminhadas e Giros', diaSemana: 'QUA', horarioInicio: '20:00', horarioFim: '21:00', sala: 'Sala 3', maxAlunos: 20 },
+		{ modalityId: 'forro-roots', professorId: professorMap.danilo, nivel: 'Footwork', diaSemana: 'QUA', horarioInicio: '21:00', horarioFim: '22:00', sala: 'Sala 3', maxAlunos: 20 },
+		// Sexta → Sala 1
+		{ modalityId: 'forro-roots', professorId: professorMap.mari, nivel: 'Footwork', diaSemana: 'SEX', horarioInicio: '19:00', horarioFim: '20:00', sala: 'Sala 1', maxAlunos: 20 },
+		{ modalityId: 'forro-roots', professorId: professorMap.danilo, nivel: 'Introdução ao Roots', diaSemana: 'SEX', horarioInicio: '20:00', horarioFim: '21:00', sala: 'Sala 1', maxAlunos: 20 },
+		{ modalityId: 'forro-roots', professorId: professorMap.mari, nivel: 'Caminhadas e Giros', diaSemana: 'SEX', horarioInicio: '21:00', horarioFim: '22:00', sala: 'Sala 1', maxAlunos: 20 },
+		// Sábado → Sala 1
+		{ modalityId: 'forro-roots', professorId: professorMap.danilo, nivel: 'Introdução ao Roots', diaSemana: 'SAB', horarioInicio: '14:00', horarioFim: '15:00', sala: 'Sala 1', maxAlunos: 20 },
+		{ modalityId: 'forro-roots', professorId: professorMap.mari, nivel: 'Caminhadas e Giros', diaSemana: 'SAB', horarioInicio: '15:00', horarioFim: '16:00', sala: 'Sala 1', maxAlunos: 20 },
+		{ modalityId: 'forro-roots', professorId: professorMap.danilo, nivel: 'Footwork', diaSemana: 'SAB', horarioInicio: '16:00', horarioFim: '17:00', sala: 'Sala 1', maxAlunos: 20 },
+
+		// ─── Samba de Gafieira — provisório ────────────
+		{ modalityId: 'samba-de-gafieira', professorId: professorMap.ani, nivel: 'Iniciante', diaSemana: 'TER', horarioInicio: '19:00', horarioFim: '20:00', sala: 'Sala 2', maxAlunos: 18 },
+		{ modalityId: 'samba-de-gafieira', professorId: professorMap.renato, nivel: 'Intermediário', diaSemana: 'TER', horarioInicio: '20:00', horarioFim: '21:00', sala: 'Sala 2', maxAlunos: 18 },
+		{ modalityId: 'samba-de-gafieira', professorId: professorMap.renato, nivel: 'Iniciante', diaSemana: 'QUI', horarioInicio: '19:00', horarioFim: '20:00', sala: 'Sala 2', maxAlunos: 18 },
+		{ modalityId: 'samba-de-gafieira', professorId: professorMap.ani, nivel: 'Intermediário', diaSemana: 'QUI', horarioInicio: '20:00', horarioFim: '21:00', sala: 'Sala 2', maxAlunos: 18 },
+		{ modalityId: 'samba-de-gafieira', professorId: professorMap.ani, nivel: 'Iniciante', diaSemana: 'SAB', horarioInicio: '10:00', horarioFim: '11:00', sala: 'Sala 2', maxAlunos: 18 },
+		{ modalityId: 'samba-de-gafieira', professorId: professorMap.renato, nivel: 'Avançado', diaSemana: 'SAB', horarioInicio: '11:00', horarioFim: '12:00', sala: 'Sala 2', maxAlunos: 18 },
+
+		// ─── Yoga — provisório ─────────────────────────
+		{ modalityId: 'yoga', professorId: professorMap.maria, nivel: 'Hatha Yoga', diaSemana: 'SEG', horarioInicio: '07:00', horarioFim: '08:00', sala: 'Sala 2', maxAlunos: 15 },
+		{ modalityId: 'yoga', professorId: professorMap.maria, nivel: 'Vinyasa Flow', diaSemana: 'QUA', horarioInicio: '07:00', horarioFim: '08:00', sala: 'Sala 2', maxAlunos: 15 },
+		{ modalityId: 'yoga', professorId: professorMap.maria, nivel: 'Yin Yoga', diaSemana: 'SEX', horarioInicio: '07:00', horarioFim: '08:00', sala: 'Sala 2', maxAlunos: 15 },
+		{ modalityId: 'yoga', professorId: professorMap.maria, nivel: 'Hatha Yoga', diaSemana: 'SAB', horarioInicio: '09:00', horarioFim: '10:00', sala: 'Sala 3', maxAlunos: 15 },
+
+		// ─── Zumba — provisório ────────────────────────
+		{ modalityId: 'zumba', professorId: professorMap.caio, nivel: 'Zumba Fitness', diaSemana: 'SEG', horarioInicio: '18:00', horarioFim: '19:00', sala: 'Sala 1', maxAlunos: 25 },
+		{ modalityId: 'zumba', professorId: professorMap.caio, nivel: 'Zumba Fitness', diaSemana: 'QUA', horarioInicio: '18:00', horarioFim: '19:00', sala: 'Sala 1', maxAlunos: 25 },
+		{ modalityId: 'zumba', professorId: professorMap.caio, nivel: 'Zumba Toning', diaSemana: 'SEX', horarioInicio: '18:00', horarioFim: '19:00', sala: 'Sala 3', maxAlunos: 25 },
+		{ modalityId: 'zumba', professorId: professorMap.caio, nivel: 'Zumba Party', diaSemana: 'SAB', horarioInicio: '12:00', horarioFim: '13:00', sala: 'Sala 3', maxAlunos: 25 }
+	];
+
+	for (const c of classes) {
+		await prisma.classGroup.create({ data: { tenantId, ...c } });
+	}
+	console.log(`✅ ${classes.length} turmas criadas`);
+
+	// ─── Planos (upsert) ─────────────────────────────
+	await prisma.plan.upsert({
 		where: { id: 'plano-basico-seed' },
 		update: {},
 		create: {
 			id: 'plano-basico-seed',
-			tenantId: tenant.id,
+			tenantId,
 			nome: 'Básico',
 			descricao: '2 aulas por semana em uma modalidade',
 			preco: 120.0,
@@ -202,13 +254,12 @@ async function main() {
 			permiteParticular: false
 		}
 	});
-
-	const planoIntermediario = await prisma.plan.upsert({
+	await prisma.plan.upsert({
 		where: { id: 'plano-intermediario-seed' },
 		update: {},
 		create: {
 			id: 'plano-intermediario-seed',
-			tenantId: tenant.id,
+			tenantId,
 			nome: 'Intermediário',
 			descricao: '4 aulas por semana em até 2 modalidades',
 			preco: 200.0,
@@ -216,13 +267,12 @@ async function main() {
 			permiteParticular: false
 		}
 	});
-
-	const planoFull = await prisma.plan.upsert({
+	await prisma.plan.upsert({
 		where: { id: 'plano-full-seed' },
 		update: {},
 		create: {
 			id: 'plano-full-seed',
-			tenantId: tenant.id,
+			tenantId,
 			nome: 'Combo Full',
 			descricao: 'Aulas ilimitadas em todas as modalidades + 1 aula particular/mês',
 			preco: 350.0,
@@ -230,183 +280,59 @@ async function main() {
 			permiteParticular: true
 		}
 	});
+	console.log('✅ Planos prontos');
 
-	console.log(`✅ Planos criados: ${planoBasico.nome}, ${planoIntermediario.nome}, ${planoFull.nome}`);
-
-	// ─── Turmas ──────────────────────────────────────
-
-	const turmaForroIni = await prisma.classGroup.create({
-		data: {
-			tenantId: tenant.id,
-			modalityId: forro.id,
-			professorId: prof1.id,
-			nivel: 'Iniciante',
-			diaSemana: 'TER',
-			horarioInicio: '19:00',
-			horarioFim: '20:00',
-			sala: 'Sala 1',
-			maxAlunos: 20
-		}
-	});
-
-	const turmaForroInter = await prisma.classGroup.create({
-		data: {
-			tenantId: tenant.id,
-			modalityId: forro.id,
-			professorId: prof1.id,
-			nivel: 'Intermediário',
-			diaSemana: 'QUI',
-			horarioInicio: '19:00',
-			horarioFim: '20:00',
-			sala: 'Sala 1',
-			maxAlunos: 15
-		}
-	});
-
-	const turmaZouk = await prisma.classGroup.create({
-		data: {
-			tenantId: tenant.id,
-			modalityId: zouk.id,
-			professorId: prof2.id,
-			nivel: 'Iniciante',
-			diaSemana: 'QUA',
-			horarioInicio: '20:00',
-			horarioFim: '21:00',
-			sala: 'Sala 2',
-			maxAlunos: 16
-		}
-	});
-
-	const turmaSamba = await prisma.classGroup.create({
-		data: {
-			tenantId: tenant.id,
-			modalityId: samba.id,
-			professorId: prof1.id,
-			nivel: 'Iniciante',
-			diaSemana: 'SEX',
-			horarioInicio: '20:00',
-			horarioFim: '21:00',
-			sala: 'Sala 1',
-			maxAlunos: 18
-		}
-	});
-
-	console.log('✅ Turmas criadas: 4 turmas');
-
-	// ─── Assinaturas ─────────────────────────────────
-
-	const now = new Date();
-
-	await prisma.subscription.createMany({
-		data: [
-			{
-				tenantId: tenant.id,
-				userId: aluno1.id,
-				planId: planoFull.id,
-				status: 'ATIVA',
-				inicio: now
-			},
-			{
-				tenantId: tenant.id,
-				userId: aluno2.id,
-				planId: planoIntermediario.id,
-				status: 'ATIVA',
-				inicio: now
-			},
-			{
-				tenantId: tenant.id,
-				userId: aluno3.id,
-				planId: planoBasico.id,
-				status: 'ATIVA',
-				inicio: now
-			}
-		]
-	});
-
-	console.log('✅ Assinaturas criadas para 3 alunos');
-
-	// ─── Inscrições em turmas ────────────────────────
-
-	await prisma.enrollment.createMany({
-		data: [
-			{ tenantId: tenant.id, userId: aluno1.id, classGroupId: turmaForroIni.id },
-			{ tenantId: tenant.id, userId: aluno1.id, classGroupId: turmaZouk.id },
-			{ tenantId: tenant.id, userId: aluno1.id, classGroupId: turmaSamba.id },
-			{ tenantId: tenant.id, userId: aluno2.id, classGroupId: turmaForroIni.id },
-			{ tenantId: tenant.id, userId: aluno2.id, classGroupId: turmaForroInter.id },
-			{ tenantId: tenant.id, userId: aluno3.id, classGroupId: turmaForroIni.id }
-		]
-	});
-
-	console.log('✅ Inscrições em turmas criadas');
-
-	// ─── CMS Content (landing page) ──────────────────
-
+	// ─── CMS (upsert) ────────────────────────────────
 	const cmsData = [
-		// Hero
 		{ secao: 'hero', chave: 'titulo', valorTexto: 'Balança Eu: Muito mais que uma escola de dança.', ordem: 1 },
 		{ secao: 'hero', chave: 'subtitulo', valorTexto: 'Um movimento que começa no corpo e transforma quem você é.', ordem: 2 },
 		{ secao: 'hero', chave: 'cta_texto', valorTexto: 'Começar Jornada', ordem: 3 },
-		{ secao: 'hero', chave: 'cta_link', valorTexto: '/cadastro', ordem: 4 },
+		{ secao: 'hero', chave: 'cta_link', valorTexto: '/comecar', ordem: 4 },
 		{ secao: 'hero', chave: 'imagem', valorImagemUrl: '/assets/hero-dance.png', ordem: 5 },
 		{ secao: 'hero', chave: 'frase_destaque', valorTexto: 'Movimento é cura.', ordem: 6 },
 
-		// Escola
 		{ secao: 'escola', chave: 'label', valorTexto: 'Balança Eu', ordem: 1 },
 		{ secao: 'escola', chave: 'titulo', valorTexto: 'Um espaço de encontro, arte e identidade.', ordem: 2 },
 		{ secao: 'escola', chave: 'paragrafo_1', valorTexto: 'No Balança Eu, acreditamos que o corpo é o nosso primeiro território. Não ensinamos apenas passos; cultivamos a percepção de si através do ritmo e da expressão artística.', ordem: 3 },
 		{ secao: 'escola', chave: 'paragrafo_2', valorTexto: 'Nossa casa é um refúgio contemporâneo onde a tradição e a inovação se abraçam para criar novas linguagens corporais e conexões humanas profundas.', ordem: 4 },
 
-		// Preços
-		{ secao: 'precos', chave: 'label', valorTexto: 'Investimento', ordem: 1 },
-		{ secao: 'precos', chave: 'titulo', valorTexto: 'Nossos Preços', ordem: 2 },
-		{ secao: 'precos', chave: 'descricao', valorTexto: 'Escolha o ritmo que combina com seu estilo de vida. Valores mensais por modalidade.', ordem: 3 },
+		{ secao: 'modulos', chave: 'label', valorTexto: 'Nossas Práticas', ordem: 1 },
+		{ secao: 'modulos', chave: 'titulo', valorTexto: 'Nossos Módulos', ordem: 2 },
+		{ secao: 'modulos', chave: 'descricao', valorTexto: 'Explore cada modalidade e encontre o ritmo que transforma.', ordem: 3 },
 
-		// Professores
 		{ secao: 'professores', chave: 'label', valorTexto: 'Mestres do Movimento', ordem: 1 },
 		{ secao: 'professores', chave: 'titulo', valorTexto: 'Quem conduz sua evolução', ordem: 2 },
 		{ secao: 'professores', chave: 'descricao', valorTexto: 'Nossa equipe é formada por artistas apaixonados e profissionais sensíveis ao seu tempo e ritmo.', ordem: 3 },
 
-		// Horários
 		{ secao: 'horarios', chave: 'label', valorTexto: 'Nossa Agenda', ordem: 1 },
 		{ secao: 'horarios', chave: 'titulo', valorTexto: 'Grade de Aulas', ordem: 2 },
 
-		// Eventos
 		{ secao: 'eventos', chave: 'label', valorTexto: 'Agenda Cultural', ordem: 1 },
 		{ secao: 'eventos', chave: 'titulo', valorTexto: 'Próximos Eventos', ordem: 2 },
 		{ secao: 'eventos', chave: 'descricao', valorTexto: 'Vibrações que transcendem as aulas regulares. Conheça nossa programação especial.', ordem: 3 },
 
-		// CTA Final
 		{ secao: 'cta_final', chave: 'titulo', valorTexto: 'Seja parte do movimento.', ordem: 1 },
 		{ secao: 'cta_final', chave: 'titulo_destaque', valorTexto: 'Venha viver a experiência Balança Eu.', ordem: 2 },
 		{ secao: 'cta_final', chave: 'cta_primario_texto', valorTexto: 'Agendar Aula Experimental', ordem: 3 },
-		{ secao: 'cta_final', chave: 'cta_primario_link', valorTexto: '/cadastro', ordem: 4 },
+		{ secao: 'cta_final', chave: 'cta_primario_link', valorTexto: '/comecar', ordem: 4 },
 		{ secao: 'cta_final', chave: 'cta_secundario_texto', valorTexto: 'Falar com Consultor', ordem: 5 },
 
-		// Contato
 		{ secao: 'contato', chave: 'whatsapp', valorTexto: '5511999990000', ordem: 1 },
 		{ secao: 'contato', chave: 'instagram', valorTexto: '@balancaeu', ordem: 2 },
 		{ secao: 'contato', chave: 'instagram_url', valorTexto: 'https://instagram.com/balancaeu', ordem: 3 },
 		{ secao: 'contato', chave: 'whatsapp_url', valorTexto: 'https://wa.me/5511999990000', ordem: 4 },
 		{ secao: 'contato', chave: 'email', valorTexto: 'contato@balancaeu.com.br', ordem: 5 },
 
-		// Footer
 		{ secao: 'footer', chave: 'descricao', valorTexto: 'Um centro cultural dedicado ao movimento consciente, à arte performática e ao florescimento humano através do corpo.', ordem: 1 },
 		{ secao: 'footer', chave: 'copyright', valorTexto: '© 2024 Balança Eu. Onde o movimento encontra a alma.', ordem: 2 }
 	];
 
 	for (const item of cmsData) {
 		await prisma.cmsContent.upsert({
-			where: {
-				tenantId_secao_chave: {
-					tenantId: tenant.id,
-					secao: item.secao,
-					chave: item.chave
-				}
-			},
+			where: { tenantId_secao_chave: { tenantId, secao: item.secao, chave: item.chave } },
 			update: {},
 			create: {
-				tenantId: tenant.id,
+				tenantId,
 				secao: item.secao,
 				chave: item.chave,
 				valorTexto: item.valorTexto ?? null,
@@ -415,30 +341,11 @@ async function main() {
 			}
 		});
 	}
-
-	console.log('✅ Conteúdo CMS criado para landing page (todas as seções)');
-
-	// ─── Evento ──────────────────────────────────────
-
-	const eventDate = new Date();
-	eventDate.setDate(eventDate.getDate() + 30);
-
-	await prisma.event.create({
-		data: {
-			tenantId: tenant.id,
-			titulo: 'Forró na Praça',
-			descricao:
-				'Venha dançar forró ao ar livre! Aula aberta para iniciantes + baile com banda ao vivo.',
-			data: eventDate,
-			horario: '16:00 - 22:00',
-			local: 'Praça da República, São Paulo',
-			preco: 25.0
-		}
-	});
-
-	console.log('✅ Evento criado');
+	console.log('✅ CMS pronto');
 
 	console.log('\n🎉 Seed concluído com sucesso!');
+	console.log('   → Login admin: admin@balancaeu.com.br / admin123');
+	console.log('   → Login professor: <nome>@balancaeu.com.br / prof123');
 }
 
 main()

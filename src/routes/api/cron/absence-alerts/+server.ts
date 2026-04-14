@@ -1,5 +1,5 @@
 // ===========================================
-// Pulso — Cron: Alertas de Faltas
+// BalancaEu — Cron: Alertas de Faltas
 // ===========================================
 // Endpoint para ser chamado por cron job (ex: weekly)
 // Detecta alunos com >3 faltas e envia alertas por email

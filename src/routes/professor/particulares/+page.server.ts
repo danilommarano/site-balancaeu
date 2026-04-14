@@ -60,7 +60,7 @@ export const actions: Actions = {
 		// Enviar email de confirmação ao aluno
 		const dataFormatada = lesson.dataHora.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
 		const horario = lesson.dataHora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-		const schoolName = locals.tenant?.nome ?? 'Pulso';
+		const schoolName = locals.tenant?.nome ?? 'BalancaEu';
 
 		sendEmail({
 			to: lesson.user.email,

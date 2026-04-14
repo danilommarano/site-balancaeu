@@ -1,5 +1,5 @@
 // ===========================================
-// Pulso — Webhook do Stripe
+// BalancaEu — Webhook do Stripe
 // ===========================================
 // TODO: Fase 10 — Receber eventos do Stripe
 // Eventos: checkout.session.completed, invoice.paid,

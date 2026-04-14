@@ -1,4 +1,4 @@
-<!-- Pulso — Professor: Aulas Particulares -->
+<!-- BalancaEu — Professor: Aulas Particulares -->
 <script lang="ts">
   import { enhance } from '$app/forms';
 
@@ -27,7 +27,7 @@
 </script>
 
 <svelte:head>
-  <title>Particulares — Professor — Pulso</title>
+  <title>Particulares — Professor — BalancaEu</title>
 </svelte:head>
 
 <div>

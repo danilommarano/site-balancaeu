@@ -1,4 +1,4 @@
-<!-- Pulso — Extrato Financeiro (Fase 11) -->
+<!-- BalancaEu — Extrato Financeiro (Fase 11) -->
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
@@ -66,7 +66,7 @@
       // Header
       doc.setFontSize(18);
       doc.setFont('helvetica', 'bold');
-      doc.text(escola?.nome ?? 'Pulso', 14, 22);
+      doc.text(escola?.nome ?? 'BalancaEu', 14, 22);
 
       doc.setFontSize(9);
       doc.setFont('helvetica', 'normal');
@@ -146,7 +146,7 @@
 </script>
 
 <svelte:head>
-  <title>Extrato — Pulso</title>
+  <title>Extrato — BalancaEu</title>
 </svelte:head>
 
 <div>

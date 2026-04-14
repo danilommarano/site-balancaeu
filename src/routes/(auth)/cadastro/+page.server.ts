@@ -60,7 +60,7 @@ export const actions: Actions = {
 		});
 
 		// Enviar email de boas-vindas (async, não bloqueia o cadastro)
-		const schoolName = locals.tenant?.nome ?? 'Pulso';
+		const schoolName = locals.tenant?.nome ?? 'BalancaEu';
 		sendEmail({
 			to: email,
 			subject: `Bem-vindo(a) à ${schoolName}! 🎉`,

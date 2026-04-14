@@ -1,5 +1,5 @@
 // ===========================================
-// Pulso — Autenticação (Session-based)
+// BalancaEu — Autenticação (Session-based)
 // ===========================================
 
 import { db } from '$lib/server/db';

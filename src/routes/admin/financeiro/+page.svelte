@@ -1,4 +1,4 @@
-<!-- Pulso — Admin: Financeiro (Fase 14) -->
+<!-- BalancaEu — Admin: Financeiro (Fase 14) -->
 <script lang="ts">
   import { goto } from '$app/navigation';
 
@@ -74,7 +74,7 @@
 </script>
 
 <svelte:head>
-  <title>Financeiro — Admin — Pulso</title>
+  <title>Financeiro — Admin — BalancaEu</title>
 </svelte:head>
 
 <div>

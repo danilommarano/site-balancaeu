@@ -1,4 +1,4 @@
-<!-- Pulso — Professor: Perfil (Fase 15) -->
+<!-- BalancaEu — Professor: Perfil (Fase 15) -->
 <script lang="ts">
   import { enhance } from '$app/forms';
 
@@ -11,7 +11,7 @@
 </script>
 
 <svelte:head>
-  <title>Perfil — Professor — Pulso</title>
+  <title>Perfil — Professor — BalancaEu</title>
 </svelte:head>
 
 <div>

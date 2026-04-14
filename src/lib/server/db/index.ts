@@ -1,5 +1,5 @@
 // ===========================================
-// Pulso — Conexão com o Banco de Dados (Prisma)
+// BalancaEu — Conexão com o Banco de Dados (Prisma)
 // ===========================================
 
 import { PrismaClient } from '@prisma/client';

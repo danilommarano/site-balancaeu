@@ -1,348 +1,280 @@
-<!-- Pulso — Inscrições em Turmas (Fase 8) -->
+<!-- BalancaEu — Minhas Turmas (calendário semanal) -->
 <script lang="ts">
   import { enhance } from '$app/forms';
 
   let { data, form } = $props();
 
-  let activeTab = $state<'minhas' | 'disponiveis'>('minhas');
-  let filtroModalidade = $state('');
-  let filtroDia = $state('');
-  let filtroNivel = $state('');
+  type TurmaDisp = typeof data.turmasDisponiveis[number];
+  type InscricaoItem = typeof data.inscricoes[number];
 
-  const diasLabels: Record<string, string> = {
-    SEG: 'Segunda', TER: 'Terça', QUA: 'Quarta', QUI: 'Quinta',
-    SEX: 'Sexta', SAB: 'Sábado', DOM: 'Domingo'
-  };
+  // ─── Estado ────────────────────────────────────
+  let filtro = $state<'minhas' | 'todas'>('todas');
+  let activeDay = $state('SEG');
 
-  const diasOptions = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB', 'DOM'];
+  const dayKeys = [
+    { key: 'SEG', label: 'Seg' },
+    { key: 'TER', label: 'Ter' },
+    { key: 'QUA', label: 'Qua' },
+    { key: 'QUI', label: 'Qui' },
+    { key: 'SEX', label: 'Sex' },
+    { key: 'SAB', label: 'Sáb' },
+  ];
 
-  const statusLabels: Record<string, { label: string; color: string }> = {
-    ATIVA: { label: 'Ativa', color: 'text-emerald-400 bg-emerald-400/10' },
-    CANCELADA: { label: 'Cancelada', color: 'text-red-400 bg-red-400/10' },
-    LISTA_ESPERA: { label: 'Lista de espera', color: 'text-amber-400 bg-amber-400/10' }
-  };
+  const SALAS = ['Sala 1', 'Sala 2', 'Sala 3'];
 
-  let niveisDisponiveis = $derived(
-    [...new Set(data.turmasDisponiveis.map(t => t.nivel))].sort()
+  // Mapa: classGroupId → enrollmentId (para cancelar)
+  const minhaInscricaoPorTurma = $derived.by(() => {
+    const m = new Map<string, InscricaoItem>();
+    for (const i of data.inscricoes) {
+      if (i.status === 'ATIVA' || i.status === 'LISTA_ESPERA') {
+        m.set(i.turma.id, i);
+      }
+    }
+    return m;
+  });
+
+  // Lista exibida conforme filtro
+  const turmasVisiveis = $derived.by(() => {
+    if (filtro === 'todas') return data.turmasDisponiveis;
+    return data.turmasDisponiveis.filter(t => minhaInscricaoPorTurma.has(t.id));
+  });
+
+  const turmasDoDia = $derived(
+    turmasVisiveis.filter(t => t.diaSemana === activeDay)
   );
 
-  let turmasFiltradas = $derived(
-    data.turmasDisponiveis.filter(t => {
-      if (filtroModalidade && t.modalidadeId !== filtroModalidade) return false;
-      if (filtroDia && t.diaSemana !== filtroDia) return false;
-      if (filtroNivel && t.nivel !== filtroNivel) return false;
-      return true;
-    })
-  );
+  const diasComAulas = $derived.by(() => {
+    const dias = new Set<string>(turmasVisiveis.map(t => t.diaSemana));
+    return dayKeys.filter(d => dias.has(d.key));
+  });
 
-  let inscricoesVisiveis = $derived(
-    data.inscricoes.filter(i => i.status !== 'CANCELADA')
-  );
+  $effect(() => {
+    const dias = diasComAulas;
+    if (dias.length > 0 && !dias.find(d => d.key === activeDay)) {
+      activeDay = dias[0].key;
+    }
+  });
 
-  let inscricoesCanceladas = $derived(
-    data.inscricoes.filter(i => i.status === 'CANCELADA')
-  );
-
-  let temFiltrosAtivos = $derived(
-    filtroModalidade !== '' || filtroDia !== '' || filtroNivel !== ''
-  );
+  // Grade: linhas = horários, colunas = salas
+  const gradeSemanal = $derived.by(() => {
+    const slotMap = new Map<string, Record<string, TurmaDisp | null>>();
+    for (const t of turmasDoDia) {
+      const key = `${t.horarioInicio} - ${t.horarioFim}`;
+      if (!slotMap.has(key)) {
+        slotMap.set(key, { 'Sala 1': null, 'Sala 2': null, 'Sala 3': null });
+      }
+      slotMap.get(key)![t.sala] = t;
+    }
+    return Array.from(slotMap.entries()).sort(([a], [b]) => a.localeCompare(b));
+  });
 </script>
 
 <svelte:head>
-  <title>Minhas Turmas — Pulso</title>
+  <title>Minhas Turmas — BalancaEu</title>
 </svelte:head>
 
 <div>
-  <div class="flex items-start justify-between mb-6">
-    <div>
-      <h1 class="text-2xl font-bold text-white mb-1">Turmas</h1>
-      <p class="text-zinc-500 text-sm">Gerencie suas inscrições em turmas regulares</p>
-    </div>
-    {#if data.temPlano}
-      <div class="text-right">
-        <p class="text-xs text-zinc-500">Inscrições ativas</p>
-        <p class="text-lg font-bold {data.inscricoesAtivas >= data.maxAulasSemana ? 'text-amber-400' : 'text-emerald-400'}">
-          {data.inscricoesAtivas}/{data.maxAulasSemana}
-        </p>
-      </div>
-    {/if}
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-zinc-900 dark:text-white mb-1">Minhas Turmas</h1>
+    <p class="text-zinc-500 text-sm">Navegue pela grade semanal e gerencie suas inscrições</p>
   </div>
 
   <!-- Feedback -->
-  {#if form?.success}
-    <div class="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-lg px-4 py-3 mb-6 text-sm">
-      <span class="material-symbols-outlined text-[18px]">check_circle</span>
-      {form.message}
-    </div>
-  {/if}
   {#if form?.error}
-    <div class="flex items-center gap-2 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg px-4 py-3 mb-6 text-sm">
+    <div class="mb-4 flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 dark:bg-red-500/10 dark:border-red-500/20 dark:text-red-400 rounded-lg px-4 py-3 text-sm">
       <span class="material-symbols-outlined text-[18px]">error</span>
-      {form.error}
+      <span>{form.error}</span>
+    </div>
+  {/if}
+  {#if form?.success}
+    <div class="mb-4 flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-700 dark:bg-emerald-500/10 dark:border-emerald-500/20 dark:text-emerald-400 rounded-lg px-4 py-3 text-sm">
+      <span class="material-symbols-outlined text-[18px]">check_circle</span>
+      <span>{form.message ?? 'Operação realizada.'}</span>
     </div>
   {/if}
 
-  <!-- No plan warning -->
-  {#if !data.temPlano}
-    <div class="bg-amber-500/10 border border-amber-500/20 rounded-xl p-5 mb-6 flex items-start gap-3">
-      <span class="material-symbols-outlined text-amber-400 text-[22px] mt-0.5">warning</span>
-      <div>
-        <p class="text-sm font-medium text-amber-300">Sem plano ativo</p>
-        <p class="text-xs text-amber-400/70 mt-1">Você precisa de um plano ativo para se inscrever em turmas. <a href="/aluno/plano" class="underline hover:text-amber-300">Ver planos</a></p>
+  <!-- Filtro + Stats -->
+  <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+    <!-- Toggle -->
+    <div class="inline-flex items-center bg-white dark:bg-zinc-900 border border-stone-200 dark:border-zinc-800 rounded-xl p-1 shadow-sm">
+      <button
+        type="button"
+        onclick={() => filtro = 'todas'}
+        class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all
+          {filtro === 'todas'
+            ? 'bg-emerald-600 text-white shadow-sm'
+            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'}"
+      >
+        <span class="material-symbols-outlined text-[16px]">grid_view</span>
+        Todas as turmas
+      </button>
+      <button
+        type="button"
+        onclick={() => filtro = 'minhas'}
+        class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all
+          {filtro === 'minhas'
+            ? 'bg-emerald-600 text-white shadow-sm'
+            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'}"
+      >
+        <span class="material-symbols-outlined text-[16px]">checklist</span>
+        Apenas minhas
+        <span class="text-[10px] bg-stone-200 dark:bg-zinc-800 {filtro === 'minhas' ? 'text-emerald-700' : 'text-zinc-500'} rounded-full px-2 py-0.5">
+          {minhaInscricaoPorTurma.size}
+        </span>
+      </button>
+    </div>
+
+    <!-- Plan badge -->
+    {#if data.temPlano}
+      <div class="flex items-center gap-2 text-xs text-zinc-500">
+        <span class="material-symbols-outlined text-[16px] text-emerald-500">bolt</span>
+        <span>
+          <strong class="text-zinc-900 dark:text-white">{data.inscricoesAtivas}</strong>/{data.maxAulasSemana} aulas ativas
+        </span>
       </div>
-    </div>
-  {/if}
-
-  <!-- Tabs -->
-  <div class="flex gap-1 mb-6 bg-zinc-900 border border-zinc-800 rounded-lg p-1 w-fit">
-    <button
-      onclick={() => activeTab = 'minhas'}
-      class="px-4 py-2 rounded-md text-sm font-medium transition-all {activeTab === 'minhas' ? 'bg-emerald-600 text-white' : 'text-zinc-400 hover:text-white'}"
-    >
-      Minhas Turmas
-      {#if inscricoesVisiveis.length > 0}
-        <span class="ml-1.5 text-[10px] bg-white/20 px-1.5 py-0.5 rounded-full">{inscricoesVisiveis.length}</span>
-      {/if}
-    </button>
-    <button
-      onclick={() => activeTab = 'disponiveis'}
-      class="px-4 py-2 rounded-md text-sm font-medium transition-all {activeTab === 'disponiveis' ? 'bg-emerald-600 text-white' : 'text-zinc-400 hover:text-white'}"
-    >
-      Turmas Disponíveis
-      <span class="ml-1.5 text-[10px] bg-white/20 px-1.5 py-0.5 rounded-full">{data.turmasDisponiveis.length}</span>
-    </button>
+    {:else}
+      <a
+        href="/aluno/plano"
+        class="text-xs text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1"
+      >
+        <span class="material-symbols-outlined text-[16px]">warning</span>
+        Você precisa de um plano ativo para se inscrever
+      </a>
+    {/if}
   </div>
 
-  <!-- TAB: Minhas Turmas -->
-  {#if activeTab === 'minhas'}
-    {#if inscricoesVisiveis.length === 0}
-      <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-12 text-center">
-        <span class="material-symbols-outlined text-5xl text-zinc-700 mb-3">groups</span>
-        <h2 class="text-lg font-semibold text-white mb-1">Nenhuma inscrição ativa</h2>
-        <p class="text-zinc-500 text-sm mb-4">Explore as turmas disponíveis e inscreva-se.</p>
-        <button onclick={() => activeTab = 'disponiveis'} class="text-emerald-400 text-sm hover:underline">
-          Ver turmas disponíveis
-        </button>
-      </div>
-    {:else}
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {#each inscricoesVisiveis as inscricao}
-          {@const turma = inscricao.turma}
-          {@const st = statusLabels[inscricao.status] ?? statusLabels.ATIVA}
-          <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden hover:border-zinc-700 transition-colors">
-            <div class="p-5">
-              <div class="flex items-start justify-between mb-3">
-                <div>
-                  <h3 class="text-base font-semibold text-white">{turma.modalidade}</h3>
-                  <p class="text-xs text-zinc-500">{turma.nivel} — Prof. {turma.professor}</p>
-                </div>
-                <span class="text-[11px] font-medium px-2 py-0.5 rounded-full {st.color}">{st.label}</span>
-              </div>
+  <!-- Day tabs -->
+  <div class="flex flex-wrap gap-2 mb-6">
+    {#each dayKeys as day}
+      {@const hasClasses = turmasVisiveis.some(t => t.diaSemana === day.key)}
+      <button
+        type="button"
+        onclick={() => activeDay = day.key}
+        disabled={!hasClasses}
+        class="px-5 py-2 rounded-full font-bold text-xs uppercase tracking-widest transition-all border-2
+          {activeDay === day.key
+            ? 'bg-emerald-600 text-white border-emerald-600'
+            : hasClasses
+              ? 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 border-stone-200 dark:border-zinc-800 hover:border-emerald-500/50'
+              : 'bg-stone-50 dark:bg-zinc-900/30 text-stone-300 dark:text-zinc-700 border-stone-100 dark:border-zinc-800/50 cursor-not-allowed'}"
+      >
+        {day.label}
+      </button>
+    {/each}
+  </div>
 
-              <div class="grid grid-cols-2 gap-3 text-sm mb-4">
-                <div class="flex items-center gap-2 text-zinc-400">
-                  <span class="material-symbols-outlined text-[16px]">calendar_today</span>
-                  {diasLabels[turma.diaSemana] ?? turma.diaSemana}
-                </div>
-                <div class="flex items-center gap-2 text-zinc-400">
-                  <span class="material-symbols-outlined text-[16px]">schedule</span>
-                  {turma.horarioInicio}–{turma.horarioFim}
-                </div>
-                <div class="flex items-center gap-2 text-zinc-400">
-                  <span class="material-symbols-outlined text-[16px]">room</span>
-                  {turma.sala}
-                </div>
-                <div class="flex items-center gap-2 text-zinc-400">
-                  <span class="material-symbols-outlined text-[16px]">group</span>
-                  {turma.inscritos}/{turma.maxAlunos} alunos
-                </div>
-              </div>
-
-              <form method="POST" action="?/cancelar" use:enhance>
-                <input type="hidden" name="enrollmentId" value={inscricao.id} />
-                <button
-                  type="submit"
-                  class="flex items-center gap-1.5 text-xs text-red-400/70 hover:text-red-400 transition-colors"
-                >
-                  <span class="material-symbols-outlined text-[14px]">cancel</span>
-                  Cancelar inscrição
-                </button>
-              </form>
-            </div>
-            <div class="px-5 py-3 bg-zinc-800/30 border-t border-zinc-800 text-[11px] text-zinc-500">
-              Inscrito em {new Date(inscricao.dataInscricao).toLocaleDateString('pt-BR')}
-            </div>
+  <!-- Grade: linhas = horários, colunas = salas -->
+  {#if gradeSemanal.length > 0}
+    <div class="bg-white dark:bg-zinc-900 border border-stone-200 dark:border-zinc-800 rounded-2xl p-5 md:p-6">
+      <!-- Header das salas -->
+      <div class="grid grid-cols-[80px_1fr_1fr_1fr] md:grid-cols-[100px_1fr_1fr_1fr] gap-3 mb-3">
+        <div></div>
+        {#each SALAS as sala}
+          <div class="text-center">
+            <span class="font-label text-xs uppercase tracking-widest text-emerald-600 dark:text-emerald-400">{sala}</span>
           </div>
         {/each}
       </div>
-    {/if}
 
-    <!-- Histórico (canceladas) -->
-    {#if inscricoesCanceladas.length > 0}
-      <details class="mt-6">
-        <summary class="text-xs text-zinc-500 cursor-pointer hover:text-zinc-400 transition-colors">
-          Histórico de inscrições canceladas ({inscricoesCanceladas.length})
-        </summary>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
-          {#each inscricoesCanceladas as inscricao}
-            {@const turma = inscricao.turma}
-            <div class="bg-zinc-900/50 border border-zinc-800/50 rounded-xl p-4 opacity-60">
-              <div class="flex items-start justify-between mb-2">
-                <div>
-                  <h3 class="text-sm font-medium text-zinc-400">{turma.modalidade}</h3>
-                  <p class="text-[11px] text-zinc-600">{turma.nivel} — Prof. {turma.professor}</p>
-                </div>
-                <span class="text-[10px] font-medium px-2 py-0.5 rounded-full text-red-400 bg-red-400/10">Cancelada</span>
-              </div>
-              <p class="text-[11px] text-zinc-600">
-                {diasLabels[turma.diaSemana] ?? turma.diaSemana} · {turma.horarioInicio}–{turma.horarioFim}
-              </p>
+      <!-- Linhas -->
+      <div class="space-y-3">
+        {#each gradeSemanal as [horario, porSala] (horario)}
+          <div class="grid grid-cols-[80px_1fr_1fr_1fr] md:grid-cols-[100px_1fr_1fr_1fr] gap-3 items-stretch">
+            <div class="bg-emerald-600/5 dark:bg-emerald-600/10 rounded-xl flex items-center justify-center border-l-2 border-emerald-600/30 px-2">
+              <span class="font-headline text-sm md:text-base text-emerald-700 dark:text-emerald-400 text-center leading-tight">{horario}</span>
             </div>
-          {/each}
-        </div>
-      </details>
-    {/if}
+            {#each SALAS as sala}
+              {@const turma = porSala[sala]}
+              {#if turma}
+                {@const inscricao = minhaInscricaoPorTurma.get(turma.id)}
+                {@const isEnrolled = !!inscricao}
+                {@const isWaitlist = inscricao?.status === 'LISTA_ESPERA'}
+                {@const isFull = turma.inscritos >= turma.maxAlunos}
+                <div
+                  class="p-3 md:p-4 rounded-xl border-2 transition-all
+                    {isEnrolled
+                      ? 'bg-emerald-50 dark:bg-emerald-600/10 border-emerald-500 dark:border-emerald-600/40'
+                      : 'bg-stone-50 dark:bg-zinc-800/40 border-stone-200 dark:border-zinc-800 hover:border-emerald-500/40'}"
+                >
+                  <div class="flex items-start justify-between gap-2 mb-2">
+                    <div class="min-w-0 flex-1">
+                      <h4 class="font-headline text-sm md:text-base text-zinc-900 dark:text-white leading-tight truncate">{turma.modalidade}</h4>
+                      <p class="text-[11px] text-zinc-600 dark:text-zinc-400 truncate">{turma.nivel}</p>
+                      <p class="text-[10px] text-zinc-500 truncate">Prof. {turma.professor}</p>
+                    </div>
+                    {#if isEnrolled}
+                      <span class="shrink-0 w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-white text-[14px]">check</span>
+                      </span>
+                    {/if}
+                  </div>
 
-  <!-- TAB: Turmas Disponíveis -->
+                  <!-- Capacity bar -->
+                  <div class="flex items-center gap-2 text-[9px] mb-2">
+                    <div class="flex-1 h-1 rounded-full bg-stone-200 dark:bg-zinc-700 overflow-hidden">
+                      <div
+                        class="h-full transition-all {isFull ? 'bg-amber-500' : 'bg-emerald-500'}"
+                        style="width: {Math.min(100, (turma.inscritos / turma.maxAlunos) * 100)}%"
+                      ></div>
+                    </div>
+                    <span class="text-zinc-500 tabular-nums">{turma.inscritos}/{turma.maxAlunos}</span>
+                  </div>
+
+                  {#if isEnrolled}
+                    <div class="flex flex-col gap-1">
+                      {#if isWaitlist}
+                        <span class="text-[9px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest">Lista de espera</span>
+                      {/if}
+                      <form method="POST" action="?/cancelar" use:enhance>
+                        <input type="hidden" name="enrollmentId" value={inscricao!.id} />
+                        <button
+                          type="submit"
+                          class="w-full text-[10px] font-bold uppercase tracking-widest py-1.5 rounded-lg bg-white dark:bg-zinc-900 border border-red-300 dark:border-red-600/40 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-600/10 transition-colors"
+                        >
+                          Cancelar
+                        </button>
+                      </form>
+                    </div>
+                  {:else if data.temPlano}
+                    <form method="POST" action="?/inscrever" use:enhance>
+                      <input type="hidden" name="classGroupId" value={turma.id} />
+                      <button
+                        type="submit"
+                        class="w-full text-[10px] font-bold uppercase tracking-widest py-1.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-colors"
+                      >
+                        {isFull ? 'Lista de espera' : 'Inscrever-se'}
+                      </button>
+                    </form>
+                  {:else}
+                    <div class="text-[9px] text-center text-zinc-500 py-1.5">Plano necessário</div>
+                  {/if}
+                </div>
+              {:else}
+                <div class="bg-stone-50/50 dark:bg-zinc-900/30 rounded-xl border border-dashed border-stone-200 dark:border-zinc-800 flex items-center justify-center min-h-[100px]">
+                  <span class="text-[10px] text-stone-300 dark:text-zinc-700 uppercase tracking-widest">—</span>
+                </div>
+              {/if}
+            {/each}
+          </div>
+        {/each}
+      </div>
+    </div>
   {:else}
-    <!-- Filters -->
-    <div class="flex flex-wrap gap-3 mb-6">
-      <div>
-        <label for="filtro-modalidade" class="sr-only">Modalidade</label>
-        <select
-          id="filtro-modalidade"
-          bind:value={filtroModalidade}
-          class="bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
-        >
-          <option value="">Todas as modalidades</option>
-          {#each data.modalidades as mod}
-            <option value={mod.id}>{mod.nome}</option>
-          {/each}
-        </select>
-      </div>
-      <div>
-        <label for="filtro-dia" class="sr-only">Dia da semana</label>
-        <select
-          id="filtro-dia"
-          bind:value={filtroDia}
-          class="bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
-        >
-          <option value="">Todos os dias</option>
-          {#each diasOptions as dia}
-            <option value={dia}>{diasLabels[dia]}</option>
-          {/each}
-        </select>
-      </div>
-      <div>
-        <label for="filtro-nivel" class="sr-only">Nível</label>
-        <select
-          id="filtro-nivel"
-          bind:value={filtroNivel}
-          class="bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
-        >
-          <option value="">Todos os níveis</option>
-          {#each niveisDisponiveis as nivel}
-            <option value={nivel}>{nivel}</option>
-          {/each}
-        </select>
-      </div>
-      {#if temFiltrosAtivos}
+    <div class="bg-white dark:bg-zinc-900 border-2 border-dashed border-stone-200 dark:border-zinc-800 rounded-2xl p-16 text-center">
+      <span class="material-symbols-outlined text-5xl text-stone-300 dark:text-zinc-700 block mb-3">event_busy</span>
+      {#if filtro === 'minhas'}
+        <p class="font-headline text-xl italic text-zinc-500 mb-2">Você ainda não está inscrito em turmas</p>
         <button
-          onclick={() => { filtroModalidade = ''; filtroDia = ''; filtroNivel = ''; }}
-          class="flex items-center gap-1 text-xs text-zinc-500 hover:text-white transition-colors px-2"
+          type="button"
+          onclick={() => filtro = 'todas'}
+          class="text-sm text-emerald-600 dark:text-emerald-400 hover:underline"
         >
-          <span class="material-symbols-outlined text-[14px]">close</span>
-          Limpar filtros
+          Ver todas as turmas disponíveis →
         </button>
+      {:else}
+        <p class="font-headline text-xl italic text-zinc-500">Nenhuma turma cadastrada no momento.</p>
       {/if}
     </div>
-
-    {#if turmasFiltradas.length === 0}
-      <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-12 text-center">
-        <span class="material-symbols-outlined text-5xl text-zinc-700 mb-3">search_off</span>
-        <h2 class="text-lg font-semibold text-white mb-1">Nenhuma turma encontrada</h2>
-        <p class="text-zinc-500 text-sm">
-          {#if temFiltrosAtivos}
-            Tente ajustar os filtros.
-          {:else}
-            Não há turmas disponíveis no momento.
-          {/if}
-        </p>
-      </div>
-    {:else}
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {#each turmasFiltradas as turma}
-          {@const lotada = turma.inscritos >= turma.maxAlunos}
-          {@const vagasRestantes = turma.maxAlunos - turma.inscritos}
-          <div class="bg-zinc-900 border rounded-xl overflow-hidden transition-colors {turma.jaInscrito ? 'border-emerald-600/30' : lotada ? 'border-amber-600/20' : 'border-zinc-800 hover:border-zinc-700'}">
-            <div class="p-5">
-              <div class="flex items-start justify-between mb-3">
-                <div>
-                  <h3 class="text-base font-semibold text-white">{turma.modalidade}</h3>
-                  <p class="text-xs text-zinc-500">{turma.nivel} — Prof. {turma.professor}</p>
-                </div>
-                {#if turma.jaInscrito}
-                  <span class="text-[11px] font-medium px-2 py-0.5 rounded-full text-emerald-400 bg-emerald-400/10">Inscrito</span>
-                {:else if lotada}
-                  <span class="text-[11px] font-medium px-2 py-0.5 rounded-full text-amber-400 bg-amber-400/10">Lotada</span>
-                {:else}
-                  <span class="text-[11px] font-medium px-2 py-0.5 rounded-full text-emerald-400 bg-emerald-400/10">{vagasRestantes} vaga{vagasRestantes !== 1 ? 's' : ''}</span>
-                {/if}
-              </div>
-
-              <div class="grid grid-cols-2 gap-3 text-sm mb-4">
-                <div class="flex items-center gap-2 text-zinc-400">
-                  <span class="material-symbols-outlined text-[16px]">calendar_today</span>
-                  {diasLabels[turma.diaSemana] ?? turma.diaSemana}
-                </div>
-                <div class="flex items-center gap-2 text-zinc-400">
-                  <span class="material-symbols-outlined text-[16px]">schedule</span>
-                  {turma.horarioInicio}–{turma.horarioFim}
-                </div>
-                <div class="flex items-center gap-2 text-zinc-400">
-                  <span class="material-symbols-outlined text-[16px]">room</span>
-                  {turma.sala}
-                </div>
-                <div class="flex items-center gap-2 text-zinc-400">
-                  <span class="material-symbols-outlined text-[16px]">group</span>
-                  {turma.inscritos}/{turma.maxAlunos} alunos
-                </div>
-              </div>
-
-              <!-- Capacity bar -->
-              <div class="w-full bg-zinc-800 rounded-full h-1.5 mb-4">
-                <div
-                  class="h-1.5 rounded-full transition-all {lotada ? 'bg-amber-500' : 'bg-emerald-500'}"
-                  style="width: {Math.min((turma.inscritos / turma.maxAlunos) * 100, 100)}%"
-                ></div>
-              </div>
-
-              {#if turma.jaInscrito}
-                <p class="text-xs text-emerald-400/70 flex items-center gap-1">
-                  <span class="material-symbols-outlined text-[14px]">check</span>
-                  Você já está inscrito nesta turma
-                </p>
-              {:else if data.temPlano}
-                <form method="POST" action="?/inscrever" use:enhance>
-                  <input type="hidden" name="classGroupId" value={turma.id} />
-                  <button
-                    type="submit"
-                    class="flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg transition-colors {lotada ? 'bg-amber-600/15 text-amber-400 hover:bg-amber-600/25' : 'bg-emerald-600 text-white hover:bg-emerald-700'}"
-                  >
-                    <span class="material-symbols-outlined text-[16px]">{lotada ? 'hourglass_top' : 'add_circle'}</span>
-                    {lotada ? 'Entrar na lista de espera' : 'Inscrever-se'}
-                  </button>
-                </form>
-              {:else}
-                <a href="/aluno/plano" class="flex items-center gap-2 text-xs text-amber-400 hover:underline">
-                  <span class="material-symbols-outlined text-[14px]">lock</span>
-                  Assine um plano para se inscrever
-                </a>
-              {/if}
-            </div>
-          </div>
-        {/each}
-      </div>
-    {/if}
   {/if}
 </div>

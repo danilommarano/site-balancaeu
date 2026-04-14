@@ -1,5 +1,5 @@
 // ===========================================
-// Pulso — Cron: Lembretes e Vencimentos
+// BalancaEu — Cron: Lembretes e Vencimentos
 // ===========================================
 // Endpoint para ser chamado por cron job (ex: daily)
 // Envia lembretes de aulas particulares (24h) e avisos de vencimento de plano (7 dias)

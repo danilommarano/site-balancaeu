@@ -1,5 +1,5 @@
 // ===========================================
-// Pulso — Tipos compartilhados
+// BalancaEu — Tipos compartilhados
 // ===========================================
 // TODO: Fase 2 — Definir tipos TypeScript baseados no schema Prisma
 

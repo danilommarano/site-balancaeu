@@ -1,4 +1,4 @@
-<!-- Pulso — Layout Área do Professor -->
+<!-- BalancaEu — Layout Área do Professor -->
 <script lang="ts">
   import { enhance } from '$app/forms';
   import { page } from '$app/stores';
@@ -49,7 +49,7 @@
           <span class="material-symbols-outlined text-white text-[18px]">school</span>
         </div>
         <div>
-          <h1 class="text-sm font-bold text-white">Pulso</h1>
+          <h1 class="text-sm font-bold text-white">BalancaEu</h1>
           <p class="text-[10px] text-zinc-500">Professor</p>
         </div>
       </div>
@@ -98,7 +98,7 @@
       <div class="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center">
         <span class="material-symbols-outlined text-white text-[16px]">school</span>
       </div>
-      <span class="text-sm font-bold text-white">Pulso</span>
+      <span class="text-sm font-bold text-white">BalancaEu</span>
     </div>
     <button onclick={() => mobileOpen = !mobileOpen} class="text-zinc-400 hover:text-white" aria-label="Menu">
       <span class="material-symbols-outlined">{mobileOpen ? 'close' : 'menu'}</span>
@@ -115,7 +115,7 @@
             <span class="material-symbols-outlined text-white text-[18px]">school</span>
           </div>
           <div>
-            <h1 class="text-sm font-bold text-white">Pulso</h1>
+            <h1 class="text-sm font-bold text-white">BalancaEu</h1>
             <p class="text-[10px] text-zinc-500">Professor</p>
           </div>
         </div>

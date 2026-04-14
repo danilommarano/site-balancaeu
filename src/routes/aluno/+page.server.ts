@@ -10,7 +10,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	if (!tenantId) throw redirect(302, '/login');
 
 	// Fetch subscription with plan, enrollments with class details, and attendance count
-	const [subscription, enrollments, presencasMes, proximosEventos] = await Promise.all([
+	const [subscription, enrollments, presencasMes, proximosEventos, placementBookings] = await Promise.all([
 		db.subscription.findFirst({
 			where: { userId: user.id, tenantId, status: 'ATIVA' },
 			include: { plan: true },
@@ -41,6 +41,23 @@ export const load: PageServerLoad = async ({ locals }) => {
 			where: { tenantId, ativo: true, data: { gte: new Date() } },
 			orderBy: { data: 'asc' },
 			take: 3
+		}),
+		db.placementBooking.findMany({
+			where: {
+				userId: user.id,
+				tenantId,
+				status: 'AGENDADO',
+				dataHora: { gte: new Date() }
+			},
+			orderBy: { dataHora: 'asc' },
+			include: {
+				classGroup: {
+					include: {
+						modality: { select: { nome: true } },
+						professor: { select: { nome: true } }
+					}
+				}
+			}
 		})
 	]);
 
@@ -75,11 +92,21 @@ export const load: PageServerLoad = async ({ locals }) => {
 		preco: e.preco ? Number(e.preco) : null
 	}));
 
+	const nivelamentos = placementBookings.map(p => ({
+		id: p.id,
+		modalidade: p.classGroup.modality.nome,
+		professor: p.classGroup.professor.nome,
+		nivel: p.classGroup.nivel,
+		sala: p.classGroup.sala,
+		dataHora: p.dataHora.toISOString()
+	}));
+
 	return {
 		planoAtual,
 		turmas,
 		presencasMes,
 		eventos,
+		nivelamentos,
 		totalTurmas: enrollments.length
 	};
 };

@@ -1,11 +1,11 @@
-<!-- Pulso — Perfil do Aluno -->
+<!-- BalancaEu — Perfil do Aluno -->
 <script lang="ts">
   import { enhance } from '$app/forms';
   let { data, form } = $props();
 </script>
 
 <svelte:head>
-  <title>Meu Perfil — Pulso</title>
+  <title>Meu Perfil — BalancaEu</title>
 </svelte:head>
 
 <div>

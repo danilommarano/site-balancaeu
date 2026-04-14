@@ -1,4 +1,4 @@
-<!-- Pulso — Aulas Particulares (Fase 9) -->
+<!-- BalancaEu — Aulas Particulares (Fase 9) -->
 <script lang="ts">
   import { enhance } from '$app/forms';
 
@@ -63,7 +63,7 @@
 </script>
 
 <svelte:head>
-  <title>Aulas Particulares — Pulso</title>
+  <title>Aulas Particulares — BalancaEu</title>
 </svelte:head>
 
 <div>

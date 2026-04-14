@@ -1,15 +1,15 @@
-<!-- Pulso — Landing Page (Dinâmica via CMS) -->
+<!-- BalancaEu — Landing Page (Dinâmica via CMS) -->
 <script lang="ts">
-  import Logo from '$lib/components/landing/Logo.svelte';
+  import PublicHeader from '$lib/components/landing/PublicHeader.svelte';
+  import PublicFooter from '$lib/components/landing/PublicFooter.svelte';
 
   let { data } = $props();
 
-  let mobileMenuOpen = $state(false);
   let activeDay = $state('SEG');
 
   const navLinks = [
     { href: '#escola', label: 'Sobre a escola' },
-    { href: '#precos', label: 'Preços' },
+    { href: '#modulos', label: 'Módulos' },
     { href: '#professores', label: 'Professores' },
     { href: '#horarios', label: 'Horários' },
     { href: '#eventos', label: 'Eventos' },
@@ -21,8 +21,8 @@
     return data.cms?.[secao]?.[chave] ?? fallback;
   }
 
-  // Planos do banco
-  const planos = $derived(data.planos ?? []);
+  // Modalidades do banco
+  const modalidades = $derived(data.modalidades ?? []);
 
   // Professores do banco
   const professores = $derived(data.professores ?? []);
@@ -46,15 +46,19 @@
     turmas.filter((t: { diaSemana: string }) => t.diaSemana === activeDay)
   );
 
-  // Agrupar turmas por horário
-  const turmasPorHorario = $derived(() => {
-    const groups: Record<string, typeof turmas> = {};
+  const SALAS = ['Sala 1', 'Sala 2', 'Sala 3'];
+
+  // Grid semanal: linhas = horários, colunas = salas
+  const gradeSemanal = $derived.by(() => {
+    const slotMap = new Map<string, Record<string, typeof turmas[number] | null>>();
     for (const t of turmasDoDia) {
       const key = `${t.horarioInicio} - ${t.horarioFim}`;
-      if (!groups[key]) groups[key] = [];
-      groups[key].push(t);
+      if (!slotMap.has(key)) {
+        slotMap.set(key, { 'Sala 1': null, 'Sala 2': null, 'Sala 3': null });
+      }
+      slotMap.get(key)![t.sala] = t;
     }
-    return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b));
+    return Array.from(slotMap.entries()).sort(([a], [b]) => a.localeCompare(b));
   });
 
   function formatCurrency(value: number | string | null) {
@@ -65,10 +69,6 @@
   function formatMonth(date: string | Date) {
     return new Date(date).toLocaleDateString('pt-BR', { month: 'short' }).toUpperCase().replace('.', '');
   }
-
-  function closeMobileMenu() {
-    mobileMenuOpen = false;
-  }
 </script>
 
 <svelte:head>
@@ -76,34 +76,7 @@
   <meta name="description" content="Um movimento que começa no corpo e transforma quem você é. Escola de dança com Forró, Samba, Zumba e Yoga." />
 </svelte:head>
 
-<!-- ═══════════ HEADER ═══════════ -->
-<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl">
-  <div class="flex justify-between items-center px-8 py-6 max-w-screen-2xl mx-auto">
-    <a class="flex items-center gap-2" href="/">
-      <Logo class="h-8 w-auto" />
-    </a>
-
-    <nav class="hidden xl:flex gap-8 items-center">
-      {#each navLinks as link, i}
-        <a
-          class="font-label text-sm uppercase tracking-widest transition-colors duration-300 {i === 0 ? 'text-primary decoration-primary/30 decoration-2 underline underline-offset-8' : 'text-stone-600 hover:text-secondary'}"
-          href={link.href}
-        >
-          {link.label}
-        </a>
-      {/each}
-    </nav>
-
-    <div class="flex items-center gap-4">
-      <a href="/login" class="bg-primary text-on-primary px-6 py-2 rounded-lg font-label font-medium hover:opacity-90 transition-opacity hidden sm:block">
-        Agendar Visita
-      </a>
-      <button class="xl:hidden text-primary p-2" onclick={() => mobileMenuOpen = true}>
-        <span class="material-symbols-outlined text-3xl">menu</span>
-      </button>
-    </div>
-  </div>
-</header>
+<PublicHeader {navLinks} />
 
 <!-- ═══════════ MAIN ═══════════ -->
 <main class="pt-24">
@@ -119,7 +92,9 @@
           {cms('hero', 'subtitulo', 'Um movimento que começa no corpo e transforma quem você é.')}
         </p>
         <div class="mt-12 flex gap-6 items-center">
-          <a href={cms('hero', 'cta_link', '/cadastro')} class="bg-primary text-on-primary px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-lg transition-all">{cms('hero', 'cta_texto', 'Começar Jornada')}</a>
+          <a href={cms('hero', 'cta_link', '/comecar')} class="bg-primary text-on-primary px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-lg transition-all">
+            {cms('hero', 'cta_texto', 'Começar Jornada')}
+          </a>
           <a class="font-headline italic text-xl text-secondary flex items-center gap-2 group" href="#escola">
             Nossa Filosofia
             <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
@@ -167,36 +142,60 @@
     </svg>
   </div>
 
-  <!-- 3. PREÇOS (CMS + Banco) -->
-  <section class="py-24 px-8 bg-primary text-white" id="precos">
+  <!-- 3. MÓDULOS (Modalidades do banco) -->
+  <section class="py-24 px-8 bg-primary text-white" id="modulos">
     <div class="max-w-screen-2xl mx-auto">
       <div class="text-center mb-20">
-        <span class="font-label text-sm uppercase tracking-[0.3em] text-white/70 mb-6 block">{cms('precos', 'label', 'Investimento')}</span>
-        <h2 class="font-headline text-5xl md:text-7xl mb-6 text-white">{cms('precos', 'titulo', 'Nossos Preços')}</h2>
-        <p class="font-body text-xl text-white/80 max-w-2xl mx-auto">{cms('precos', 'descricao', 'Escolha o ritmo que combina com seu estilo de vida.')}</p>
+        <span class="font-label text-sm uppercase tracking-[0.3em] text-white/70 mb-6 block">
+          {cms('modulos', 'label', 'Nossas Práticas')}
+        </span>
+        <h2 class="font-headline text-5xl md:text-7xl mb-6 text-white">
+          {cms('modulos', 'titulo', 'Nossos Módulos')}
+        </h2>
+        <p class="font-body text-xl text-white/80 max-w-2xl mx-auto">
+          {cms('modulos', 'descricao', 'Explore cada modalidade e encontre o ritmo que transforma.')}
+        </p>
       </div>
-      {#if planos.length > 0}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-{Math.min(planos.length, 4)} gap-8">
-          {#each planos as plan}
-            <div class="group bg-white/10 backdrop-blur-sm p-10 rounded-3xl border border-white/10 hover:border-white/30 hover:shadow-xl transition-all duration-500 flex flex-col items-center text-center">
-              <h3 class="font-headline text-3xl mb-2 text-white italic">{plan.nome}</h3>
-              <p class="text-white/60 text-sm mb-8">{plan.descricao}</p>
-              <div class="mb-8 relative">
-                <span class="text-5xl font-bold">{formatCurrency(plan.preco)}</span>
-                <span class="text-white/60 text-sm">/mês</span>
+
+      {#if modalidades.length > 0}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {#each modalidades as mod}
+            <a
+              href="/modulo/{mod.id}"
+              class="group relative overflow-hidden rounded-3xl aspect-[3/4] block hover:-translate-y-2 transition-all duration-500"
+            >
+              {#if mod.imagemUrl}
+                <img
+                  src={mod.imagemUrl}
+                  alt={mod.nome}
+                  class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                />
+              {:else}
+                <div class="absolute inset-0 bg-white/10 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-9xl text-white/20">sports_martial_arts</span>
+                </div>
+              {/if}
+
+              <!-- Overlay gradient -->
+              <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"></div>
+
+              <!-- Border on hover -->
+              <div class="absolute inset-0 rounded-3xl border border-white/0 group-hover:border-white/30 transition-colors duration-500"></div>
+
+              <!-- Content -->
+              <div class="absolute inset-0 flex flex-col justify-end p-8">
+                <h3 class="font-headline text-3xl text-white mb-2 italic leading-tight">{mod.nome}</h3>
+                <p class="text-white/70 text-sm leading-relaxed line-clamp-2 mb-6">{mod.descricao}</p>
+                <span class="inline-flex items-center gap-2 text-white font-label text-xs uppercase tracking-[0.2em] group-hover:gap-4 transition-all duration-300">
+                  Explorar módulo
+                  <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </span>
               </div>
-              <ul class="space-y-4 mb-10 text-sm opacity-80">
-                <li>Até {plan.maxAulasSemana === 99 ? 'ilimitadas' : plan.maxAulasSemana + 'x'} aulas/semana</li>
-                {#if plan.permiteParticular}
-                  <li>Inclui aula particular</li>
-                {/if}
-              </ul>
-              <a href="/cadastro" class="w-full bg-white text-primary py-4 rounded-xl font-bold hover:scale-105 transition-all shadow-lg text-center block">Matricular-se</a>
-            </div>
+            </a>
           {/each}
         </div>
       {:else}
-        <p class="text-center text-white/60 text-lg italic">Planos em breve disponíveis.</p>
+        <p class="text-center text-white/60 text-lg italic">Módulos em breve disponíveis.</p>
       {/if}
     </div>
   </section>
@@ -272,25 +271,43 @@
         {/each}
       </div>
 
-      <!-- Schedule Grid (Dinâmico) -->
-      {#if turmasDoDia.length > 0}
-        {@const horarios = turmasPorHorario()}
-        <div class="grid grid-cols-1 lg:grid-cols-{Math.min(horarios.length, 4)} gap-6">
-          {#each horarios as [horario, turmasHorario]}
-            <div class="space-y-4">
-              <div class="bg-primary/5 p-4 rounded-xl text-center border-b-2 border-primary/20">
-                <span class="font-headline text-2xl text-primary">{horario}</span>
+      <!-- Grade semanal: linhas = horários, colunas = salas -->
+      {#if gradeSemanal.length > 0}
+        <div class="max-w-5xl mx-auto">
+          <!-- Header das salas -->
+          <div class="grid grid-cols-[80px_1fr_1fr_1fr] md:grid-cols-[120px_1fr_1fr_1fr] gap-3 mb-3">
+            <div></div>
+            {#each SALAS as sala}
+              <div class="text-center">
+                <span class="font-label text-xs md:text-sm uppercase tracking-widest text-primary">{sala}</span>
               </div>
-              {#each turmasHorario as turma}
-                <div class="bg-white p-6 rounded-2xl editorial-shadow border border-stone-100">
-                  <span class="text-[10px] uppercase font-bold tracking-tighter text-stone-400 mb-1 block">{turma.sala}</span>
-                  <h4 class="font-headline text-xl">{turma.modality.nome}</h4>
-                  <p class="text-xs text-on-surface-variant">{turma.nivel}</p>
-                  <p class="text-[10px] text-stone-400 mt-1">Prof. {turma.professor.nome}</p>
+            {/each}
+          </div>
+
+          <!-- Linhas por horário -->
+          <div class="space-y-3">
+            {#each gradeSemanal as [horario, porSala]}
+              <div class="grid grid-cols-[80px_1fr_1fr_1fr] md:grid-cols-[120px_1fr_1fr_1fr] gap-3 items-stretch">
+                <div class="bg-primary/5 rounded-xl flex items-center justify-center border-l-2 border-primary/20 px-2">
+                  <span class="font-headline text-sm md:text-lg text-primary text-center leading-tight">{horario}</span>
                 </div>
-              {/each}
-            </div>
-          {/each}
+                {#each SALAS as sala}
+                  {@const turma = porSala[sala]}
+                  {#if turma}
+                    <div class="bg-white p-4 rounded-2xl editorial-shadow border border-stone-100">
+                      <h4 class="font-headline text-base md:text-lg leading-tight">{turma.modality.nome}</h4>
+                      <p class="text-xs text-on-surface-variant mt-0.5">{turma.nivel}</p>
+                      <p class="text-[10px] text-stone-400 mt-1">Prof. {turma.professor.nome}</p>
+                    </div>
+                  {:else}
+                    <div class="bg-white/30 rounded-2xl border border-dashed border-stone-200 flex items-center justify-center min-h-[64px]">
+                      <span class="text-[10px] text-stone-300 uppercase tracking-widest">—</span>
+                    </div>
+                  {/if}
+                {/each}
+              </div>
+            {/each}
+          </div>
         </div>
       {:else}
         <div class="text-center py-20 bg-white/50 rounded-3xl border-2 border-dashed border-stone-200 font-headline text-2xl italic text-on-surface-variant opacity-70">
@@ -370,87 +387,16 @@
         <span class="italic text-primary">{cms('cta_final', 'titulo_destaque', 'Venha viver a experiência Balança Eu.')}</span>
       </h2>
       <div class="flex flex-col md:flex-row gap-6 justify-center mt-12">
-        <a href={cms('cta_final', 'cta_primario_link', '/cadastro')} class="bg-primary text-on-primary px-10 py-5 rounded-xl font-bold text-xl hover:scale-105 transition-all editorial-shadow">{cms('cta_final', 'cta_primario_texto', 'Agendar Aula Experimental')}</a>
-        <button class="bg-surface-container-high text-on-surface px-10 py-5 rounded-xl font-bold text-xl hover:bg-surface-container-highest transition-all">{cms('cta_final', 'cta_secundario_texto', 'Falar com Consultor')}</button>
+        <a href={cms('cta_final', 'cta_primario_link', '/comecar')} class="bg-primary text-on-primary px-10 py-5 rounded-xl font-bold text-xl hover:scale-105 transition-all editorial-shadow">
+          {cms('cta_final', 'cta_primario_texto', 'Agendar Aula Experimental')}
+        </a>
+        <button class="bg-surface-container-high text-on-surface px-10 py-5 rounded-xl font-bold text-xl hover:bg-surface-container-highest transition-all">
+          {cms('cta_final', 'cta_secundario_texto', 'Falar com Consultor')}
+        </button>
       </div>
     </div>
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-primary-fixed/20 blur-[120px] rounded-full -z-10"></div>
   </section>
 </main>
 
-<!-- ═══════════ FOOTER (CMS) ═══════════ -->
-<footer class="bg-surface border-t border-primary/10">
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-12 px-12 py-20 max-w-screen-2xl mx-auto">
-    <div class="md:col-span-2">
-      <span class="mb-4 block">
-        <Logo class="h-10 w-auto text-secondary" />
-      </span>
-      <p class="text-stone-500 font-label text-sm leading-relaxed max-w-sm mb-8">
-        {cms('footer', 'descricao', 'Um centro cultural dedicado ao movimento consciente, à arte performática e ao florescimento humano através do corpo.')}
-      </p>
-      <div class="flex gap-6">
-        {#if cms('contato', 'instagram_url')}
-          <a class="text-stone-500 hover:text-primary transition-colors" href={cms('contato', 'instagram_url')} target="_blank" rel="noopener"><span class="material-symbols-outlined">share</span></a>
-        {/if}
-        {#if cms('contato', 'whatsapp_url')}
-          <a class="text-stone-500 hover:text-primary transition-colors" href={cms('contato', 'whatsapp_url')} target="_blank" rel="noopener"><span class="material-symbols-outlined">chat</span></a>
-        {/if}
-      </div>
-    </div>
-    <div>
-      <h4 class="font-bold text-on-surface mb-6 uppercase tracking-widest text-xs">Explore</h4>
-      <nav class="flex flex-col gap-4">
-        {#each navLinks as link}
-          <a class="text-stone-500 hover:text-primary underline decoration-from-font transition-all font-label text-sm" href={link.href}>{link.label}</a>
-        {/each}
-      </nav>
-    </div>
-    <div>
-      <h4 class="font-bold text-on-surface mb-6 uppercase tracking-widest text-xs">Conecte-se</h4>
-      <nav class="flex flex-col gap-4">
-        {#if cms('contato', 'instagram')}
-          <a class="text-stone-500 hover:text-primary transition-all font-label text-sm" href={cms('contato', 'instagram_url', '#')} target="_blank" rel="noopener">Instagram ({cms('contato', 'instagram')})</a>
-        {/if}
-        {#if cms('contato', 'whatsapp')}
-          <a class="text-stone-500 hover:text-primary transition-all font-label text-sm" href={cms('contato', 'whatsapp_url', '#')} target="_blank" rel="noopener">WhatsApp</a>
-        {/if}
-        {#if cms('contato', 'email')}
-          <a class="text-stone-500 hover:text-primary transition-all font-label text-sm" href="mailto:{cms('contato', 'email')}">{cms('contato', 'email')}</a>
-        {/if}
-      </nav>
-    </div>
-  </div>
-  <div class="px-12 py-8 border-t border-primary/5 text-center">
-    <p class="text-stone-500 font-label text-sm">{cms('footer', 'copyright', '© 2024 Balança Eu. Onde o movimento encontra a alma.')}</p>
-  </div>
-</footer>
-
-<!-- ═══════════ MOBILE MENU ═══════════ -->
-{#if mobileMenuOpen}
-  <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <div class="fixed inset-0 z-[100] bg-background/95 backdrop-blur-lg xl:hidden" onclick={closeMobileMenu} onkeydown={(e) => e.key === 'Escape' && closeMobileMenu()}>
-    <div class="flex flex-col h-full p-8" onclick={(e) => e.stopPropagation()} onkeydown={() => {}}>
-      <div class="flex justify-between items-center mb-12">
-        <Logo class="h-8 w-auto" />
-        <button class="text-primary p-2" onclick={closeMobileMenu}>
-          <span class="material-symbols-outlined text-3xl">close</span>
-        </button>
-      </div>
-      <nav class="flex flex-col gap-4">
-        {#each navLinks as link}
-          <a
-            class="w-full py-4 px-6 border-2 border-stone-200 rounded-2xl font-headline text-xl text-on-surface flex justify-between items-center group active:border-primary"
-            href={link.href}
-            onclick={closeMobileMenu}
-          >
-            {link.label}
-            <span class="material-symbols-outlined opacity-0 group-active:opacity-100 transition-opacity">arrow_forward</span>
-          </a>
-        {/each}
-      </nav>
-      <div class="mt-auto py-8">
-        <a href="/login" class="w-full bg-primary text-on-primary py-4 rounded-2xl font-bold text-lg block text-center">Agendar Visita</a>
-      </div>
-    </div>
-  </div>
-{/if}
+<PublicFooter {navLinks} cms={data.cms} />

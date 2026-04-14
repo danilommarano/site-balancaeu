@@ -1,4 +1,4 @@
-<!-- Pulso — Admin: Check-in (QR + Facial + Manual) -->
+<!-- BalancaEu — Admin: Check-in (QR + Facial + Manual) -->
 <script lang="ts">
   import { invalidateAll } from '$app/navigation';
 
@@ -280,7 +280,7 @@
 </script>
 
 <svelte:head>
-  <title>Check-in — Admin — Pulso</title>
+  <title>Check-in — Admin — BalancaEu</title>
 </svelte:head>
 
 <div>

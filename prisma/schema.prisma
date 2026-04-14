@@ -44,6 +44,13 @@ enum EnrollmentStatus {
   LISTA_ESPERA
 }
 
+enum PlacementStatus {
+  AGENDADO
+  REALIZADO
+  CANCELADO
+  FALTOU
+}
+
 enum LessonStatus {
   AGENDADA
   CONFIRMADA
@@ -100,6 +107,7 @@ model Tenant {
   events         Event[]
   teachers        Teacher[]
   faceDescriptors FaceDescriptor[]
+  placementBookings PlacementBooking[]
 
   @@map("tenants")
 }
@@ -133,6 +141,7 @@ model User {
   transactions     Transaction[]
   teacher          Teacher?
   faceDescriptors  FaceDescriptor[]
+  placementBookings PlacementBooking[]
 
   @@unique([tenantId, email])
   @@index([tenantId])
@@ -237,6 +246,7 @@ model ClassGroup {
   professor   User         @relation("ProfessorClasses", fields: [professorId], references: [id], onDelete: Restrict)
   enrollments Enrollment[]
   attendances Attendance[]
+  placementBookings PlacementBooking[]
 
   @@index([tenantId])
   @@index([professorId])
@@ -437,4 +447,25 @@ model TeacherAvailability {
 
   @@index([teacherId])
   @@map("teacher_availabilities")
+}
+
+// ─── PlacementBooking (Nivelamento agendado) ─────────
+
+model PlacementBooking {
+  id           String          @id @default(uuid())
+  tenantId     String          @map("tenant_id")
+  userId       String          @map("user_id")
+  classGroupId String          @map("class_group_id")
+  dataHora     DateTime        @map("data_hora")
+  status       PlacementStatus @default(AGENDADO)
+  createdAt    DateTime        @default(now()) @map("created_at")
+
+  tenant     Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  classGroup ClassGroup @relation(fields: [classGroupId], references: [id], onDelete: Restrict)
+
+  @@index([tenantId])
+  @@index([userId])
+  @@index([classGroupId])
+  @@map("placement_bookings")
 }

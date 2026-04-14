@@ -1,4 +1,4 @@
-<!-- Pulso — Meu QR Code & Reconhecimento Facial -->
+<!-- BalancaEu — Meu QR Code & Reconhecimento Facial -->
 <script lang="ts">
   import { invalidateAll } from '$app/navigation';
 
@@ -176,7 +176,7 @@
 </script>
 
 <svelte:head>
-  <title>Check-in — Pulso</title>
+  <title>Check-in — BalancaEu</title>
 </svelte:head>
 
 <div>

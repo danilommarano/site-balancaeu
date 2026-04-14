@@ -1,5 +1,5 @@
 // ===========================================
-// Pulso — Tipos globais do SvelteKit
+// BalancaEu — Tipos globais do SvelteKit
 // ===========================================
 
 import type { Tenant, User } from '@prisma/client';

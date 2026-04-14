@@ -1,4 +1,4 @@
-<!-- Pulso — Admin: Controle de Presença (Fase 13) -->
+<!-- BalancaEu — Admin: Controle de Presença (Fase 13) -->
 <script lang="ts">
   import { goto } from '$app/navigation';
 
@@ -33,7 +33,7 @@
 </script>
 
 <svelte:head>
-  <title>Presença — Admin — Pulso</title>
+  <title>Presença — Admin — BalancaEu</title>
 </svelte:head>
 
 <div>

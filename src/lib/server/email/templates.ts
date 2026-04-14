@@ -1,9 +1,9 @@
 // ===========================================
-// Pulso — Templates de Email HTML
+// BalancaEu — Templates de Email HTML
 // ===========================================
 // Fase 16 — Templates responsivos para emails transacionais
 
-function baseTemplate(content: string, schoolName = 'Pulso'): string {
+function baseTemplate(content: string, schoolName = 'BalancaEu'): string {
 	return `
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -41,7 +41,7 @@ function baseTemplate(content: string, schoolName = 'Pulso'): string {
 }
 
 // ─── Email de boas-vindas ────────────────────────────
-export function welcomeEmail(nome: string, schoolName = 'Pulso'): string {
+export function welcomeEmail(nome: string, schoolName = 'BalancaEu'): string {
 	return baseTemplate(`
     <h1 style="color:#fff;font-size:22px;font-weight:700;margin:0 0 16px;">
       Bem-vindo(a), ${nome}! 🎉
@@ -68,7 +68,7 @@ export function lessonConfirmationEmail(
 	data: string,
 	horario: string,
 	modalidade: string,
-	schoolName = 'Pulso'
+	schoolName = 'BalancaEu'
 ): string {
 	return baseTemplate(`
     <h1 style="color:#fff;font-size:22px;font-weight:700;margin:0 0 16px;">
@@ -110,7 +110,7 @@ export function lessonReminderEmail(
 	data: string,
 	horario: string,
 	modalidade: string,
-	schoolName = 'Pulso'
+	schoolName = 'BalancaEu'
 ): string {
 	return baseTemplate(`
     <h1 style="color:#fff;font-size:22px;font-weight:700;margin:0 0 16px;">
@@ -150,7 +150,7 @@ export function absenceAlertEmail(
 	alunoNome: string,
 	faltas: number,
 	turma: string,
-	schoolName = 'Pulso'
+	schoolName = 'BalancaEu'
 ): string {
 	return baseTemplate(`
     <h1 style="color:#fff;font-size:22px;font-weight:700;margin:0 0 16px;">
@@ -178,7 +178,7 @@ export function planExpiringEmail(
 	alunoNome: string,
 	plano: string,
 	dataVencimento: string,
-	schoolName = 'Pulso'
+	schoolName = 'BalancaEu'
 ): string {
 	return baseTemplate(`
     <h1 style="color:#fff;font-size:22px;font-weight:700;margin:0 0 16px;">
@@ -208,7 +208,7 @@ export function newEventEmail(
 	horario: string,
 	local: string,
 	preco: string | null,
-	schoolName = 'Pulso'
+	schoolName = 'BalancaEu'
 ): string {
 	return baseTemplate(`
     <h1 style="color:#fff;font-size:22px;font-weight:700;margin:0 0 16px;">
