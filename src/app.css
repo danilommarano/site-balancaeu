@@ -1,8 +1,11 @@
 /* ===========================================
-   Pulso — Estilos globais
+   BalancaEu — Estilos globais
    =========================================== */
 
 @import 'tailwindcss';
+
+/* Tailwind v4: variante dark ativada via classe `dark` na tag <html> */
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   --color-primary: #9f3023;
