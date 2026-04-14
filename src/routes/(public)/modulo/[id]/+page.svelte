@@ -25,6 +25,8 @@
     return raw.replace(/\{modalidade\}/g, modality.nome);
   }
 
+  const heroImage = $derived(mcms('hero', 'imagem', modality.imagemUrl ?? ''));
+
   let activeDay = $state('');
 
   // Calcular dias que têm aulas nessa modalidade
@@ -86,7 +88,6 @@
   <!-- ══════════ 1. HERO ══════════ -->
   <section class="relative min-h-[85vh] flex items-end overflow-hidden bg-stone-950">
     <!-- Background image -->
-    {@const heroImage = mcms('hero', 'imagem', modality.imagemUrl ?? '')}
     {#if heroImage}
       <img
         src={heroImage}
