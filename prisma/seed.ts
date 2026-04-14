@@ -81,19 +81,14 @@ async function main() {
 			descricao: 'Forró tradicional nordestino, com passo marcado, giros e caminhadas. A raiz que move o corpo.'
 		},
 		{
+			id: 'forro-pe-descalco',
+			nome: 'Forró Pé Descalço',
+			descricao: 'Método Pé Descalço de ensino de forró, com progressão por graduações (Azul, Branca, Transparente, Preta) para todos os níveis.'
+		},
+		{
 			id: 'samba-de-gafieira',
 			nome: 'Samba de Gafieira',
 			descricao: 'O samba elegante dos salões cariocas. Técnica, musicalidade e conexão em dupla.'
-		},
-		{
-			id: 'yoga',
-			nome: 'Yoga',
-			descricao: 'Prática milenar que une corpo, respiração e mente. Força, flexibilidade e presença.'
-		},
-		{
-			id: 'zumba',
-			nome: 'Zumba',
-			descricao: 'Dança-fitness com ritmos latinos. Queima calorias enquanto você se diverte.'
 		}
 	];
 
@@ -161,19 +156,12 @@ async function main() {
 		['samba-de-gafieira'],
 		['Samba de Gafieira', 'Samba de Salão']
 	);
-	const maria = await createProfessor(
-		'Maria Eduarda Balestro',
-		'maria@balancaeu.com.br',
-		'Professora de yoga certificada em Hatha e Vinyasa. Conduz práticas suaves e transformadoras.',
-		['yoga'],
-		['Hatha Yoga', 'Vinyasa Flow', 'Yin Yoga']
-	);
-	const caio = await createProfessor(
-		'Caio Amorim (Supimpa)',
-		'caio@balancaeu.com.br',
-		'Instrutor oficial de Zumba. Energia total, ritmos latinos e muita diversão.',
-		['zumba'],
-		['Zumba Fitness', 'Ritmos Latinos']
+	const peDescalco = await createProfessor(
+		'Equipe Forró Pé Descalço',
+		'pedescalco@balancaeu.com.br',
+		'Corpo docente do método Pé Descalço. Graduações progressivas do Azul Iniciante à Preta Avançada.',
+		['forro-pe-descalco'],
+		['Forró Pé Descalço', 'Método Pé Descalço']
 	);
 
 	console.log('✅ Professores criados');
@@ -183,8 +171,7 @@ async function main() {
 		mari: mari.id,
 		ani: ani.id,
 		renato: renato.id,
-		maria: maria.id,
-		caio: caio.id
+		peDescalco: peDescalco.id
 	};
 
 	// ─── Turmas ──────────────────────────────────────
@@ -199,40 +186,70 @@ async function main() {
 		maxAlunos: number;
 	};
 
+	// Alterna entre Ani e Renatinho nas turmas de samba (dupla "Ani e Renatinho")
+	const aniRen = [professorMap.ani, professorMap.renato];
+	// Alterna Danilo e Mari nas turmas de Roots
+	const rootsProfs = [professorMap.danilo, professorMap.mari];
+
 	const classes: ClassDef[] = [
-		// ─── Forró Roots — cronograma oficial ──────────
-		// Quarta → Sala 3
-		{ modalityId: 'forro-roots', professorId: professorMap.danilo, nivel: 'Introdução ao Roots', diaSemana: 'QUA', horarioInicio: '19:00', horarioFim: '20:00', sala: 'Sala 3', maxAlunos: 20 },
-		{ modalityId: 'forro-roots', professorId: professorMap.mari, nivel: 'Caminhadas e Giros', diaSemana: 'QUA', horarioInicio: '20:00', horarioFim: '21:00', sala: 'Sala 3', maxAlunos: 20 },
-		{ modalityId: 'forro-roots', professorId: professorMap.danilo, nivel: 'Footwork', diaSemana: 'QUA', horarioInicio: '21:00', horarioFim: '22:00', sala: 'Sala 3', maxAlunos: 20 },
-		// Sexta → Sala 1
-		{ modalityId: 'forro-roots', professorId: professorMap.mari, nivel: 'Footwork', diaSemana: 'SEX', horarioInicio: '19:00', horarioFim: '20:00', sala: 'Sala 1', maxAlunos: 20 },
-		{ modalityId: 'forro-roots', professorId: professorMap.danilo, nivel: 'Introdução ao Roots', diaSemana: 'SEX', horarioInicio: '20:00', horarioFim: '21:00', sala: 'Sala 1', maxAlunos: 20 },
-		{ modalityId: 'forro-roots', professorId: professorMap.mari, nivel: 'Caminhadas e Giros', diaSemana: 'SEX', horarioInicio: '21:00', horarioFim: '22:00', sala: 'Sala 1', maxAlunos: 20 },
-		// Sábado → Sala 1
-		{ modalityId: 'forro-roots', professorId: professorMap.danilo, nivel: 'Introdução ao Roots', diaSemana: 'SAB', horarioInicio: '14:00', horarioFim: '15:00', sala: 'Sala 1', maxAlunos: 20 },
-		{ modalityId: 'forro-roots', professorId: professorMap.mari, nivel: 'Caminhadas e Giros', diaSemana: 'SAB', horarioInicio: '15:00', horarioFim: '16:00', sala: 'Sala 1', maxAlunos: 20 },
-		{ modalityId: 'forro-roots', professorId: professorMap.danilo, nivel: 'Footwork', diaSemana: 'SAB', horarioInicio: '16:00', horarioFim: '17:00', sala: 'Sala 1', maxAlunos: 20 },
+		// ─── SEGUNDA — Sala 3 — Samba de Gafieira ──────
+		{ modalityId: 'samba-de-gafieira', professorId: aniRen[0], nivel: 'Iniciante', diaSemana: 'SEG', horarioInicio: '19:30', horarioFim: '20:30', sala: 'Sala 3', maxAlunos: 18 },
+		{ modalityId: 'samba-de-gafieira', professorId: aniRen[1], nivel: 'Intermediário', diaSemana: 'SEG', horarioInicio: '20:30', horarioFim: '21:40', sala: 'Sala 3', maxAlunos: 18 },
 
-		// ─── Samba de Gafieira — provisório ────────────
-		{ modalityId: 'samba-de-gafieira', professorId: professorMap.ani, nivel: 'Iniciante', diaSemana: 'TER', horarioInicio: '19:00', horarioFim: '20:00', sala: 'Sala 2', maxAlunos: 18 },
-		{ modalityId: 'samba-de-gafieira', professorId: professorMap.renato, nivel: 'Intermediário', diaSemana: 'TER', horarioInicio: '20:00', horarioFim: '21:00', sala: 'Sala 2', maxAlunos: 18 },
-		{ modalityId: 'samba-de-gafieira', professorId: professorMap.renato, nivel: 'Iniciante', diaSemana: 'QUI', horarioInicio: '19:00', horarioFim: '20:00', sala: 'Sala 2', maxAlunos: 18 },
-		{ modalityId: 'samba-de-gafieira', professorId: professorMap.ani, nivel: 'Intermediário', diaSemana: 'QUI', horarioInicio: '20:00', horarioFim: '21:00', sala: 'Sala 2', maxAlunos: 18 },
-		{ modalityId: 'samba-de-gafieira', professorId: professorMap.ani, nivel: 'Iniciante', diaSemana: 'SAB', horarioInicio: '10:00', horarioFim: '11:00', sala: 'Sala 2', maxAlunos: 18 },
-		{ modalityId: 'samba-de-gafieira', professorId: professorMap.renato, nivel: 'Avançado', diaSemana: 'SAB', horarioInicio: '11:00', horarioFim: '12:00', sala: 'Sala 2', maxAlunos: 18 },
+		// ─── TERÇA — Sala 3 — Samba de Gafieira ────────
+		{ modalityId: 'samba-de-gafieira', professorId: aniRen[0], nivel: 'Iniciante', diaSemana: 'TER', horarioInicio: '19:30', horarioFim: '20:30', sala: 'Sala 3', maxAlunos: 18 },
+		{ modalityId: 'samba-de-gafieira', professorId: aniRen[1], nivel: 'Iniciado (lista de espera)', diaSemana: 'TER', horarioInicio: '20:30', horarioFim: '21:40', sala: 'Sala 3', maxAlunos: 18 },
 
-		// ─── Yoga — provisório ─────────────────────────
-		{ modalityId: 'yoga', professorId: professorMap.maria, nivel: 'Hatha Yoga', diaSemana: 'SEG', horarioInicio: '07:00', horarioFim: '08:00', sala: 'Sala 2', maxAlunos: 15 },
-		{ modalityId: 'yoga', professorId: professorMap.maria, nivel: 'Vinyasa Flow', diaSemana: 'QUA', horarioInicio: '07:00', horarioFim: '08:00', sala: 'Sala 2', maxAlunos: 15 },
-		{ modalityId: 'yoga', professorId: professorMap.maria, nivel: 'Yin Yoga', diaSemana: 'SEX', horarioInicio: '07:00', horarioFim: '08:00', sala: 'Sala 2', maxAlunos: 15 },
-		{ modalityId: 'yoga', professorId: professorMap.maria, nivel: 'Hatha Yoga', diaSemana: 'SAB', horarioInicio: '09:00', horarioFim: '10:00', sala: 'Sala 3', maxAlunos: 15 },
+		// ─── QUARTA — Sala 1 — Forró Pé Descalço ───────
+		{ modalityId: 'forro-pe-descalco', professorId: professorMap.peDescalco, nivel: 'Azul Iniciante', diaSemana: 'QUA', horarioInicio: '19:00', horarioFim: '20:00', sala: 'Sala 1', maxAlunos: 20 },
+		{ modalityId: 'forro-pe-descalco', professorId: professorMap.peDescalco, nivel: 'Branca e Transparente', diaSemana: 'QUA', horarioInicio: '20:00', horarioFim: '21:00', sala: 'Sala 1', maxAlunos: 20 },
+		{ modalityId: 'forro-pe-descalco', professorId: professorMap.peDescalco, nivel: 'Azul Avançado', diaSemana: 'QUA', horarioInicio: '21:00', horarioFim: '22:00', sala: 'Sala 1', maxAlunos: 20 },
+		{ modalityId: 'forro-pe-descalco', professorId: professorMap.peDescalco, nivel: 'Horário Livre', diaSemana: 'QUA', horarioInicio: '22:00', horarioFim: '23:00', sala: 'Sala 1', maxAlunos: 20 },
 
-		// ─── Zumba — provisório ────────────────────────
-		{ modalityId: 'zumba', professorId: professorMap.caio, nivel: 'Zumba Fitness', diaSemana: 'SEG', horarioInicio: '18:00', horarioFim: '19:00', sala: 'Sala 1', maxAlunos: 25 },
-		{ modalityId: 'zumba', professorId: professorMap.caio, nivel: 'Zumba Fitness', diaSemana: 'QUA', horarioInicio: '18:00', horarioFim: '19:00', sala: 'Sala 1', maxAlunos: 25 },
-		{ modalityId: 'zumba', professorId: professorMap.caio, nivel: 'Zumba Toning', diaSemana: 'SEX', horarioInicio: '18:00', horarioFim: '19:00', sala: 'Sala 3', maxAlunos: 25 },
-		{ modalityId: 'zumba', professorId: professorMap.caio, nivel: 'Zumba Party', diaSemana: 'SAB', horarioInicio: '12:00', horarioFim: '13:00', sala: 'Sala 3', maxAlunos: 25 }
+		// ─── QUARTA — Sala 2 — Forró Pé Descalço ───────
+		{ modalityId: 'forro-pe-descalco', professorId: professorMap.peDescalco, nivel: 'Azul Intermediário', diaSemana: 'QUA', horarioInicio: '19:00', horarioFim: '20:00', sala: 'Sala 2', maxAlunos: 20 },
+		{ modalityId: 'forro-pe-descalco', professorId: professorMap.peDescalco, nivel: 'Base e Ciclo Experimental', diaSemana: 'QUA', horarioInicio: '20:00', horarioFim: '21:00', sala: 'Sala 2', maxAlunos: 20 },
+		{ modalityId: 'forro-pe-descalco', professorId: professorMap.peDescalco, nivel: 'Preta e Preta Avançada', diaSemana: 'QUA', horarioInicio: '21:00', horarioFim: '22:00', sala: 'Sala 2', maxAlunos: 20 },
+
+		// ─── QUARTA — Sala 3 — Forró Roots ─────────────
+		{ modalityId: 'forro-roots', professorId: rootsProfs[0], nivel: 'Introdução ao Roots', diaSemana: 'QUA', horarioInicio: '19:00', horarioFim: '20:00', sala: 'Sala 3', maxAlunos: 20 },
+		{ modalityId: 'forro-roots', professorId: rootsProfs[1], nivel: 'Caminhadas e Giros', diaSemana: 'QUA', horarioInicio: '20:00', horarioFim: '21:00', sala: 'Sala 3', maxAlunos: 20 },
+		{ modalityId: 'forro-roots', professorId: rootsProfs[0], nivel: 'Footwork', diaSemana: 'QUA', horarioInicio: '21:00', horarioFim: '22:00', sala: 'Sala 3', maxAlunos: 20 },
+
+		// ─── QUINTA — Sala 1 — Forró Pé Descalço ───────
+		{ modalityId: 'forro-pe-descalco', professorId: professorMap.peDescalco, nivel: 'Espaço Livre', diaSemana: 'QUI', horarioInicio: '19:00', horarioFim: '19:30', sala: 'Sala 1', maxAlunos: 20 },
+		{ modalityId: 'forro-pe-descalco', professorId: professorMap.peDescalco, nivel: 'Preta e Preta Avançada', diaSemana: 'QUI', horarioInicio: '19:30', horarioFim: '20:30', sala: 'Sala 1', maxAlunos: 20 },
+		{ modalityId: 'forro-pe-descalco', professorId: professorMap.peDescalco, nivel: 'Azul Iniciante', diaSemana: 'QUI', horarioInicio: '20:30', horarioFim: '21:30', sala: 'Sala 1', maxAlunos: 20 },
+		{ modalityId: 'forro-pe-descalco', professorId: professorMap.peDescalco, nivel: 'Branca', diaSemana: 'QUI', horarioInicio: '21:30', horarioFim: '22:30', sala: 'Sala 1', maxAlunos: 20 },
+		{ modalityId: 'forro-pe-descalco', professorId: professorMap.peDescalco, nivel: 'Horário Livre', diaSemana: 'QUI', horarioInicio: '22:30', horarioFim: '23:00', sala: 'Sala 1', maxAlunos: 20 },
+
+		// ─── QUINTA — Sala 2 — Forró Pé Descalço ───────
+		{ modalityId: 'forro-pe-descalco', professorId: professorMap.peDescalco, nivel: 'Azul Avançada', diaSemana: 'QUI', horarioInicio: '19:30', horarioFim: '20:30', sala: 'Sala 2', maxAlunos: 20 },
+		{ modalityId: 'forro-pe-descalco', professorId: professorMap.peDescalco, nivel: 'Azul Intermediário Experimental', diaSemana: 'QUI', horarioInicio: '20:30', horarioFim: '21:30', sala: 'Sala 2', maxAlunos: 20 },
+		{ modalityId: 'forro-pe-descalco', professorId: professorMap.peDescalco, nivel: 'Transparente Base e Ciclo', diaSemana: 'QUI', horarioInicio: '21:30', horarioFim: '22:30', sala: 'Sala 2', maxAlunos: 20 },
+
+		// ─── QUINTA — Sala 3 — Samba de Gafieira ───────
+		{ modalityId: 'samba-de-gafieira', professorId: aniRen[0], nivel: 'Iniciante', diaSemana: 'QUI', horarioInicio: '19:00', horarioFim: '20:10', sala: 'Sala 3', maxAlunos: 18 },
+		{ modalityId: 'samba-de-gafieira', professorId: aniRen[1], nivel: 'Intermediário', diaSemana: 'QUI', horarioInicio: '20:10', horarioFim: '21:40', sala: 'Sala 3', maxAlunos: 18 },
+
+		// ─── SÁBADO — Sala 1 — Forró Pé Descalço ───────
+		{ modalityId: 'forro-pe-descalco', professorId: professorMap.peDescalco, nivel: 'Preta', diaSemana: 'SAB', horarioInicio: '16:00', horarioFim: '17:00', sala: 'Sala 1', maxAlunos: 20 },
+		{ modalityId: 'forro-pe-descalco', professorId: professorMap.peDescalco, nivel: 'Azul Avançada', diaSemana: 'SAB', horarioInicio: '17:00', horarioFim: '18:00', sala: 'Sala 1', maxAlunos: 20 },
+		{ modalityId: 'forro-pe-descalco', professorId: professorMap.peDescalco, nivel: 'Branca', diaSemana: 'SAB', horarioInicio: '18:00', horarioFim: '19:00', sala: 'Sala 1', maxAlunos: 20 },
+		{ modalityId: 'forro-pe-descalco', professorId: professorMap.peDescalco, nivel: 'Espaço Livre', diaSemana: 'SAB', horarioInicio: '19:00', horarioFim: '22:00', sala: 'Sala 1', maxAlunos: 20 },
+
+		// ─── SÁBADO — Sala 2 — Forró Pé Descalço ───────
+		{ modalityId: 'forro-pe-descalco', professorId: professorMap.peDescalco, nivel: 'Preta Avançada', diaSemana: 'SAB', horarioInicio: '16:00', horarioFim: '17:00', sala: 'Sala 2', maxAlunos: 20 },
+		{ modalityId: 'forro-pe-descalco', professorId: professorMap.peDescalco, nivel: 'Azul Intermediária', diaSemana: 'SAB', horarioInicio: '17:00', horarioFim: '18:00', sala: 'Sala 2', maxAlunos: 20 },
+		{ modalityId: 'forro-pe-descalco', professorId: professorMap.peDescalco, nivel: 'Transparente Base e Ciclo', diaSemana: 'SAB', horarioInicio: '18:00', horarioFim: '19:00', sala: 'Sala 2', maxAlunos: 20 },
+
+		// ─── SÁBADO — Sala 3 — mix (Samba manhã + Roots/Pé Descalço tarde) ─
+		{ modalityId: 'samba-de-gafieira', professorId: aniRen[0], nivel: 'Intermediário', diaSemana: 'SAB', horarioInicio: '10:30', horarioFim: '12:00', sala: 'Sala 3', maxAlunos: 18 },
+		{ modalityId: 'forro-roots', professorId: rootsProfs[0], nivel: 'Introdução ao Roots', diaSemana: 'SAB', horarioInicio: '14:00', horarioFim: '15:00', sala: 'Sala 3', maxAlunos: 20 },
+		{ modalityId: 'forro-roots', professorId: rootsProfs[1], nivel: 'Caminhadas e Giros', diaSemana: 'SAB', horarioInicio: '15:00', horarioFim: '16:00', sala: 'Sala 3', maxAlunos: 20 },
+		{ modalityId: 'forro-roots', professorId: rootsProfs[0], nivel: 'Footwork', diaSemana: 'SAB', horarioInicio: '16:00', horarioFim: '17:00', sala: 'Sala 3', maxAlunos: 20 },
+		{ modalityId: 'forro-pe-descalco', professorId: professorMap.peDescalco, nivel: 'Azul Iniciante', diaSemana: 'SAB', horarioInicio: '17:00', horarioFim: '18:00', sala: 'Sala 3', maxAlunos: 20 },
+		{ modalityId: 'forro-pe-descalco', professorId: professorMap.peDescalco, nivel: 'Experimental', diaSemana: 'SAB', horarioInicio: '18:00', horarioFim: '19:00', sala: 'Sala 3', maxAlunos: 20 }
 	];
 
 	for (const c of classes) {
