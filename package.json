@@ -43,9 +43,12 @@
     "vitest": "^3.0.0"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1039.0",
+    "@aws-sdk/s3-request-presigner": "^3.1039.0",
     "@prisma/client": "^6.0.0",
     "@types/qrcode": "^1.5.6",
     "@vladmandic/face-api": "^1.7.15",
+    "apexcharts": "^5.10.6",
     "arctic": "^3.7.0",
     "bcrypt": "^6.0.0",
     "date-fns": "^4.0.0",

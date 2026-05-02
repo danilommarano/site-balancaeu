@@ -1,4 +1,4 @@
-<!-- BalancaEu — Dashboard do Professor (Fase 15) -->
+<!-- BalancaEu — Dashboard do Professor -->
 <script lang="ts">
   let { data } = $props();
 
@@ -13,210 +13,166 @@
     return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
   }
 
-  const statusLabels: Record<string, { label: string; color: string; icon: string }> = {
-    AGENDADA: { label: 'Pendente', color: 'text-amber-400 bg-amber-400/10', icon: 'hourglass_top' },
-    CONFIRMADA: { label: 'Confirmada', color: 'text-blue-400 bg-blue-400/10', icon: 'check_circle' }
-  };
+  let primeiroNome = $derived(data.user?.nome?.split(' ')[0] ?? 'Professor');
 </script>
 
 <svelte:head>
-  <title>Painel — Professor — BalancaEu</title>
+  <title>Painel — Professor · Balança Eu</title>
 </svelte:head>
 
-<div>
-  <div class="mb-8">
-    <h1 class="text-2xl font-bold text-white mb-1">Olá, {data.user?.nome?.split(' ')[0] ?? 'Professor'}!</h1>
-    <p class="text-zinc-500 text-sm">{data.diaLabel} — Painel do professor</p>
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Olá, <em>{primeiroNome}!</em></h1>
+    <p class="page-sub">{data.diaLabel} — Painel do professor</p>
+  </div>
+</div>
+
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="stat-card__head">
+      <div class="stat-card__label">Turmas Ativas</div>
+      <div class="stat-card__icon is-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/></svg></div>
+    </div>
+    <div class="stat-card__value">{data.stats.totalTurmas}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card__head">
+      <div class="stat-card__label">Aulas Hoje</div>
+      <div class="stat-card__icon is-success"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg></div>
+    </div>
+    <div class="stat-card__value">{data.stats.aulasHoje}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card__head">
+      <div class="stat-card__label">Particulares Pendentes</div>
+      <div class="stat-card__icon is-ocre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6-7 6 7M6 15l6 7 6-7"/></svg></div>
+    </div>
+    <div class="stat-card__value">{data.stats.particularesPendentes}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card__head">
+      <div class="stat-card__label">Confirmadas</div>
+      <div class="stat-card__icon is-plum"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg></div>
+    </div>
+    <div class="stat-card__value">{data.stats.particularesConfirmadas}</div>
+  </div>
+</div>
+
+<div class="two-col" style="grid-template-columns: 2fr 1fr;">
+  <div style="display:flex; flex-direction:column; gap:16px;">
+    <div class="card">
+      <div class="card__head">
+        <div class="card__title blue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          Turmas de Hoje
+        </div>
+        <span style="font-size:11px; color:var(--text-mute);">{data.turmasHoje.length} turma{data.turmasHoje.length !== 1 ? 's' : ''}</span>
+      </div>
+      {#if data.turmasHoje.length === 0}
+        <div class="empty">
+          <div class="empty__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg></div>
+          <p>Nenhuma aula programada para hoje.</p>
+        </div>
+      {:else}
+        {#each data.turmasHoje as turma}
+          <div class="turma-row">
+            <div>
+              <div class="turma-row__name">{turma.modalidade}</div>
+              <div class="turma-row__meta"><strong>{turma.nivel}</strong> · {turma.horarioInicio} — {turma.horarioFim} · Sala {turma.sala}</div>
+            </div>
+            {#if turma.chamadaFeita}
+              <span class="turma-row__count">Chamada feita</span>
+            {:else}
+              <a href="/professor/chamada?data={new Date().toISOString().split('T')[0]}&turma={turma.id}" class="btn btn--primary btn--sm" style="margin-left:auto;">Chamada</a>
+            {/if}
+          </div>
+        {/each}
+      {/if}
+    </div>
+
+    <div class="card">
+      <div class="card__head">
+        <div class="card__title plum">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          Últimas Chamadas
+        </div>
+      </div>
+      {#if data.ultimasChamadas.length === 0}
+        <div class="empty">
+          <p>Nenhuma chamada registrada ainda.</p>
+        </div>
+      {:else}
+        {#each data.ultimasChamadas as chamada}
+          {@const total = chamada.presentes + chamada.ausentes}
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--line);">
+            <div>
+              <div style="font-size:13px; font-weight:600; color:var(--text);">{chamada.turma}</div>
+              <div style="font-size:11px; color:var(--text-mute);">{formatDateShort(chamada.data)}</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:11px; color:var(--success);">{chamada.presentes}P</span>
+              <span style="font-size:11px; color:var(--coral);">{chamada.ausentes}F</span>
+              <span style="font-size:11px; color:var(--text-mute);">/ {total}</span>
+            </div>
+          </div>
+        {/each}
+      {/if}
+    </div>
   </div>
 
-  <!-- Stats cards -->
-  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 hover:border-zinc-700 transition-colors">
-      <div class="flex items-center justify-between mb-2">
-        <span class="text-zinc-500 text-xs uppercase tracking-wider">Turmas Ativas</span>
-        <div class="w-7 h-7 bg-blue-500/10 rounded-lg flex items-center justify-center">
-          <span class="material-symbols-outlined text-[16px] text-blue-400">groups</span>
+  <div style="display:flex; flex-direction:column; gap:16px;">
+    <div class="card">
+      <div class="card__head">
+        <div class="card__title coral">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
+          Próximas Particulares
         </div>
+        <a href="/professor/particulares">Ver todas</a>
       </div>
-      <p class="text-2xl font-bold text-white">{data.stats.totalTurmas}</p>
-    </div>
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 hover:border-zinc-700 transition-colors">
-      <div class="flex items-center justify-between mb-2">
-        <span class="text-zinc-500 text-xs uppercase tracking-wider">Aulas Hoje</span>
-        <div class="w-7 h-7 bg-emerald-500/10 rounded-lg flex items-center justify-center">
-          <span class="material-symbols-outlined text-[16px] text-emerald-400">today</span>
+      {#if data.proximasParticulares.length === 0}
+        <div class="empty" style="padding:30px 12px;">
+          <div class="empty__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg></div>
+          <p style="font-size:13px;">Nenhuma particular agendada.</p>
         </div>
-      </div>
-      <p class="text-2xl font-bold text-white">{data.stats.aulasHoje}</p>
-    </div>
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 hover:border-zinc-700 transition-colors">
-      <div class="flex items-center justify-between mb-2">
-        <span class="text-zinc-500 text-xs uppercase tracking-wider">Particulares Pendentes</span>
-        <div class="w-7 h-7 bg-amber-500/10 rounded-lg flex items-center justify-center">
-          <span class="material-symbols-outlined text-[16px] text-amber-400">hourglass_top</span>
-        </div>
-      </div>
-      <p class="text-2xl font-bold text-white">{data.stats.particularesPendentes}</p>
-    </div>
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 hover:border-zinc-700 transition-colors">
-      <div class="flex items-center justify-between mb-2">
-        <span class="text-zinc-500 text-xs uppercase tracking-wider">Confirmadas</span>
-        <div class="w-7 h-7 bg-purple-500/10 rounded-lg flex items-center justify-center">
-          <span class="material-symbols-outlined text-[16px] text-purple-400">event_available</span>
-        </div>
-      </div>
-      <p class="text-2xl font-bold text-white">{data.stats.particularesConfirmadas}</p>
-    </div>
-  </div>
-
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- Today's classes -->
-    <div class="lg:col-span-2 space-y-6">
-      <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-        <div class="p-5 border-b border-zinc-800 flex items-center gap-2">
-          <span class="material-symbols-outlined text-[18px] text-emerald-400">today</span>
-          <h2 class="text-sm font-semibold text-white">Turmas de Hoje</h2>
-          <span class="ml-auto text-[10px] text-zinc-500">{data.turmasHoje.length} turma(s)</span>
-        </div>
-        {#if data.turmasHoje.length === 0}
-          <div class="p-8 text-center">
-            <span class="material-symbols-outlined text-4xl text-zinc-700 mb-2">event_busy</span>
-            <p class="text-zinc-500 text-sm">Nenhuma aula programada para hoje.</p>
+      {:else}
+        {#each data.proximasParticulares as aula}
+          <div style="padding:12px 0; border-bottom:1px solid var(--line);">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
+              <span style="font-size:13px; font-weight:600; color:var(--text);">{aula.modalidade}</span>
+              <span style="font-size:10px; color:var(--text-mute); text-transform:uppercase; letter-spacing:.04em;">
+                {aula.status === 'CONFIRMADA' ? 'Confirmada' : 'Pendente'}
+              </span>
+            </div>
+            <div style="font-size:11px; color:var(--text-mute);">Aluno: {aula.aluno}</div>
+            <div style="font-size:11px; color:var(--text-mute);">{formatDateTime(aula.dataHora)} · {aula.duracao}min</div>
           </div>
-        {:else}
-          <div class="divide-y divide-zinc-800/50">
-            {#each data.turmasHoje as turma}
-              <div class="px-5 py-4 flex items-center gap-4 hover:bg-zinc-800/20 transition-colors">
-                <div class="w-12 h-12 rounded-xl bg-blue-600/10 flex items-center justify-center shrink-0">
-                  <span class="material-symbols-outlined text-blue-400">sports_martial_arts</span>
-                </div>
-                <div class="flex-1 min-w-0">
-                  <p class="text-sm font-semibold text-white">{turma.modalidade}</p>
-                  <p class="text-xs text-zinc-500">{turma.nivel} · {turma.horarioInicio}–{turma.horarioFim} · Sala {turma.sala}</p>
-                  <p class="text-[10px] text-zinc-600">{turma.totalAlunos} aluno(s) inscrito(s)</p>
-                </div>
-                <div class="flex items-center gap-2 shrink-0">
-                  {#if turma.chamadaFeita}
-                    <span class="text-[10px] bg-emerald-400/10 text-emerald-400 px-2 py-0.5 rounded-full flex items-center gap-1">
-                      <span class="material-symbols-outlined text-[12px]">check</span>
-                      Chamada feita
-                    </span>
-                  {:else}
-                    <a
-                      href="/professor/chamada?data={new Date().toISOString().split('T')[0]}&turma={turma.id}"
-                      class="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
-                    >
-                      <span class="material-symbols-outlined text-[14px]">fact_check</span>
-                      Chamada
-                    </a>
-                  {/if}
-                </div>
-              </div>
-            {/each}
-          </div>
-        {/if}
-      </div>
-
-      <!-- Recent attendance -->
-      <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-        <div class="p-5 border-b border-zinc-800 flex items-center gap-2">
-          <span class="material-symbols-outlined text-[18px] text-purple-400">history</span>
-          <h2 class="text-sm font-semibold text-white">Últimas Chamadas</h2>
-        </div>
-        {#if data.ultimasChamadas.length === 0}
-          <div class="p-6 text-center">
-            <p class="text-zinc-500 text-xs">Nenhuma chamada registrada ainda.</p>
-          </div>
-        {:else}
-          <div class="divide-y divide-zinc-800/50">
-            {#each data.ultimasChamadas as chamada}
-              {@const total = chamada.presentes + chamada.ausentes}
-              {@const pct = total > 0 ? Math.round((chamada.presentes / total) * 100) : 0}
-              <div class="px-5 py-3 flex items-center justify-between">
-                <div>
-                  <p class="text-xs text-white font-medium">{chamada.turma}</p>
-                  <p class="text-[10px] text-zinc-500">{formatDateShort(chamada.data)}</p>
-                </div>
-                <div class="flex items-center gap-3">
-                  <span class="text-[10px] text-emerald-400">{chamada.presentes}P</span>
-                  <span class="text-[10px] text-red-400">{chamada.ausentes}F</span>
-                  <div class="w-16 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                    <div class="h-full bg-emerald-500 rounded-full" style="width: {pct}%"></div>
-                  </div>
-                </div>
-              </div>
-            {/each}
-          </div>
-        {/if}
-      </div>
+        {/each}
+      {/if}
     </div>
 
-    <!-- Sidebar: upcoming private lessons -->
-    <div class="space-y-6">
-      <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-        <div class="p-5 border-b border-zinc-800 flex items-center justify-between">
-          <h2 class="text-sm font-semibold text-white flex items-center gap-2">
-            <span class="material-symbols-outlined text-[18px] text-amber-400">person</span>
-            Próximas Particulares
-          </h2>
-          <a href="/professor/particulares" class="text-[10px] text-primary hover:underline">Ver todas</a>
+    <div class="quick-actions">
+      <div class="quick-actions__title">Ações Rápidas</div>
+      <a class="quick-action" href="/professor/chamada">
+        <div class="quick-action__ico is-coral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+        <div class="quick-action__text">
+          <div class="quick-action__name">Chamada</div>
+          <div class="quick-action__hint">Registrar presença</div>
         </div>
-        {#if data.proximasParticulares.length === 0}
-          <div class="p-6 text-center">
-            <span class="material-symbols-outlined text-3xl text-zinc-700 mb-2">event_busy</span>
-            <p class="text-zinc-500 text-xs">Nenhuma particular agendada.</p>
-          </div>
-        {:else}
-          <div class="divide-y divide-zinc-800/50">
-            {#each data.proximasParticulares as aula}
-              {@const st = statusLabels[aula.status] ?? statusLabels.AGENDADA}
-              <div class="px-5 py-3 hover:bg-zinc-800/20 transition-colors">
-                <div class="flex items-center justify-between mb-1">
-                  <span class="text-xs text-white font-medium">{aula.modalidade}</span>
-                  <span class="text-[10px] font-medium px-2 py-0.5 rounded-full {st.color} flex items-center gap-0.5">
-                    <span class="material-symbols-outlined text-[10px]">{st.icon}</span>
-                    {st.label}
-                  </span>
-                </div>
-                <p class="text-[10px] text-zinc-400">Aluno: {aula.aluno}</p>
-                <p class="text-[10px] text-zinc-500">{formatDateTime(aula.dataHora)} · {aula.duracao}min</p>
-              </div>
-            {/each}
-          </div>
-        {/if}
-      </div>
-
-      <!-- Quick navigation -->
-      <div class="space-y-2">
-        <h3 class="text-[10px] font-semibold text-zinc-600 uppercase tracking-wider px-1">Ações rápidas</h3>
-        <a href="/professor/chamada" class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex items-center gap-3 hover:border-blue-500/30 transition-colors group">
-          <div class="w-9 h-9 rounded-lg bg-blue-600/10 flex items-center justify-center">
-            <span class="material-symbols-outlined text-blue-400 text-[18px]">fact_check</span>
-          </div>
-          <div>
-            <p class="text-xs text-white font-medium group-hover:text-blue-400 transition-colors">Chamada</p>
-            <p class="text-[10px] text-zinc-600">Registrar presença</p>
-          </div>
-        </a>
-        <a href="/professor/agenda" class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex items-center gap-3 hover:border-blue-500/30 transition-colors group">
-          <div class="w-9 h-9 rounded-lg bg-purple-600/10 flex items-center justify-center">
-            <span class="material-symbols-outlined text-purple-400 text-[18px]">calendar_month</span>
-          </div>
-          <div>
-            <p class="text-xs text-white font-medium group-hover:text-purple-400 transition-colors">Agenda</p>
-            <p class="text-[10px] text-zinc-600">Ver semana completa</p>
-          </div>
-        </a>
-        <a href="/professor/disponibilidade" class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex items-center gap-3 hover:border-blue-500/30 transition-colors group">
-          <div class="w-9 h-9 rounded-lg bg-teal-600/10 flex items-center justify-center">
-            <span class="material-symbols-outlined text-teal-400 text-[18px]">schedule</span>
-          </div>
-          <div>
-            <p class="text-xs text-white font-medium group-hover:text-teal-400 transition-colors">Disponibilidade</p>
-            <p class="text-[10px] text-zinc-600">Configurar horários</p>
-          </div>
-        </a>
-      </div>
+      </a>
+      <a class="quick-action" href="/professor/agenda">
+        <div class="quick-action__ico is-plum"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg></div>
+        <div class="quick-action__text">
+          <div class="quick-action__name">Agenda</div>
+          <div class="quick-action__hint">Ver semana completa</div>
+        </div>
+      </a>
+      <a class="quick-action" href="/professor/disponibilidade">
+        <div class="quick-action__ico is-success"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+        <div class="quick-action__text">
+          <div class="quick-action__name">Disponibilidade</div>
+          <div class="quick-action__hint">Configurar horários</div>
+        </div>
+      </a>
     </div>
   </div>
 </div>

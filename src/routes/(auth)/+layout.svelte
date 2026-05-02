@@ -1,5 +1,6 @@
-<!-- BalancaEu — Auth Layout (sem navbar, páginas públicas de auth) -->
+<!-- BalancaEu — Auth Layout -->
 <script>
+  import '$lib/styles/auth.css';
   let { children } = $props();
 </script>
 

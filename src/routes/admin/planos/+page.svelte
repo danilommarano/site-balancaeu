@@ -1,7 +1,6 @@
 <!-- BalancaEu — Admin: Planos -->
 <script lang="ts">
   import { enhance } from '$app/forms';
-  import FormFeedback from '$lib/components/admin/FormFeedback.svelte';
 
   let { data, form } = $props();
   let showCreateForm = $state(false);
@@ -33,166 +32,130 @@
 </script>
 
 <svelte:head>
-  <title>Planos — Admin — BalancaEu</title>
+  <title>Planos — Admin · Balança Eu</title>
 </svelte:head>
 
-<div>
-  <div class="flex items-center justify-between mb-8">
-    <div>
-      <h1 class="text-2xl font-bold text-white mb-1">Planos</h1>
-      <p class="text-zinc-500 text-sm">{data.planos.length} plano(s) cadastrado(s)</p>
-    </div>
-    <button
-      onclick={() => showCreateForm = !showCreateForm}
-      class="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
-    >
-      <span class="material-symbols-outlined text-[18px]">{showCreateForm ? 'close' : 'add'}</span>
-      {showCreateForm ? 'Cancelar' : 'Novo Plano'}
-    </button>
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Planos</h1>
+    <p class="page-sub">{data.planos.length} plano(s) cadastrado(s)</p>
   </div>
-
-  <FormFeedback {form} />
-
-  {#if showCreateForm}
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-6">
-      <h2 class="text-sm font-semibold text-white mb-4">Novo Plano</h2>
-      <form method="POST" action="?/create" use:enhance={() => { return async ({ update }) => { await update(); showCreateForm = false; }; }}>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-          <div>
-            <label for="c-nome" class="block text-xs text-zinc-400 mb-1.5">Nome</label>
-            <input id="c-nome" name="nome" type="text" required placeholder="Ex: Plano Básico"
-              class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary" />
-          </div>
-          <div>
-            <label for="c-desc" class="block text-xs text-zinc-400 mb-1.5">Descrição</label>
-            <input id="c-desc" name="descricao" type="text" required placeholder="Breve descrição"
-              class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary" />
-          </div>
-          <div>
-            <label for="c-preco" class="block text-xs text-zinc-400 mb-1.5">Preço (R$)</label>
-            <input id="c-preco" name="preco" type="number" required min="0" step="0.01" placeholder="150.00"
-              class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary" />
-          </div>
-          <div>
-            <label for="c-max" class="block text-xs text-zinc-400 mb-1.5">Máx. aulas/semana</label>
-            <input id="c-max" name="maxAulasSemana" type="number" required min="1" value="2"
-              class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary" />
-          </div>
-          <div class="flex items-end">
-            <label class="flex items-center gap-2 text-sm text-zinc-300 cursor-pointer pb-2">
-              <input type="checkbox" name="permiteParticular" class="accent-primary" />
-              Permite aula particular
-            </label>
-          </div>
-        </div>
-        <button type="submit" class="bg-primary text-white px-5 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">Criar Plano</button>
-      </form>
-    </div>
-  {/if}
-
-  <!-- Cards -->
-  {#if data.planos.length === 0}
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-10 text-center">
-      <span class="material-symbols-outlined text-4xl text-zinc-700 mb-3 block">credit_card</span>
-      <p class="text-zinc-500 text-sm">Nenhum plano cadastrado.</p>
-    </div>
-  {:else}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {#each data.planos as plano}
-        <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden hover:border-zinc-700 transition-colors {!plano.ativo ? 'opacity-50' : ''}">
-          {#if editingId === plano.id}
-            <!-- Inline Edit Form -->
-            <form method="POST" action="?/update" use:enhance={() => { return async ({ update }) => { await update(); editingId = null; }; }} class="p-6">
-              <input type="hidden" name="id" value={plano.id} />
-              <input type="hidden" name="ativo" value={editAtivo.toString()} />
-              <div class="space-y-3 mb-4">
-                <div>
-                  <label for="edit-plan-nome" class="block text-[10px] text-zinc-500 mb-1">Nome</label>
-                  <input id="edit-plan-nome" name="nome" type="text" required bind:value={editNome}
-                    class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-primary" />
-                </div>
-                <div>
-                  <label for="edit-plan-descricao" class="block text-[10px] text-zinc-500 mb-1">Descrição</label>
-                  <input id="edit-plan-descricao" name="descricao" type="text" required bind:value={editDescricao}
-                    class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-primary" />
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                  <div>
-                    <label for="edit-plan-preco" class="block text-[10px] text-zinc-500 mb-1">Preço (R$)</label>
-                    <input id="edit-plan-preco" name="preco" type="number" required min="0" step="0.01" bind:value={editPreco}
-                      class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-primary" />
-                  </div>
-                  <div>
-                    <label for="edit-plan-maxaulas" class="block text-[10px] text-zinc-500 mb-1">Máx. aulas/sem</label>
-                    <input id="edit-plan-maxaulas" name="maxAulasSemana" type="number" required min="1" bind:value={editMaxAulas}
-                      class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-primary" />
-                  </div>
-                </div>
-                <div class="flex items-center gap-4">
-                  <label class="flex items-center gap-2 text-xs text-zinc-300 cursor-pointer">
-                    <input type="checkbox" name="permiteParticular" bind:checked={editPermiteParticular} class="accent-primary" />
-                    Permite particular
-                  </label>
-                  <label class="flex items-center gap-2 text-xs text-zinc-300 cursor-pointer">
-                    <input type="checkbox" bind:checked={editAtivo} class="accent-emerald-500" />
-                    Ativo
-                  </label>
-                </div>
-              </div>
-              <div class="flex gap-2">
-                <button type="submit" class="flex-1 bg-primary text-white py-1.5 rounded-lg text-xs font-medium hover:opacity-90">Salvar</button>
-                <button type="button" onclick={cancelEdit} class="flex-1 bg-zinc-800 text-zinc-400 py-1.5 rounded-lg text-xs hover:bg-zinc-700">Cancelar</button>
-              </div>
-            </form>
-          {:else}
-            <!-- Display Card -->
-            <div class="p-6">
-              <div class="flex items-start justify-between mb-4">
-                <div>
-                  <h3 class="text-lg font-bold text-white">{plano.nome}</h3>
-                  <p class="text-xs text-zinc-500 mt-1">{plano.descricao}</p>
-                </div>
-                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wider {plano.ativo ? 'bg-emerald-500/10 text-emerald-400' : 'bg-zinc-700 text-zinc-400'}">
-                  {plano.ativo ? 'Ativo' : 'Inativo'}
-                </span>
-              </div>
-
-              <div class="mb-4">
-                <span class="text-3xl font-bold text-white">{formatCurrency(plano.preco)}</span>
-                <span class="text-zinc-500 text-sm">/mês</span>
-              </div>
-
-              <div class="space-y-2 mb-6 text-sm">
-                <div class="flex items-center gap-2 text-zinc-400">
-                  <span class="material-symbols-outlined text-[16px]">event_repeat</span>
-                  {plano.maxAulasSemana >= 99 ? 'Aulas ilimitadas' : `${plano.maxAulasSemana} aulas/semana`}
-                </div>
-                <div class="flex items-center gap-2 text-zinc-400">
-                  <span class="material-symbols-outlined text-[16px]">{plano.permiteParticular ? 'check_circle' : 'cancel'}</span>
-                  {plano.permiteParticular ? 'Permite aula particular' : 'Sem aula particular'}
-                </div>
-                <div class="flex items-center gap-2 text-zinc-400">
-                  <span class="material-symbols-outlined text-[16px]">group</span>
-                  {plano._count.subscriptions} assinante(s)
-                </div>
-              </div>
-
-              <div class="flex items-center gap-2 pt-3 border-t border-zinc-800">
-                <button onclick={() => startEdit(plano)} class="p-1.5 rounded-lg text-zinc-500 hover:text-blue-400 hover:bg-blue-500/10 transition-colors" title="Editar">
-                  <span class="material-symbols-outlined text-[18px]">edit</span>
-                </button>
-                <form method="POST" action="?/delete" use:enhance class="ml-auto">
-                  <input type="hidden" name="id" value={plano.id} />
-                  <button type="submit" class="p-1.5 rounded-lg text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-colors" title="Excluir"
-                    onclick={(e) => { if (!confirm('Excluir este plano?')) e.preventDefault(); }}>
-                    <span class="material-symbols-outlined text-[18px]">delete</span>
-                  </button>
-                </form>
-              </div>
-            </div>
-          {/if}
-        </div>
-      {/each}
-    </div>
-  {/if}
+  <button class="btn btn--primary" onclick={() => showCreateForm = !showCreateForm}>
+    {#if showCreateForm}
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>Cancelar
+    {:else}
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>Novo Plano
+    {/if}
+  </button>
 </div>
+
+{#if form?.error}
+  <div class="card" style="border-color: var(--danger); margin-bottom: 16px;">
+    <p style="color: var(--danger); font-size: 13px;">{form.error}</p>
+  </div>
+{/if}
+{#if form?.success}
+  <div class="card" style="border-color: var(--success); margin-bottom: 16px;">
+    <p style="color: var(--success); font-size: 13px;">Operação realizada com sucesso!</p>
+  </div>
+{/if}
+
+{#if showCreateForm}
+  <div class="form-card" style="margin-bottom: 18px;">
+    <h3>Novo Plano</h3>
+    <form method="POST" action="?/create" use:enhance={() => async ({ update }) => { await update(); showCreateForm = false; }}>
+      <div class="form-grid">
+        <div class="field"><label for="cpl-nome">Nome</label><input id="cpl-nome" name="nome" type="text" required placeholder="Ex: Plano Básico" /></div>
+        <div class="field"><label for="cpl-desc">Descrição</label><input id="cpl-desc" name="descricao" type="text" required placeholder="Breve descrição" /></div>
+        <div class="field"><label for="cpl-preco">Preço (R$)</label><input id="cpl-preco" name="preco" type="number" required min="0" step="0.01" placeholder="150.00" /></div>
+        <div class="field"><label for="cpl-max">Máx. aulas/semana</label><input id="cpl-max" name="maxAulasSemana" type="number" required min="1" value="2" /></div>
+        <div class="field" style="display:flex; align-items:center; gap:8px; padding-top:18px;">
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; margin:0;">
+            <input type="checkbox" name="permiteParticular" /> Permite aula particular
+          </label>
+        </div>
+      </div>
+      <div style="margin-top: 16px;">
+        <button type="submit" class="btn btn--primary">Criar Plano</button>
+      </div>
+    </form>
+  </div>
+{/if}
+
+{#if data.planos.length === 0}
+  <div class="empty">
+    <div class="empty__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg></div>
+    <p>Nenhum plano cadastrado.</p>
+  </div>
+{:else}
+  <div class="cards-grid">
+    {#each data.planos as plano}
+      <div class="plan-admin">
+        {#if editingId === plano.id}
+          <form method="POST" action="?/update" use:enhance={() => async ({ update }) => { await update(); editingId = null; }}>
+            <input type="hidden" name="id" value={plano.id} />
+            <input type="hidden" name="ativo" value={editAtivo.toString()} />
+            <div class="form-grid" style="grid-template-columns: 1fr; gap: 10px;">
+              <div class="field"><label for="ep-{plano.id}-nome">Nome</label><input id="ep-{plano.id}-nome" name="nome" type="text" required bind:value={editNome} /></div>
+              <div class="field"><label for="ep-{plano.id}-desc">Descrição</label><input id="ep-{plano.id}-desc" name="descricao" type="text" required bind:value={editDescricao} /></div>
+              <div class="field"><label for="ep-{plano.id}-preco">Preço</label><input id="ep-{plano.id}-preco" name="preco" type="number" required min="0" step="0.01" bind:value={editPreco} /></div>
+              <div class="field"><label for="ep-{plano.id}-max">Máx. aulas/sem</label><input id="ep-{plano.id}-max" name="maxAulasSemana" type="number" required min="1" bind:value={editMaxAulas} /></div>
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:12px;">
+                <input type="checkbox" name="permiteParticular" bind:checked={editPermiteParticular} /> Permite particular
+              </label>
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:12px;">
+                <input type="checkbox" bind:checked={editAtivo} /> Ativo
+              </label>
+            </div>
+            <div style="margin-top:12px; display:flex; gap:8px;">
+              <button type="submit" class="btn btn--primary btn--sm" style="flex:1;">Salvar</button>
+              <button type="button" class="btn btn--ghost btn--sm" style="flex:1;" onclick={cancelEdit}>Cancelar</button>
+            </div>
+          </form>
+        {:else}
+          <div class="plan-admin__head">
+            <div>
+              <div class="plan-admin__name">{plano.nome}</div>
+              <div class="plan-admin__tag">{plano.descricao}</div>
+            </div>
+            {#if plano.ativo}
+              <span class="badge badge--active">Ativo</span>
+            {:else}
+              <span class="badge">Inativo</span>
+            {/if}
+          </div>
+          <div class="plan-admin__price">{formatCurrency(plano.preco)}<span class="per">/mês</span></div>
+          <ul class="plan-admin__list">
+            <li class="on">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+              {plano.maxAulasSemana >= 99 ? 'Aulas ilimitadas' : `${plano.maxAulasSemana} aulas/semana`}
+            </li>
+            <li class={plano.permiteParticular ? 'on' : ''}>
+              {#if plano.permiteParticular}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Permite aula particular
+              {:else}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>Sem aula particular
+              {/if}
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
+              {plano._count.subscriptions} assinante(s)
+            </li>
+          </ul>
+          <div class="plan-admin__foot">
+            <button class="btn--icon" onclick={() => startEdit(plano)} aria-label="Editar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </button>
+            <form method="POST" action="?/delete" use:enhance style="display:inline;">
+              <input type="hidden" name="id" value={plano.id} />
+              <button type="submit" class="btn--icon is-danger" aria-label="Excluir"
+                onclick={(e) => { if (!confirm('Excluir este plano?')) e.preventDefault(); }}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+              </button>
+            </form>
+          </div>
+        {/if}
+      </div>
+    {/each}
+  </div>
+{/if}

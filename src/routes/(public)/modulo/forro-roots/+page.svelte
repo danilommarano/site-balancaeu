@@ -24,7 +24,7 @@
   <meta name="description" content={modality.descricao} />
 </svelte:head>
 
-<PublicHeader {navLinks} />
+<PublicHeader />
 
 <main class="pt-24 bg-background">
 
@@ -178,4 +178,4 @@
   </section>
 </main>
 
-<PublicFooter {navLinks} cms={cmsData} />
+<PublicFooter />

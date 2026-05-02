@@ -1,4 +1,4 @@
-<!-- BalancaEu — Meu Plano (Fase 10) -->
+<!-- BalancaEu — Meu Plano -->
 <script lang="ts">
   import { enhance } from '$app/forms';
 
@@ -6,309 +6,262 @@
 
   let confirmAction = $state<{ type: string; planId?: string; planNome?: string; subId?: string } | null>(null);
 
-  const statusLabels: Record<string, { label: string; color: string }> = {
-    ATIVA: { label: 'Ativa', color: 'text-emerald-400 bg-emerald-400/10' },
-    CANCELADA: { label: 'Cancelada', color: 'text-red-400 bg-red-400/10' },
-    PAUSADA: { label: 'Pausada', color: 'text-amber-400 bg-amber-400/10' },
-    EXPIRADA: { label: 'Expirada', color: 'text-zinc-400 bg-zinc-400/10' }
+  const statusLabels: Record<string, string> = {
+    ATIVA: 'Ativa',
+    CANCELADA: 'Cancelada',
+    PAUSADA: 'Pausada',
+    EXPIRADA: 'Expirada'
   };
 
   function formatDate(iso: string): string {
     return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
   }
 
-  function getActionForPlan(plano: { id: string; preco: number }): { action: string; label: string; icon: string; color: string } | null {
+  function getActionForPlan(plano: { id: string; preco: number }): { action: string; label: string } | null {
     if (!data.assinaturaAtiva) {
-      return { action: 'assinar', label: 'Assinar', icon: 'shopping_cart', color: 'bg-emerald-600 hover:bg-emerald-700 text-white' };
+      return { action: 'assinar', label: 'Assinar' };
     }
     if (plano.id === data.assinaturaAtiva.plano.id) return null;
     if (plano.preco > data.assinaturaAtiva.plano.preco) {
-      return { action: 'trocar', label: 'Upgrade', icon: 'arrow_upward', color: 'bg-blue-600 hover:bg-blue-700 text-white' };
+      return { action: 'trocar', label: 'Upgrade' };
     }
-    return { action: 'trocar', label: 'Downgrade', icon: 'arrow_downward', color: 'bg-amber-600/15 hover:bg-amber-600/25 text-amber-400' };
+    return { action: 'trocar', label: 'Downgrade' };
+  }
+
+  // Heuristic: featured = highest priced plan that is not the current one (or middle one).
+  function isFeatured(plano: { id: string }, idx: number, total: number): boolean {
+    if (data.assinaturaAtiva?.plano.id === plano.id) return false;
+    return idx === Math.floor(total / 2);
   }
 </script>
 
 <svelte:head>
-  <title>Meu Plano — BalancaEu</title>
+  <title>Meu Plano — Balança Eu</title>
 </svelte:head>
 
-<div>
-  <div class="mb-8">
-    <h1 class="text-2xl font-bold text-white mb-1">Meu Plano</h1>
-    <p class="text-zinc-500 text-sm">Gerencie sua assinatura e compare planos disponíveis</p>
+<div class="page-head">
+  <h1 class="page-title">Meu <em>Plano</em></h1>
+  <p class="page-sub">Gerencie sua assinatura e compare planos disponíveis.</p>
+</div>
+
+{#if form?.success}
+  <div class="alert" style="margin-bottom: 20px;">
+    <div class="alert__icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+    </div>
+    <div class="alert__body">
+      <strong>Sucesso</strong>
+      <p>{form.message}</p>
+    </div>
   </div>
-
-  <!-- Feedback -->
-  {#if form?.success}
-    <div class="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-lg px-4 py-3 mb-6 text-sm">
-      <span class="material-symbols-outlined text-[18px]">check_circle</span>
-      {form.message}
+{/if}
+{#if form?.error}
+  <div class="alert" style="margin-bottom: 20px;">
+    <div class="alert__icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
     </div>
-  {/if}
-  {#if form?.error}
-    <div class="flex items-center gap-2 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg px-4 py-3 mb-6 text-sm">
-      <span class="material-symbols-outlined text-[18px]">error</span>
-      {form.error}
+    <div class="alert__body">
+      <strong>Erro</strong>
+      <p>{form.error}</p>
     </div>
-  {/if}
+  </div>
+{/if}
 
-  <!-- Assinatura Atual -->
-  {#if data.assinaturaAtiva}
-    {@const sub = data.assinaturaAtiva}
-    {@const st = statusLabels[sub.status] ?? statusLabels.ATIVA}
-    <div class="bg-zinc-900 border border-emerald-600/30 rounded-xl overflow-hidden mb-8">
-      <div class="p-6">
-        <div class="flex items-start justify-between mb-6">
-          <div>
-            <div class="flex items-center gap-3 mb-2">
-              <h2 class="text-xl font-bold text-white">{sub.plano.nome}</h2>
-              <span class="text-[11px] font-medium px-2 py-0.5 rounded-full {st.color}">{st.label}</span>
-            </div>
-            <p class="text-sm text-zinc-400">{sub.plano.descricao}</p>
-          </div>
-          <div class="text-right">
-            <p class="text-2xl font-bold text-emerald-400">R$ {sub.plano.preco.toFixed(2)}</p>
-            <p class="text-xs text-zinc-500">por mês</p>
-          </div>
-        </div>
+{#if data.assinaturaAtiva}
+  {@const sub = data.assinaturaAtiva}
+  <div class="card" style="margin-bottom: 28px; border-color: var(--terracota);">
+    <div class="card__head">
+      <div class="card__title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg>
+        {sub.plano.nome}
+      </div>
+      <span style="font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: var(--coral); color: var(--terracota-ink);">
+        {statusLabels[sub.status] ?? sub.status}
+      </span>
+    </div>
 
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-          <div class="bg-zinc-800/50 rounded-lg p-3">
-            <span class="text-[10px] text-zinc-500 uppercase tracking-wider">Aulas/semana</span>
-            <p class="text-lg font-bold text-white mt-1">{sub.plano.maxAulasSemana}</p>
-          </div>
-          <div class="bg-zinc-800/50 rounded-lg p-3">
-            <span class="text-[10px] text-zinc-500 uppercase tracking-wider">Aula particular</span>
-            <p class="text-lg font-bold mt-1 {sub.plano.permiteParticular ? 'text-emerald-400' : 'text-zinc-500'}">
-              {sub.plano.permiteParticular ? 'Sim' : 'Não'}
-            </p>
-          </div>
-          <div class="bg-zinc-800/50 rounded-lg p-3">
-            <span class="text-[10px] text-zinc-500 uppercase tracking-wider">Início</span>
-            <p class="text-sm font-medium text-white mt-1">{formatDate(sub.inicio)}</p>
-          </div>
-          <div class="bg-zinc-800/50 rounded-lg p-3">
-            <span class="text-[10px] text-zinc-500 uppercase tracking-wider">Vigência</span>
-            <p class="text-sm font-medium text-white mt-1">{sub.fim ? formatDate(sub.fim) : 'Recorrente'}</p>
-          </div>
-        </div>
+    <p style="font-size: 14px; color: var(--ink-soft); margin-top: -4px;">{sub.plano.descricao ?? ''}</p>
 
-        <button
-          onclick={() => confirmAction = { type: 'cancelar', subId: sub.id, planNome: sub.plano.nome }}
-          class="flex items-center gap-1.5 text-xs text-red-400/70 hover:text-red-400 transition-colors"
-        >
-          <span class="material-symbols-outlined text-[14px]">cancel</span>
-          Cancelar assinatura
-        </button>
+    <div class="info-row" style="margin-top: 18px;">
+      <div class="info-row__item">
+        <h5>Preço</h5>
+        <p>R$ {sub.plano.preco.toFixed(2)}/mês</p>
+      </div>
+      <div class="info-row__item">
+        <h5>Aulas/semana</h5>
+        <p>{sub.plano.maxAulasSemana}</p>
+      </div>
+      <div class="info-row__item">
+        <h5>Aula particular</h5>
+        <p>{sub.plano.permiteParticular ? 'Sim' : 'Não'}</p>
+      </div>
+      <div class="info-row__item">
+        <h5>Início</h5>
+        <p>{formatDate(sub.inicio)}</p>
       </div>
     </div>
-  {:else}
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-8 text-center mb-8">
-      <span class="material-symbols-outlined text-5xl text-zinc-700 mb-3">credit_card_off</span>
-      <h2 class="text-lg font-semibold text-white mb-1">Sem assinatura ativa</h2>
-      <p class="text-zinc-500 text-sm mb-4">Escolha um plano abaixo para começar.</p>
-    </div>
-  {/if}
 
-  <!-- Planos Disponíveis -->
-  <div class="mb-8">
-    <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-      <span class="material-symbols-outlined text-[20px] text-purple-400">compare</span>
-      Planos Disponíveis
-    </h2>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      {#each data.planos as plano}
-        {@const isAtual = data.assinaturaAtiva?.plano.id === plano.id}
-        {@const actionInfo = getActionForPlan(plano)}
-        <div class="bg-zinc-900 border rounded-xl overflow-hidden {isAtual ? 'border-emerald-600/50' : 'border-zinc-800'} flex flex-col">
+    <div style="margin-top: 18px;">
+      <button
+        type="button"
+        class="btn btn--ghost btn--sm"
+        style="border-color: var(--danger); color: var(--danger);"
+        onclick={() => confirmAction = { type: 'cancelar', subId: sub.id, planNome: sub.plano.nome }}
+      >
+        Cancelar assinatura
+      </button>
+    </div>
+  </div>
+{:else}
+  <div class="plan-status">
+    <div class="plan-status__icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><path d="M8 15h3"/></svg>
+    </div>
+    <h3>Sem assinatura ativa</h3>
+    <p>Escolha um plano abaixo para começar.</p>
+  </div>
+{/if}
+
+<div class="plans-title">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L3 7l9 5 9-5-9-5z"/><path d="M3 12l9 5 9-5M3 17l9 5 9-5"/></svg>
+  Planos Disponíveis
+</div>
+
+{#if data.planos.length === 0}
+  <div class="empty-state">
+    <p>Nenhum plano disponível no momento.</p>
+  </div>
+{:else}
+  <div class="plan-grid">
+    {#each data.planos as plano, idx}
+      {@const isAtual = data.assinaturaAtiva?.plano.id === plano.id}
+      {@const featured = isFeatured(plano, idx, data.planos.length)}
+      {@const actionInfo = getActionForPlan(plano)}
+      {@const precoStr = plano.preco.toFixed(2).replace('.', ',')}
+      <div class="plan {featured ? 'is-featured' : ''}">
+        <div class="plan__name">{plano.nome}</div>
+        <div class="plan__tag">{plano.descricao ?? ''}</div>
+        <div class="plan__price">
+          <span class="cur">R$</span><span class="val">{precoStr}</span><span class="per">/mês</span>
+        </div>
+        <ul class="plan__features">
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            {plano.maxAulasSemana} aula{plano.maxAulasSemana === 1 ? '' : 's'} por semana
+          </li>
+          <li class={plano.permiteParticular ? '' : 'is-off'}>
+            {#if plano.permiteParticular}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            {:else}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            {/if}
+            Aulas particulares
+          </li>
+        </ul>
+        <div class="plan__cta">
           {#if isAtual}
-            <div class="bg-emerald-600/15 text-center py-1.5">
-              <span class="text-[11px] font-medium text-emerald-400 uppercase tracking-wider">Plano Atual</span>
-            </div>
+            <button type="button" class="btn btn--ghost btn--full" disabled style="opacity:0.7; cursor: default;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+              Plano atual
+            </button>
+          {:else if actionInfo}
+            <button
+              type="button"
+              class="btn btn--coral btn--full"
+              onclick={() => confirmAction = { type: actionInfo.action, planId: plano.id, planNome: plano.nome }}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/><path d="M3 4h2l2.4 11.5a2 2 0 002 1.5h7.4a2 2 0 002-1.5L20 8H6"/></svg>
+              {actionInfo.label}
+            </button>
           {/if}
-          <div class="p-5 flex-1 flex flex-col">
-            <h3 class="text-base font-semibold text-white mb-1">{plano.nome}</h3>
-            <p class="text-xs text-zinc-500 mb-4">{plano.descricao}</p>
-            <p class="text-2xl font-bold text-white mb-4">
-              R$ {plano.preco.toFixed(2)}
-              <span class="text-xs font-normal text-zinc-500">/mês</span>
-            </p>
-            <ul class="space-y-2 text-sm mb-5">
-              <li class="flex items-center gap-2 text-zinc-300">
-                <span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>
-                {plano.maxAulasSemana} aulas por semana
-              </li>
-              <li class="flex items-center gap-2 {plano.permiteParticular ? 'text-zinc-300' : 'text-zinc-600'}">
-                <span class="material-symbols-outlined text-[16px] {plano.permiteParticular ? 'text-emerald-400' : 'text-zinc-600'}">{plano.permiteParticular ? 'check' : 'close'}</span>
-                Aulas particulares
-              </li>
-            </ul>
-
-            <div class="mt-auto">
-              {#if isAtual}
-                <p class="text-xs text-emerald-400/70 flex items-center gap-1 justify-center">
-                  <span class="material-symbols-outlined text-[14px]">check</span>
-                  Seu plano atual
-                </p>
-              {:else if actionInfo}
-                <button
-                  onclick={() => confirmAction = { type: actionInfo.action, planId: plano.id, planNome: plano.nome }}
-                  class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors {actionInfo.color}"
-                >
-                  <span class="material-symbols-outlined text-[16px]">{actionInfo.icon}</span>
-                  {actionInfo.label}
-                </button>
-              {/if}
-            </div>
-          </div>
         </div>
-      {/each}
-    </div>
-    {#if data.planos.length === 0}
-      <p class="text-zinc-500 text-sm text-center py-4">Nenhum plano disponível no momento.</p>
-    {/if}
-  </div>
-
-  <!-- Info boxes -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-    <div class="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4 flex items-start gap-3">
-      <span class="material-symbols-outlined text-blue-400 text-[20px] mt-0.5">arrow_upward</span>
-      <div>
-        <p class="text-xs font-medium text-white">Upgrade</p>
-        <p class="text-[11px] text-zinc-500 mt-0.5">Efeito imediato. Você paga apenas a diferença pro-rata dos dias restantes do ciclo.</p>
       </div>
-    </div>
-    <div class="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4 flex items-start gap-3">
-      <span class="material-symbols-outlined text-amber-400 text-[20px] mt-0.5">arrow_downward</span>
-      <div>
-        <p class="text-xs font-medium text-white">Downgrade</p>
-        <p class="text-[11px] text-zinc-500 mt-0.5">Entra em vigor no próximo ciclo. Você mantém os benefícios atuais até lá.</p>
-      </div>
-    </div>
+    {/each}
   </div>
+{/if}
 
-  <!-- Histórico de Assinaturas -->
-  {#if data.historico.length > 1}
+{#if data.historico.length > 1}
+  <div style="margin-top: 30px;">
     <details>
-      <summary class="text-xs text-zinc-500 cursor-pointer hover:text-zinc-400 transition-colors mb-3">
+      <summary style="font-size: 13px; color: var(--ink-mute); cursor: pointer; padding: 8px 0;">
         Histórico de Assinaturas ({data.historico.length})
       </summary>
-      <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="text-left text-[11px] text-zinc-500 uppercase tracking-wider border-b border-zinc-800">
-                <th class="px-5 py-3">Plano</th>
-                <th class="px-5 py-3">Status</th>
-                <th class="px-5 py-3">Início</th>
-                <th class="px-5 py-3">Fim</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-zinc-800/50">
-              {#each data.historico as sub}
-                {@const st = statusLabels[sub.status] ?? statusLabels.ATIVA}
-                <tr class="hover:bg-zinc-800/30 transition-colors">
-                  <td class="px-5 py-3 text-white font-medium">{sub.plano}</td>
-                  <td class="px-5 py-3">
-                    <span class="text-[11px] font-medium px-2 py-0.5 rounded-full {st.color}">{st.label}</span>
-                  </td>
-                  <td class="px-5 py-3 text-zinc-400">{formatDate(sub.inicio)}</td>
-                  <td class="px-5 py-3 text-zinc-400">{sub.fim ? formatDate(sub.fim) : '—'}</td>
-                </tr>
-              {/each}
-            </tbody>
-          </table>
+      <div class="card" style="margin-top: 10px;">
+        <div class="upcoming__list">
+          {#each data.historico as sub}
+            <div class="upcoming-row">
+              <div class="upcoming-info">
+                <h4>{sub.plano}</h4>
+                <p>{formatDate(sub.inicio)} {sub.fim ? `→ ${formatDate(sub.fim)}` : '(em curso)'}</p>
+              </div>
+              <div class="upcoming-time">{statusLabels[sub.status] ?? sub.status}</div>
+            </div>
+          {/each}
         </div>
       </div>
     </details>
-  {/if}
-</div>
+  </div>
+{/if}
 
-<!-- Confirmation Modal -->
 {#if confirmAction}
-  <div class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl w-full max-w-md overflow-hidden">
-      <div class="p-6">
-        {#if confirmAction.type === 'cancelar'}
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-10 h-10 rounded-full bg-red-600/15 flex items-center justify-center">
-              <span class="material-symbols-outlined text-red-400">warning</span>
-            </div>
-            <div>
-              <h3 class="text-base font-semibold text-white">Cancelar assinatura</h3>
-              <p class="text-xs text-zinc-500">Esta ação não pode ser desfeita</p>
-            </div>
+  <div style="position: fixed; inset: 0; background: rgba(27, 20, 16, 0.6); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 16px;">
+    <div class="card" style="max-width: 460px; width: 100%; background: var(--bg);">
+      {#if confirmAction.type === 'cancelar'}
+        <div class="card__head">
+          <div class="card__title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+            Cancelar assinatura
           </div>
-          <p class="text-sm text-zinc-400 mb-6">
-            Ao cancelar o plano <strong class="text-white">{confirmAction.planNome}</strong>, todas as suas inscrições em turmas serão canceladas automaticamente. Um crédito pro-rata será registrado caso haja dias restantes no ciclo.
-          </p>
-          <div class="flex gap-3">
-            <button
-              onclick={() => confirmAction = null}
-              class="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium bg-zinc-800 text-zinc-300 hover:bg-zinc-700 transition-colors"
-            >Voltar</button>
-            <form method="POST" action="?/cancelar" use:enhance={() => { return async ({ update }) => { confirmAction = null; await update(); }; }} class="flex-1">
-              <input type="hidden" name="subscriptionId" value={confirmAction.subId} />
-              <button type="submit" class="w-full px-4 py-2.5 rounded-lg text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors">
-                Confirmar Cancelamento
-              </button>
-            </form>
-          </div>
+        </div>
+        <p style="font-size: 14px; color: var(--ink-soft); margin-bottom: 18px;">
+          Ao cancelar o plano <strong>{confirmAction.planNome}</strong>, todas as suas inscrições em turmas serão canceladas automaticamente. Um crédito pro-rata será registrado caso haja dias restantes no ciclo.
+        </p>
+        <div style="display: flex; gap: 10px;">
+          <button type="button" class="btn btn--ghost btn--full" onclick={() => confirmAction = null}>Voltar</button>
+          <form method="POST" action="?/cancelar" style="flex: 1;" use:enhance={() => { return async ({ update }) => { confirmAction = null; await update(); }; }}>
+            <input type="hidden" name="subscriptionId" value={confirmAction.subId} />
+            <button type="submit" class="btn btn--coral btn--full" style="background: var(--danger); color: var(--creme);">
+              Confirmar Cancelamento
+            </button>
+          </form>
+        </div>
 
-        {:else if confirmAction.type === 'trocar'}
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-10 h-10 rounded-full bg-blue-600/15 flex items-center justify-center">
-              <span class="material-symbols-outlined text-blue-400">swap_vert</span>
-            </div>
-            <div>
-              <h3 class="text-base font-semibold text-white">Trocar de plano</h3>
-              <p class="text-xs text-zinc-500">Efeito imediato</p>
-            </div>
+      {:else if confirmAction.type === 'trocar'}
+        <div class="card__head">
+          <div class="card__title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l-3 3 3 3M4 10h11M17 17l3-3-3-3M20 14H9"/></svg>
+            Trocar de plano
           </div>
-          <p class="text-sm text-zinc-400 mb-6">
-            Deseja mudar para o plano <strong class="text-white">{confirmAction.planNome}</strong>? A diferença pro-rata será calculada proporcionalmente aos dias restantes do ciclo.
-          </p>
-          <div class="flex gap-3">
-            <button
-              onclick={() => confirmAction = null}
-              class="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium bg-zinc-800 text-zinc-300 hover:bg-zinc-700 transition-colors"
-            >Voltar</button>
-            <form method="POST" action="?/trocar" use:enhance={() => { return async ({ update }) => { confirmAction = null; await update(); }; }} class="flex-1">
-              <input type="hidden" name="planId" value={confirmAction.planId} />
-              <button type="submit" class="w-full px-4 py-2.5 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors">
-                Confirmar Troca
-              </button>
-            </form>
-          </div>
+        </div>
+        <p style="font-size: 14px; color: var(--ink-soft); margin-bottom: 18px;">
+          Deseja mudar para o plano <strong>{confirmAction.planNome}</strong>? A diferença pro-rata será calculada proporcionalmente aos dias restantes do ciclo.
+        </p>
+        <div style="display: flex; gap: 10px;">
+          <button type="button" class="btn btn--ghost btn--full" onclick={() => confirmAction = null}>Voltar</button>
+          <form method="POST" action="?/trocar" style="flex: 1;" use:enhance={() => { return async ({ update }) => { confirmAction = null; await update(); }; }}>
+            <input type="hidden" name="planId" value={confirmAction.planId} />
+            <button type="submit" class="btn btn--primary btn--full">Confirmar Troca</button>
+          </form>
+        </div>
 
-        {:else if confirmAction.type === 'assinar'}
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-10 h-10 rounded-full bg-emerald-600/15 flex items-center justify-center">
-              <span class="material-symbols-outlined text-emerald-400">shopping_cart</span>
-            </div>
-            <div>
-              <h3 class="text-base font-semibold text-white">Assinar plano</h3>
-              <p class="text-xs text-zinc-500">Ativação imediata</p>
-            </div>
+      {:else if confirmAction.type === 'assinar'}
+        <div class="card__head">
+          <div class="card__title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/><path d="M3 4h2l2.4 11.5a2 2 0 002 1.5h7.4a2 2 0 002-1.5L20 8H6"/></svg>
+            Assinar plano
           </div>
-          <p class="text-sm text-zinc-400 mb-6">
-            Deseja assinar o plano <strong class="text-white">{confirmAction.planNome}</strong>? A primeira mensalidade será registrada imediatamente.
-          </p>
-          <div class="flex gap-3">
-            <button
-              onclick={() => confirmAction = null}
-              class="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium bg-zinc-800 text-zinc-300 hover:bg-zinc-700 transition-colors"
-            >Voltar</button>
-            <form method="POST" action="?/assinar" use:enhance={() => { return async ({ update }) => { confirmAction = null; await update(); }; }} class="flex-1">
-              <input type="hidden" name="planId" value={confirmAction.planId} />
-              <button type="submit" class="w-full px-4 py-2.5 rounded-lg text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition-colors">
-                Confirmar Assinatura
-              </button>
-            </form>
-          </div>
-        {/if}
-      </div>
+        </div>
+        <p style="font-size: 14px; color: var(--ink-soft); margin-bottom: 18px;">
+          Deseja assinar o plano <strong>{confirmAction.planNome}</strong>? A primeira mensalidade será registrada imediatamente.
+        </p>
+        <div style="display: flex; gap: 10px;">
+          <button type="button" class="btn btn--ghost btn--full" onclick={() => confirmAction = null}>Voltar</button>
+          <form method="POST" action="?/assinar" style="flex: 1;" use:enhance={() => { return async ({ update }) => { confirmAction = null; await update(); }; }}>
+            <input type="hidden" name="planId" value={confirmAction.planId} />
+            <button type="submit" class="btn btn--coral btn--full">Confirmar Assinatura</button>
+          </form>
+        </div>
+      {/if}
     </div>
   </div>
 {/if}

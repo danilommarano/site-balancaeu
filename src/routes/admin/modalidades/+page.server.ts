@@ -26,6 +26,7 @@ export const actions: Actions = {
 		const data = await request.formData();
 		const nome = data.get('nome')?.toString().trim();
 		const descricao = data.get('descricao')?.toString().trim();
+		const imagemUrl = data.get('imagemUrl')?.toString().trim() || null;
 
 		if (!nome || !descricao) {
 			return fail(400, { error: 'Nome e descrição são obrigatórios', nome, descricao });
@@ -42,7 +43,7 @@ export const actions: Actions = {
 		}
 
 		await db.modality.create({
-			data: { id, tenantId, nome, descricao }
+			data: { id, tenantId, nome, descricao, imagemUrl }
 		});
 
 		return { success: true };
@@ -57,6 +58,7 @@ export const actions: Actions = {
 		const nome = data.get('nome')?.toString().trim();
 		const descricao = data.get('descricao')?.toString().trim();
 		const ativo = data.get('ativo') === 'true';
+		const imagemUrl = data.get('imagemUrl')?.toString().trim() || null;
 
 		if (!id || !nome || !descricao) {
 			return fail(400, { error: 'Campos obrigatórios faltando' });
@@ -64,7 +66,7 @@ export const actions: Actions = {
 
 		await db.modality.update({
 			where: { id },
-			data: { nome, descricao, ativo }
+			data: { nome, descricao, ativo, imagemUrl }
 		});
 
 		return { success: true };

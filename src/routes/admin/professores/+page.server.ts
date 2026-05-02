@@ -22,6 +22,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 				teacher: {
 					select: {
 						bio: true,
+						imagemUrl: true,
 						especialidades: true,
 						modalities: { select: { id: true, nome: true } }
 					}
@@ -57,6 +58,7 @@ export const actions: Actions = {
 		const email = fd.get('email')?.toString().trim().toLowerCase();
 		const telefone = fd.get('telefone')?.toString().trim() || null;
 		const bio = fd.get('bio')?.toString().trim() || '';
+		const imagemUrl = fd.get('imagemUrl')?.toString().trim() || null;
 		const modalityIds = fd.getAll('modalityIds').map(v => v.toString()).filter(Boolean);
 		const senha = fd.get('senha')?.toString();
 
@@ -92,6 +94,7 @@ export const actions: Actions = {
 				tenantId,
 				userId: user.id,
 				bio,
+				imagemUrl,
 				especialidades: [],
 				modalities: { connect: modalityIds.map(id => ({ id })) }
 			}
@@ -110,6 +113,7 @@ export const actions: Actions = {
 		const email = fd.get('email')?.toString().trim().toLowerCase();
 		const telefone = fd.get('telefone')?.toString().trim() || null;
 		const bio = fd.get('bio')?.toString().trim() || '';
+		const imagemUrl = fd.get('imagemUrl')?.toString().trim() || null;
 		const modalityIds = fd.getAll('modalityIds').map(v => v.toString()).filter(Boolean);
 		const ativo = fd.get('ativo') === 'true';
 
@@ -141,6 +145,7 @@ export const actions: Actions = {
 				where: { id: teacher.id },
 				data: {
 					bio,
+					imagemUrl,
 					modalities: { set: modalityIds.map(mid => ({ id: mid })) }
 				}
 			});

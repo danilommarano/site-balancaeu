@@ -120,16 +120,21 @@ export const actions: Actions = {
 		const diaSemana = diasSemana[dataHora.getDay()];
 		const horaStr = horario;
 
-		const slotDisponivel = teacher.availabilities.find(a =>
-			a.diaSemana === diaSemana && a.horarioInicio <= horaStr && a.horarioFim > horaStr
-		);
-		if (!slotDisponivel) {
-			return fail(400, { error: 'O professor não tem disponibilidade nesse dia/horário.' });
-		}
-
-		// 5. Check for conflicting lessons for the professor at that time
+		// 5. Compute lesson end + check that the whole lesson fits inside an availability block
 		const inicioAula = dataHora;
 		const fimAula = new Date(dataHora.getTime() + duracao * 60000);
+		const fimAulaStr = `${String(fimAula.getHours()).padStart(2, '0')}:${String(fimAula.getMinutes()).padStart(2, '0')}`;
+		const cruzaMeiaNoite = fimAula.getDate() !== dataHora.getDate();
+
+		const slotDisponivel = teacher.availabilities.find(a =>
+			a.diaSemana === diaSemana &&
+			a.horarioInicio <= horaStr &&
+			a.horarioFim >= fimAulaStr &&
+			!cruzaMeiaNoite
+		);
+		if (!slotDisponivel) {
+			return fail(400, { error: 'A aula inteira precisa caber em um bloco de disponibilidade do professor.' });
+		}
 
 		const conflitoProfessor = await db.privateLesson.findFirst({
 			where: {

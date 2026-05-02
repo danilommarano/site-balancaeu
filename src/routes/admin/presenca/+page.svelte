@@ -1,4 +1,4 @@
-<!-- BalancaEu — Admin: Controle de Presença (Fase 13) -->
+<!-- BalancaEu — Admin: Controle de Presença -->
 <script lang="ts">
   import { goto } from '$app/navigation';
 
@@ -33,161 +33,138 @@
 </script>
 
 <svelte:head>
-  <title>Presença — Admin — BalancaEu</title>
+  <title>Presença — Admin · Balança Eu</title>
 </svelte:head>
 
-<div>
-  <div class="mb-6">
-    <h1 class="text-2xl font-bold text-white mb-1">Controle de Presença</h1>
-    <p class="text-zinc-500 text-sm">Visão geral da frequência dos alunos (últimos 30 dias)</p>
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Controle de Presença</h1>
+    <p class="page-sub">Visão geral da frequência dos alunos (últimos 30 dias)</p>
   </div>
+</div>
 
-  <!-- Summary cards -->
-  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
-      <span class="text-[10px] text-zinc-500 uppercase tracking-wider">Presenças</span>
-      <p class="text-lg font-bold text-emerald-400 mt-1">{data.resumo.totalPresencas}</p>
+<div class="stat-grid stat-grid--4">
+  <div class="stat-card">
+    <div class="stat-card__head">
+      <div class="stat-card__label">Presenças</div>
+      <div class="stat-card__icon is-success"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
     </div>
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
-      <span class="text-[10px] text-zinc-500 uppercase tracking-wider">Faltas</span>
-      <p class="text-lg font-bold text-red-400 mt-1">{data.resumo.totalFaltas}</p>
-    </div>
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
-      <span class="text-[10px] text-zinc-500 uppercase tracking-wider">Taxa de Presença</span>
-      <p class="text-lg font-bold text-white mt-1">{data.resumo.taxaPresenca}%</p>
-    </div>
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
-      <span class="text-[10px] text-zinc-500 uppercase tracking-wider">Registros</span>
-      <p class="text-lg font-bold text-white mt-1">{data.registros.length}</p>
-    </div>
+    <div class="stat-card__value is-success">{data.resumo.totalPresencas}</div>
   </div>
-
-  <!-- Filters -->
-  <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 mb-6">
-    <div class="flex items-center gap-2 mb-3">
-      <span class="material-symbols-outlined text-[18px] text-zinc-400">filter_list</span>
-      <span class="text-xs font-medium text-zinc-400">Filtros</span>
-      {#if filtroTurma || filtroAluno}
-        <button onclick={limparFiltros} class="ml-auto text-[11px] text-zinc-500 hover:text-white transition-colors flex items-center gap-1">
-          <span class="material-symbols-outlined text-[14px]">close</span>
-          Limpar
-        </button>
-      {/if}
+  <div class="stat-card">
+    <div class="stat-card__head">
+      <div class="stat-card__label">Faltas</div>
+      <div class="stat-card__icon" style="background:rgba(226,90,76,0.12); color:var(--danger);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg></div>
     </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-      <div>
-        <label for="f-turma" class="block text-[10px] text-zinc-500 mb-1">Turma</label>
-        <select id="f-turma" bind:value={filtroTurma} onchange={aplicarFiltros}
-          class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-primary">
-          <option value="">Todas</option>
-          {#each data.turmas as turma}
-            <option value={turma.id}>{turma.label}</option>
-          {/each}
-        </select>
-      </div>
-      <div>
-        <label for="f-aluno" class="block text-[10px] text-zinc-500 mb-1">Aluno</label>
-        <select id="f-aluno" bind:value={filtroAluno} onchange={aplicarFiltros}
-          class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-primary">
-          <option value="">Todos</option>
-          {#each data.alunosList as aluno}
-            <option value={aluno.id}>{aluno.nome}</option>
-          {/each}
-        </select>
-      </div>
-    </div>
+    <div class="stat-card__value is-danger">{data.resumo.totalFaltas}</div>
   </div>
-
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- Alunos com mais faltas -->
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-      <div class="p-4 border-b border-zinc-800">
-        <h2 class="text-sm font-semibold text-white flex items-center gap-2">
-          <span class="material-symbols-outlined text-[18px] text-amber-400">warning</span>
-          Alunos com Faltas
-        </h2>
-      </div>
-      {#if data.alunosComFaltas.length === 0}
-        <div class="p-6 text-center">
-          <p class="text-zinc-500 text-xs">Nenhum registro de faltas.</p>
-        </div>
-      {:else}
-        <div class="divide-y divide-zinc-800/50 max-h-[400px] overflow-y-auto">
-          {#each data.alunosComFaltas as aluno}
-            <div class="px-4 py-3 flex items-center justify-between">
-              <div class="min-w-0">
-                <p class="text-sm text-white truncate">{aluno.nome}</p>
-                <p class="text-[10px] text-zinc-500">{aluno.total} aula(s) registrada(s)</p>
-              </div>
-              <div class="flex items-center gap-2 shrink-0">
-                {#if aluno.faltas >= 3}
-                  <span class="material-symbols-outlined text-[14px] text-amber-400" title="3+ faltas">warning</span>
-                {/if}
-                <div class="text-right">
-                  <span class="text-xs font-medium {aluno.faltas > 0 ? 'text-red-400' : 'text-emerald-400'}">{aluno.faltas} falta(s)</span>
-                  <div class="w-14 h-1.5 bg-zinc-800 rounded-full overflow-hidden mt-1">
-                    <div class="h-full bg-emerald-500 rounded-full" style="width: {aluno.taxa}%"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          {/each}
-        </div>
-      {/if}
+  <div class="stat-card">
+    <div class="stat-card__head">
+      <div class="stat-card__label">Taxa de presença</div>
+      <div class="stat-card__icon is-ocre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 010 18"/></svg></div>
     </div>
+    <div class="stat-card__value">{data.resumo.taxaPresenca}%</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card__head">
+      <div class="stat-card__label">Registros</div>
+      <div class="stat-card__icon is-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14v16H5z"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></div>
+    </div>
+    <div class="stat-card__value">{data.registros.length}</div>
+  </div>
+</div>
 
-    <!-- Registros detalhados -->
-    <div class="lg:col-span-2 bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-      <div class="p-4 border-b border-zinc-800">
-        <h2 class="text-sm font-semibold text-white flex items-center gap-2">
-          <span class="material-symbols-outlined text-[18px] text-blue-400">list_alt</span>
-          Registros de Presença
-        </h2>
+<div class="filters-bar" style="margin-top:18px; grid-template-columns:auto 1fr 1fr;">
+  <div class="filters-bar__title">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M6 12h12M10 18h4"/></svg>Filtros
+    {#if filtroTurma || filtroAluno}
+      <button onclick={limparFiltros} class="btn btn--ghost btn--sm" style="margin-left:auto;">Limpar</button>
+    {/if}
+  </div>
+  <div class="field">
+    <label for="f-turma">Turma</label>
+    <select id="f-turma" bind:value={filtroTurma} onchange={aplicarFiltros}>
+      <option value="">Todas</option>
+      {#each data.turmas as turma}
+        <option value={turma.id}>{turma.label}</option>
+      {/each}
+    </select>
+  </div>
+  <div class="field">
+    <label for="f-aluno">Aluno</label>
+    <select id="f-aluno" bind:value={filtroAluno} onchange={aplicarFiltros}>
+      <option value="">Todos</option>
+      {#each data.alunosList as aluno}
+        <option value={aluno.id}>{aluno.nome}</option>
+      {/each}
+    </select>
+  </div>
+</div>
+
+<div class="two-col" style="margin-top:0;">
+  <div class="card">
+    <div class="card__head">
+      <div class="card__title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--warning);"><path d="M10.3 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.7 3.86a2 2 0 00-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+        Alunos com Faltas
       </div>
-      {#if data.registros.length === 0}
-        <div class="p-8 text-center">
-          <span class="material-symbols-outlined text-4xl text-zinc-700 mb-2">fact_check</span>
-          <p class="text-zinc-500 text-sm">Nenhum registro de presença encontrado.</p>
-        </div>
-      {:else}
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="text-left text-[11px] text-zinc-500 uppercase tracking-wider border-b border-zinc-800">
-                <th class="px-4 py-3">Data</th>
-                <th class="px-4 py-3">Aluno</th>
-                <th class="px-4 py-3">Turma</th>
-                <th class="px-4 py-3">Status</th>
+    </div>
+    {#if data.alunosComFaltas.length === 0}
+      <div class="empty" style="background:transparent; border:0; padding:30px 20px;">
+        <p style="font-family:var(--sans); font-style:normal; font-size:13px;">Nenhum registro de faltas.</p>
+      </div>
+    {:else}
+      <div class="bar-list">
+        {#each data.alunosComFaltas as aluno}
+          <div class="bar-list__row">
+            <div class="bar-list__label">{aluno.nome}</div>
+            <div class="bar-list__track"><div class="bar-list__fill" style="--fill: {aluno.taxa}%"></div></div>
+            <div class="bar-list__value">{aluno.faltas} falta(s) / {aluno.total} aulas</div>
+          </div>
+        {/each}
+      </div>
+    {/if}
+  </div>
+  <div class="card">
+    <div class="card__head">
+      <div class="card__title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="coral"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+        Registros de Presença
+      </div>
+    </div>
+    {#if data.registros.length === 0}
+      <div class="empty" style="background:transparent; border:0; padding:40px 20px;">
+        <div class="empty__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14v16H5z"/><path d="M9 8h6M9 12h6"/></svg></div>
+        <p>Nenhum registro de presença encontrado.</p>
+      </div>
+    {:else}
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Data</th><th>Aluno</th><th>Turma</th><th>Status</th></tr></thead>
+          <tbody>
+            {#each data.registros as r}
+              <tr>
+                <td class="muted">{formatDate(r.data)}</td>
+                <td>{r.aluno}</td>
+                <td>
+                  {r.turma}
+                  <div class="muted" style="font-size:11px;">{diasLabels[r.dia]} {r.horario}</div>
+                </td>
+                <td>
+                  {#if r.presente}
+                    <span class="badge badge--active">Presente</span>
+                  {:else}
+                    <span class="badge badge--danger">Ausente</span>
+                  {/if}
+                  {#if r.observacao}
+                    <div class="muted" style="font-size:11px; margin-top:2px;">{r.observacao}</div>
+                  {/if}
+                </td>
               </tr>
-            </thead>
-            <tbody class="divide-y divide-zinc-800/50">
-              {#each data.registros as r}
-                <tr class="hover:bg-zinc-800/30 transition-colors">
-                  <td class="px-4 py-2.5 text-zinc-400 whitespace-nowrap text-xs">
-                    {formatDate(r.data)}
-                  </td>
-                  <td class="px-4 py-2.5">
-                    <p class="text-xs text-white">{r.aluno}</p>
-                  </td>
-                  <td class="px-4 py-2.5">
-                    <p class="text-xs text-zinc-400">{r.turma}</p>
-                    <p class="text-[10px] text-zinc-600">{diasLabels[r.dia]} {r.horario}</p>
-                  </td>
-                  <td class="px-4 py-2.5">
-                    <span class="text-[10px] font-medium px-2 py-0.5 rounded-full
-                      {r.presente ? 'text-emerald-400 bg-emerald-400/10' : 'text-red-400 bg-red-400/10'}">
-                      {r.presente ? 'Presente' : 'Ausente'}
-                    </span>
-                    {#if r.observacao}
-                      <p class="text-[10px] text-zinc-600 mt-0.5">{r.observacao}</p>
-                    {/if}
-                  </td>
-                </tr>
-              {/each}
-            </tbody>
-          </table>
-        </div>
-      {/if}
-    </div>
+            {/each}
+          </tbody>
+        </table>
+      </div>
+    {/if}
   </div>
 </div>

@@ -2,182 +2,152 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
   let { data, form } = $props();
+
+  function formatMembro(iso: string): string {
+    return new Date(iso).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
 </script>
 
 <svelte:head>
-  <title>Meu Perfil — BalancaEu</title>
+  <title>Meu Perfil — Balança Eu</title>
 </svelte:head>
 
-<div>
-  <div class="mb-8">
-    <h1 class="text-2xl font-bold text-white mb-1">Meu Perfil</h1>
-    <p class="text-zinc-500 text-sm">Gerencie seus dados pessoais e senha</p>
-  </div>
+<div class="page-head">
+  <h1 class="page-title">Meu <em>Perfil</em></h1>
+  <p class="page-sub">Gerencie seus dados pessoais e senha.</p>
+</div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <!-- Dados Pessoais -->
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-      <div class="p-5 border-b border-zinc-800">
-        <h2 class="text-base font-semibold text-white flex items-center gap-2">
-          <span class="material-symbols-outlined text-[20px] text-emerald-400">person</span>
-          Dados Pessoais
-        </h2>
+<div class="two-col" style="margin-top: 0;">
+  <div class="card">
+    <div class="card__head">
+      <div class="card__title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
+        Dados Pessoais
       </div>
-      <form method="POST" action="?/update" use:enhance class="p-5 space-y-4">
-        {#if form?.success}
-          <div class="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-lg px-4 py-3 text-sm">
-            <span class="material-symbols-outlined text-[18px]">check_circle</span>
-            {form.success}
-          </div>
-        {/if}
-        {#if form?.error && !form?.senhaError}
-          <div class="flex items-center gap-2 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg px-4 py-3 text-sm">
-            <span class="material-symbols-outlined text-[18px]">error</span>
-            {form.error}
-          </div>
-        {/if}
-
-        <div>
-          <label for="perfil-nome" class="block text-xs text-zinc-400 mb-1.5">Nome completo</label>
-          <input
-            id="perfil-nome"
-            name="nome"
-            type="text"
-            required
-            value={data.perfil.nome}
-            class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
-          />
-        </div>
-
-        <div>
-          <label for="perfil-email" class="block text-xs text-zinc-400 mb-1.5">Email</label>
-          <input
-            id="perfil-email"
-            name="email"
-            type="email"
-            required
-            value={data.perfil.email}
-            class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
-          />
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label for="perfil-telefone" class="block text-xs text-zinc-400 mb-1.5">Telefone</label>
-            <input
-              id="perfil-telefone"
-              name="telefone"
-              type="text"
-              value={data.perfil.telefone ?? ''}
-              placeholder="(11) 99999-9999"
-              class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
-            />
-          </div>
-          <div>
-            <label for="perfil-datanasc" class="block text-xs text-zinc-400 mb-1.5">Data de nascimento</label>
-            <input
-              id="perfil-datanasc"
-              name="dataNasc"
-              type="date"
-              value={data.perfil.dataNasc}
-              class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
-            />
-          </div>
-        </div>
-
-        <div class="pt-2">
-          <button type="submit" class="bg-emerald-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors">
-            Salvar alterações
-          </button>
-        </div>
-      </form>
     </div>
 
-    <!-- Alterar Senha -->
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-      <div class="p-5 border-b border-zinc-800">
-        <h2 class="text-base font-semibold text-white flex items-center gap-2">
-          <span class="material-symbols-outlined text-[20px] text-amber-400">lock</span>
-          Alterar Senha
-        </h2>
+    {#if form?.success}
+      <div class="alert" style="margin-bottom: 18px;">
+        <div class="alert__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+        </div>
+        <div class="alert__body">
+          <strong>Sucesso!</strong>
+          <p>{form.success}</p>
+        </div>
       </div>
-      <form method="POST" action="?/senha" use:enhance class="p-5 space-y-4">
-        {#if form?.senhaSuccess}
-          <div class="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-lg px-4 py-3 text-sm">
-            <span class="material-symbols-outlined text-[18px]">check_circle</span>
-            {form.senhaSuccess}
-          </div>
-        {/if}
-        {#if form?.senhaError}
-          <div class="flex items-center gap-2 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg px-4 py-3 text-sm">
-            <span class="material-symbols-outlined text-[18px]">error</span>
-            {form.senhaError}
-          </div>
-        {/if}
-
-        <div>
-          <label for="senha-atual" class="block text-xs text-zinc-400 mb-1.5">Senha atual</label>
-          <input
-            id="senha-atual"
-            name="senhaAtual"
-            type="password"
-            required
-            class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500"
-          />
+    {/if}
+    {#if form?.error && !form?.senhaError}
+      <div class="alert" style="margin-bottom: 18px;">
+        <div class="alert__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
         </div>
-
-        <div>
-          <label for="senha-nova" class="block text-xs text-zinc-400 mb-1.5">Nova senha</label>
-          <input
-            id="senha-nova"
-            name="novaSenha"
-            type="password"
-            required
-            minlength="6"
-            class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500"
-          />
-          <p class="text-[10px] text-zinc-600 mt-1">Mínimo de 6 caracteres</p>
+        <div class="alert__body">
+          <strong>Erro</strong>
+          <p>{form.error}</p>
         </div>
+      </div>
+    {/if}
 
-        <div>
-          <label for="senha-confirmar" class="block text-xs text-zinc-400 mb-1.5">Confirmar nova senha</label>
-          <input
-            id="senha-confirmar"
-            name="confirmarSenha"
-            type="password"
-            required
-            minlength="6"
-            class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500"
-          />
+    <form method="POST" action="?/update" use:enhance>
+      <div class="form-grid">
+        <div class="field field--full">
+          <label for="perfil-nome">Nome completo</label>
+          <input id="perfil-nome" name="nome" type="text" required value={data.perfil.nome} />
         </div>
-
-        <div class="pt-2">
-          <button type="submit" class="bg-amber-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-amber-700 transition-colors">
-            Alterar senha
-          </button>
+        <div class="field field--full">
+          <label for="perfil-email">Email</label>
+          <input id="perfil-email" name="email" type="email" required value={data.perfil.email} />
         </div>
-      </form>
-    </div>
+        <div class="field">
+          <label for="perfil-telefone">Telefone</label>
+          <input id="perfil-telefone" name="telefone" type="tel" placeholder="(11) 99999-9999" value={data.perfil.telefone ?? ''} />
+        </div>
+        <div class="field">
+          <label for="perfil-datanasc">Data de nascimento</label>
+          <input id="perfil-datanasc" name="dataNasc" type="date" value={data.perfil.dataNasc} />
+        </div>
+      </div>
+      <div class="form-foot">
+        <button type="submit" class="btn btn--primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          Salvar alterações
+        </button>
+      </div>
+    </form>
   </div>
 
-  <!-- Account Info -->
-  <div class="mt-6 bg-zinc-900 border border-zinc-800 rounded-xl p-5">
-    <h3 class="text-sm font-medium text-zinc-400 mb-3">Informações da conta</h3>
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
-      <div>
-        <span class="text-zinc-600 text-xs">Membro desde</span>
-        <p class="text-zinc-300">{new Date(data.perfil.createdAt).toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+  <div class="card">
+    <div class="card__head">
+      <div class="card__title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
+        Alterar Senha
       </div>
-      <div>
-        <span class="text-zinc-600 text-xs">Email</span>
-        <p class="text-zinc-300">{data.perfil.email}</p>
+    </div>
+
+    {#if form?.senhaSuccess}
+      <div class="alert" style="margin-bottom: 18px;">
+        <div class="alert__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+        </div>
+        <div class="alert__body">
+          <strong>Sucesso!</strong>
+          <p>{form.senhaSuccess}</p>
+        </div>
       </div>
-      <div>
-        <span class="text-zinc-600 text-xs">Status</span>
-        <p class="text-emerald-400 flex items-center gap-1">
-          <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span>
-          Ativo
-        </p>
+    {/if}
+    {#if form?.senhaError}
+      <div class="alert" style="margin-bottom: 18px;">
+        <div class="alert__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+        </div>
+        <div class="alert__body">
+          <strong>Erro</strong>
+          <p>{form.senhaError}</p>
+        </div>
+      </div>
+    {/if}
+
+    <form method="POST" action="?/senha" use:enhance>
+      <div class="form-grid" style="grid-template-columns: 1fr;">
+        <div class="field">
+          <label for="senha-atual">Senha atual</label>
+          <input id="senha-atual" name="senhaAtual" type="password" required />
+        </div>
+        <div class="field">
+          <label for="senha-nova">Nova senha</label>
+          <input id="senha-nova" name="novaSenha" type="password" required minlength="6" />
+          <span class="field__hint">Mínimo de 6 caracteres.</span>
+        </div>
+        <div class="field">
+          <label for="senha-confirmar">Confirmar nova senha</label>
+          <input id="senha-confirmar" name="confirmarSenha" type="password" required minlength="6" />
+        </div>
+      </div>
+      <div class="form-foot">
+        <button type="submit" class="btn btn--coral">Alterar senha</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div style="margin-top: 20px;">
+  <div class="card card--bordered">
+    <div class="card__head">
+      <div class="card__title" style="font-size: 18px;">Informações da conta</div>
+    </div>
+    <div class="info-row">
+      <div class="info-row__item">
+        <h5>Membro desde</h5>
+        <p>{formatMembro(data.perfil.createdAt)}</p>
+      </div>
+      <div class="info-row__item">
+        <h5>Email</h5>
+        <p style="font-family: var(--sans); font-size: 14px;">{data.perfil.email}</p>
+      </div>
+      <div class="info-row__item">
+        <h5>Status</h5>
+        <p><span class="status-dot"></span>Ativo</p>
       </div>
     </div>
   </div>

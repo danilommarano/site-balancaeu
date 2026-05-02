@@ -1,10 +1,10 @@
-<!-- BalancaEu — Admin: Financeiro (Fase 14) -->
+<!-- BalancaEu — Admin: Financeiro -->
 <script lang="ts">
   import { goto } from '$app/navigation';
 
   let { data } = $props();
 
-  let filtroPerido = $state(data.filtros.periodo);
+  let filtroPeriodo = $state(data.filtros.periodo);
   let filtroTipo = $state(data.filtros.tipo);
   let filtroStatus = $state(data.filtros.status);
 
@@ -15,15 +15,9 @@
     OUTRO: 'Outro'
   };
 
-  const statusLabels: Record<string, { label: string; color: string }> = {
-    PAGO: { label: 'Pago', color: 'text-emerald-400 bg-emerald-400/10' },
-    PENDENTE: { label: 'Pendente', color: 'text-amber-400 bg-amber-400/10' },
-    CANCELADO: { label: 'Cancelado', color: 'text-red-400 bg-red-400/10' }
-  };
-
   function aplicarFiltros() {
     const params = new URLSearchParams();
-    if (filtroPerido) params.set('periodo', filtroPerido);
+    if (filtroPeriodo) params.set('periodo', filtroPeriodo);
     if (filtroTipo) params.set('tipo', filtroTipo);
     if (filtroStatus) params.set('status', filtroStatus);
     const qs = params.toString();
@@ -31,7 +25,7 @@
   }
 
   function limparFiltros() {
-    filtroPerido = '';
+    filtroPeriodo = '';
     filtroTipo = '';
     filtroStatus = '';
     goto('/admin/financeiro', { invalidateAll: true });
@@ -39,11 +33,10 @@
 
   function exportarCsv() {
     const params = new URLSearchParams();
-    if (filtroPerido) params.set('periodo', filtroPerido);
+    if (filtroPeriodo) params.set('periodo', filtroPeriodo);
     if (filtroTipo) params.set('tipo', filtroTipo);
     if (filtroStatus) params.set('status', filtroStatus);
     params.set('export', 'csv');
-    // Trigger download via fetch
     fetch(`/admin/financeiro?${params.toString()}`)
       .then(r => r.json())
       .then(d => {
@@ -74,163 +67,146 @@
 </script>
 
 <svelte:head>
-  <title>Financeiro — Admin — BalancaEu</title>
+  <title>Financeiro — Admin · Balança Eu</title>
 </svelte:head>
 
-<div>
-  <div class="flex items-start justify-between mb-6">
-    <div>
-      <h1 class="text-2xl font-bold text-white mb-1">Financeiro</h1>
-      <p class="text-zinc-500 text-sm">Relatório de transações e receitas</p>
-    </div>
-    <button
-      onclick={exportarCsv}
-      class="flex items-center gap-2 bg-zinc-800 text-zinc-300 px-4 py-2 rounded-lg text-sm hover:bg-zinc-700 transition-colors"
-    >
-      <span class="material-symbols-outlined text-[16px]">download</span>
-      Exportar CSV
-    </button>
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Financeiro</h1>
+    <p class="page-sub">Relatório de transações e receitas</p>
   </div>
+  <button class="btn btn--ghost" onclick={exportarCsv}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+    Exportar CSV
+  </button>
+</div>
 
-  <!-- Summary cards -->
-  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
-      <span class="text-[10px] text-zinc-500 uppercase tracking-wider">Receita Paga</span>
-      <p class="text-2xl font-bold text-emerald-400 mt-2">{formatCurrency(data.resumo.totalPago)}</p>
+<div class="stat-grid stat-grid--2">
+  <div class="stat-card">
+    <div class="stat-card__head">
+      <div class="stat-card__label">Receita Paga</div>
+      <div class="stat-card__icon is-success"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 6H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
     </div>
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
-      <span class="text-[10px] text-zinc-500 uppercase tracking-wider">Pendente</span>
-      <p class="text-2xl font-bold text-amber-400 mt-2">{formatCurrency(data.resumo.totalPendente)}</p>
+    <div class="stat-card__value is-success">{formatCurrency(data.resumo.totalPago)}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card__head">
+      <div class="stat-card__label">Pendente</div>
+      <div class="stat-card__icon is-ocre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
     </div>
+    <div class="stat-card__value is-warning">{formatCurrency(data.resumo.totalPendente)}</div>
+  </div>
+</div>
+
+{#if Object.keys(data.resumo.porTipo).length > 0}
+  <div class="stat-grid stat-grid--4" style="margin-top: 14px;">
     {#each Object.entries(data.resumo.porTipo) as [tipo, valor]}
-      <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
-        <span class="text-[10px] text-zinc-500 uppercase tracking-wider">{tipoLabels[tipo] ?? tipo}</span>
-        <p class="text-lg font-bold text-white mt-2">{formatCurrency(valor as number)}</p>
+      <div class="stat-card">
+        <div class="stat-card__head"><div class="stat-card__label">{tipoLabels[tipo] ?? tipo}</div></div>
+        <div class="stat-card__value is-sm">{formatCurrency(valor as number)}</div>
       </div>
     {/each}
   </div>
+{/if}
 
-  <!-- Revenue chart -->
-  {#if data.receitaPorMes && data.receitaPorMes.length > 0}
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden mb-6">
-      <div class="p-5 border-b border-zinc-800 flex items-center gap-2">
-        <span class="material-symbols-outlined text-[18px] text-blue-400">bar_chart</span>
-        <h2 class="text-sm font-semibold text-white">Receita por Mês</h2>
-      </div>
-      <div class="p-5">
-        <div class="flex items-end gap-3 h-36">
-          {#each data.receitaPorMes as item}
-            {@const maxVal = revenueMax(data.receitaPorMes)}
-            {@const height = maxVal > 0 ? (item.valor / maxVal) * 100 : 0}
-            <div class="flex-1 flex flex-col items-center gap-1">
-              <span class="text-[10px] text-zinc-400 font-medium">{formatCurrency(item.valor)}</span>
-              <div class="w-full rounded-t-md bg-blue-500/20 relative overflow-hidden transition-all" style="height: {Math.max(height, 4)}%">
-                <div class="absolute inset-0 bg-gradient-to-t from-blue-500 to-blue-400/60 rounded-t-md"></div>
-              </div>
-              <span class="text-[9px] text-zinc-600 uppercase">{item.mes}</span>
-            </div>
-          {/each}
+{#if data.receitaPorMes && data.receitaPorMes.length > 0}
+  <div class="card" style="margin-top: 18px;">
+    <div class="card__head">
+      <div class="card__title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="coral"><rect x="3" y="12" width="4" height="8"/><rect x="10" y="8" width="4" height="12"/><rect x="17" y="4" width="4" height="16"/></svg>Receita por Mês</div>
+    </div>
+    <div class="chart">
+      {#each data.receitaPorMes as item}
+        {@const maxVal = revenueMax(data.receitaPorMes)}
+        {@const height = maxVal > 0 ? (item.valor / maxVal) * 100 : 0}
+        <div class="chart__bar">
+          <div class="chart__bar-value">{formatCurrency(item.valor)}</div>
+          <div class="chart__bar-fill" style="height: {Math.max(height, 2)}%"></div>
+          <div class="chart__bar-label">{item.mes}</div>
         </div>
-      </div>
-    </div>
-  {/if}
-
-  <!-- Filters -->
-  <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 mb-6">
-    <div class="flex items-center gap-2 mb-3">
-      <span class="material-symbols-outlined text-[18px] text-zinc-400">filter_list</span>
-      <span class="text-xs font-medium text-zinc-400">Filtros</span>
-      {#if filtroPerido || filtroTipo || filtroStatus}
-        <button onclick={limparFiltros} class="ml-auto text-[11px] text-zinc-500 hover:text-white transition-colors flex items-center gap-1">
-          <span class="material-symbols-outlined text-[14px]">close</span>
-          Limpar
-        </button>
-      {/if}
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-      <div>
-        <label for="f-periodo" class="block text-[10px] text-zinc-500 mb-1">Período</label>
-        <select id="f-periodo" bind:value={filtroPerido} onchange={aplicarFiltros}
-          class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-primary">
-          <option value="">Todo período</option>
-          <option value="7d">Últimos 7 dias</option>
-          <option value="30d">Últimos 30 dias</option>
-          <option value="90d">Últimos 90 dias</option>
-          <option value="12m">Último ano</option>
-        </select>
-      </div>
-      <div>
-        <label for="f-tipo" class="block text-[10px] text-zinc-500 mb-1">Tipo</label>
-        <select id="f-tipo" bind:value={filtroTipo} onchange={aplicarFiltros}
-          class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-primary">
-          <option value="">Todos</option>
-          <option value="MENSALIDADE">Mensalidade</option>
-          <option value="PARTICULAR">Particular</option>
-          <option value="EVENTO">Evento</option>
-          <option value="OUTRO">Outro</option>
-        </select>
-      </div>
-      <div>
-        <label for="f-status" class="block text-[10px] text-zinc-500 mb-1">Status</label>
-        <select id="f-status" bind:value={filtroStatus} onchange={aplicarFiltros}
-          class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-primary">
-          <option value="">Todos</option>
-          <option value="PAGO">Pago</option>
-          <option value="PENDENTE">Pendente</option>
-          <option value="CANCELADO">Cancelado</option>
-        </select>
-      </div>
+      {/each}
     </div>
   </div>
+{/if}
 
-  <!-- Transactions table -->
-  <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-    <div class="p-5 border-b border-zinc-800 flex items-center justify-between">
-      <h2 class="text-sm font-semibold text-white flex items-center gap-2">
-        <span class="material-symbols-outlined text-[18px] text-blue-400">receipt_long</span>
-        Transações
-      </h2>
-      <span class="text-[10px] text-zinc-500">{data.transacoes.length} registro(s)</span>
-    </div>
-    {#if data.transacoes.length === 0}
-      <div class="p-12 text-center">
-        <span class="material-symbols-outlined text-5xl text-zinc-700 mb-3">receipt_long</span>
-        <h3 class="text-lg font-semibold text-white mb-1">Nenhuma transação</h3>
-        <p class="text-zinc-500 text-sm">Não há transações para os filtros selecionados.</p>
-      </div>
-    {:else}
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm">
-          <thead>
-            <tr class="text-left text-[11px] text-zinc-500 uppercase tracking-wider border-b border-zinc-800">
-              <th class="px-5 py-3">Data</th>
-              <th class="px-5 py-3">Aluno</th>
-              <th class="px-5 py-3">Tipo</th>
-              <th class="px-5 py-3">Descrição</th>
-              <th class="px-5 py-3 text-right">Valor</th>
-              <th class="px-5 py-3">Status</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-zinc-800/50">
-            {#each data.transacoes as t}
-              {@const st = statusLabels[t.status] ?? statusLabels.PENDENTE}
-              <tr class="hover:bg-zinc-800/30 transition-colors">
-                <td class="px-5 py-3 text-xs text-zinc-400 whitespace-nowrap">{formatDate(t.data)}</td>
-                <td class="px-5 py-3">
-                  <p class="text-xs text-white">{t.aluno}</p>
-                  <p class="text-[10px] text-zinc-600">{t.email}</p>
-                </td>
-                <td class="px-5 py-3 text-xs text-zinc-400">{tipoLabels[t.tipo] ?? t.tipo}</td>
-                <td class="px-5 py-3 text-xs text-zinc-400 max-w-[200px] truncate">{t.descricao}</td>
-                <td class="px-5 py-3 text-xs text-white font-medium text-right whitespace-nowrap">{formatCurrency(t.valor)}</td>
-                <td class="px-5 py-3">
-                  <span class="text-[10px] font-medium px-2 py-0.5 rounded-full {st.color}">{st.label}</span>
-                </td>
-              </tr>
-            {/each}
-          </tbody>
-        </table>
-      </div>
+<div class="filters-bar" style="margin-top:18px;">
+  <div class="filters-bar__title">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M6 12h12M10 18h4"/></svg>Filtros
+    {#if filtroPeriodo || filtroTipo || filtroStatus}
+      <button onclick={limparFiltros} class="btn btn--ghost btn--sm" style="margin-left:auto;">Limpar</button>
     {/if}
   </div>
+  <div class="field">
+    <label for="f-periodo">Período</label>
+    <select id="f-periodo" bind:value={filtroPeriodo} onchange={aplicarFiltros}>
+      <option value="">Todo período</option>
+      <option value="7d">Últimos 7 dias</option>
+      <option value="30d">Últimos 30 dias</option>
+      <option value="90d">Últimos 90 dias</option>
+      <option value="12m">Último ano</option>
+    </select>
+  </div>
+  <div class="field">
+    <label for="f-tipo">Tipo</label>
+    <select id="f-tipo" bind:value={filtroTipo} onchange={aplicarFiltros}>
+      <option value="">Todos</option>
+      <option value="MENSALIDADE">Mensalidade</option>
+      <option value="PARTICULAR">Particular</option>
+      <option value="EVENTO">Evento</option>
+      <option value="OUTRO">Outro</option>
+    </select>
+  </div>
+  <div class="field">
+    <label for="f-status">Status</label>
+    <select id="f-status" bind:value={filtroStatus} onchange={aplicarFiltros}>
+      <option value="">Todos</option>
+      <option value="PAGO">Pago</option>
+      <option value="PENDENTE">Pendente</option>
+      <option value="CANCELADO">Cancelado</option>
+    </select>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card__head">
+    <div class="card__title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="blue"><path d="M5 4h11l4 4v12a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1z"/><path d="M8 12h8M8 16h6"/></svg>
+      Transações
+    </div>
+    <div style="font-size:11px; color:var(--text-mute);">{data.transacoes.length} registro(s)</div>
+  </div>
+  {#if data.transacoes.length === 0}
+    <div class="empty">
+      <div class="empty__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14v16H5z"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></div>
+      <p>Não há transações para os filtros selecionados.</p>
+    </div>
+  {:else}
+    <table class="table" style="border:0;">
+      <thead><tr><th>Data</th><th>Aluno</th><th>Tipo</th><th>Descrição</th><th>Valor</th><th>Status</th></tr></thead>
+      <tbody>
+        {#each data.transacoes as t}
+          <tr>
+            <td>{formatDate(t.data)}</td>
+            <td>
+              <div class="name">
+                <div class="dot">{t.aluno[0]}</div>
+                <div>{t.aluno}<div style="font-size:11px; color:var(--text-mute); font-weight:400;">{t.email}</div></div>
+              </div>
+            </td>
+            <td>{tipoLabels[t.tipo] ?? t.tipo}</td>
+            <td class="muted">{t.descricao}</td>
+            <td>{formatCurrency(t.valor)}</td>
+            <td>
+              {#if t.status === 'PAGO'}
+                <span class="badge badge--active">Pago</span>
+              {:else if t.status === 'PENDENTE'}
+                <span class="badge badge--pending">Pendente</span>
+              {:else}
+                <span class="badge badge--danger">Cancelado</span>
+              {/if}
+            </td>
+          </tr>
+        {/each}
+      </tbody>
+    </table>
+  {/if}
 </div>

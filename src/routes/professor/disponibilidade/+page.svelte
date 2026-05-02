@@ -21,127 +21,93 @@
 </script>
 
 <svelte:head>
-  <title>Disponibilidade — Professor — BalancaEu</title>
+  <title>Disponibilidade — Professor · Balança Eu</title>
 </svelte:head>
 
-<div>
-  <div class="mb-8">
-    <h1 class="text-2xl font-bold text-white mb-1">Minha Disponibilidade</h1>
-    <p class="text-zinc-500 text-sm">Configure os horários em que você está disponível para aulas particulares</p>
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Minha <em>Disponibilidade</em></h1>
+    <p class="page-sub">Configure os horários em que você está disponível para aulas particulares</p>
   </div>
+</div>
 
-  <!-- Feedback -->
-  {#if form?.success}
-    <div class="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-lg px-4 py-3 mb-6 text-sm">
-      <span class="material-symbols-outlined text-[18px]">check_circle</span>
-      {form.message}
-    </div>
-  {/if}
-  {#if form?.error}
-    <div class="flex items-center gap-2 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg px-4 py-3 mb-6 text-sm">
-      <span class="material-symbols-outlined text-[18px]">error</span>
-      {form.error}
-    </div>
-  {/if}
+{#if form?.success}
+  <div class="alert alert--success">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg>
+    {form.message}
+  </div>
+{/if}
+{#if form?.error}
+  <div class="alert">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+    {form.error}
+  </div>
+{/if}
 
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- Add form -->
-    <div class="lg:col-span-1">
-      <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-        <div class="p-5 border-b border-zinc-800">
-          <h2 class="text-sm font-semibold text-white flex items-center gap-2">
-            <span class="material-symbols-outlined text-[18px] text-blue-400">add_circle</span>
-            Adicionar Horário
-          </h2>
-        </div>
-        <form method="POST" action="?/adicionar" use:enhance class="p-5 space-y-4">
-          <div>
-            <label for="diaSemana" class="block text-xs text-zinc-400 mb-1.5">Dia da semana</label>
-            <select
-              id="diaSemana"
-              name="diaSemana"
-              required
-              class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
-            >
-              {#each diasOptions as dia}
-                <option value={dia}>{diasLabels[dia]}</option>
-              {/each}
-            </select>
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label for="horarioInicio" class="block text-xs text-zinc-400 mb-1.5">Início</label>
-              <input
-                id="horarioInicio"
-                name="horarioInicio"
-                type="time"
-                required
-                class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
-              />
-            </div>
-            <div>
-              <label for="horarioFim" class="block text-xs text-zinc-400 mb-1.5">Fim</label>
-              <input
-                id="horarioFim"
-                name="horarioFim"
-                type="time"
-                required
-                class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
-              />
-            </div>
-          </div>
-          <button
-            type="submit"
-            class="w-full flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
-          >
-            <span class="material-symbols-outlined text-[16px]">add</span>
-            Adicionar
-          </button>
-        </form>
+<div class="two-col" style="grid-template-columns: 1fr 1.4fr; margin-top: 0;">
+  <div class="card">
+    <div class="card__head">
+      <div class="card__title blue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+        Adicionar Horário
       </div>
     </div>
-
-    <!-- Schedule overview -->
-    <div class="lg:col-span-2">
-      {#if data.disponibilidades.length === 0}
-        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-12 text-center">
-          <span class="material-symbols-outlined text-5xl text-zinc-700 mb-3">event_busy</span>
-          <h2 class="text-lg font-semibold text-white mb-1">Nenhuma disponibilidade</h2>
-          <p class="text-zinc-500 text-sm">Adicione seus horários disponíveis para aulas particulares.</p>
+    <form method="POST" action="?/adicionar" use:enhance style="display:flex; flex-direction:column; gap:14px;">
+      <div class="field">
+        <label for="diaSemana">Dia da semana</label>
+        <select id="diaSemana" name="diaSemana" required>
+          {#each diasOptions as dia}
+            <option value={dia}>{diasLabels[dia]}</option>
+          {/each}
+        </select>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div class="field">
+          <label for="horarioInicio">Início</label>
+          <input id="horarioInicio" name="horarioInicio" type="time" required placeholder="--:--" />
         </div>
-      {:else}
-        <div class="space-y-4">
-          {#each disponibilidadesPorDia as grupo}
-            <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-              <div class="px-5 py-3 border-b border-zinc-800 flex items-center gap-2">
-                <span class="material-symbols-outlined text-[18px] text-blue-400">calendar_today</span>
-                <h3 class="text-sm font-semibold text-white">{grupo.label}</h3>
-                <span class="text-[10px] text-zinc-500 ml-auto">{grupo.slots.length} horário(s)</span>
-              </div>
-              <div class="divide-y divide-zinc-800/50">
-                {#each grupo.slots as slot}
-                  <div class="px-5 py-3 flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                      <span class="material-symbols-outlined text-[16px] text-zinc-500">schedule</span>
-                      <span class="text-sm text-white font-medium">{slot.horarioInicio} – {slot.horarioFim}</span>
-                    </div>
-                    <form method="POST" action="?/remover" use:enhance>
-                      <input type="hidden" name="id" value={slot.id} />
-                      <button
-                        type="submit"
-                        class="flex items-center gap-1 text-xs text-red-400/70 hover:text-red-400 transition-colors"
-                      >
-                        <span class="material-symbols-outlined text-[14px]">delete</span>
-                        Remover
-                      </button>
-                    </form>
-                  </div>
-                {/each}
-              </div>
+        <div class="field">
+          <label for="horarioFim">Fim</label>
+          <input id="horarioFim" name="horarioFim" type="time" required placeholder="--:--" />
+        </div>
+      </div>
+      <button type="submit" class="btn btn--primary" style="width:100%;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        Adicionar
+      </button>
+    </form>
+  </div>
+
+  {#if data.disponibilidades.length === 0}
+    <div class="card">
+      <div class="empty">
+        <div class="empty__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg></div>
+        <p>Nenhuma disponibilidade. Adicione seus horários para aulas particulares.</p>
+      </div>
+    </div>
+  {:else}
+    <div class="dispo-list">
+      {#each disponibilidadesPorDia as grupo}
+        <div class="dispo-day">
+          <div class="dispo-day__head">
+            <div class="dispo-day__name">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg>
+              {grupo.label}
+            </div>
+            <div class="dispo-day__count">{grupo.slots.length} horário{grupo.slots.length !== 1 ? 's' : ''}</div>
+          </div>
+          {#each grupo.slots as slot}
+            <div class="dispo-slot">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+              <span class="dispo-slot__time">{slot.horarioInicio} – {slot.horarioFim}</span>
+              <form method="POST" action="?/remover" use:enhance style="margin-left:auto;">
+                <input type="hidden" name="id" value={slot.id} />
+                <button type="submit" class="dispo-slot__remove">Remover</button>
+              </form>
             </div>
           {/each}
         </div>
-      {/if}
+      {/each}
     </div>
-  </div>
+  {/if}
 </div>

@@ -108,6 +108,7 @@ model Tenant {
   teachers        Teacher[]
   faceDescriptors FaceDescriptor[]
   placementBookings PlacementBooking[]
+  mediaAssets       MediaAsset[]
 
   @@map("tenants")
 }
@@ -126,6 +127,7 @@ model User {
   dataNasc         DateTime? @map("data_nasc")
   stripeCustomerId String?   @map("stripe_customer_id")
   ativo            Boolean   @default(true)
+  themePreference  String?   @map("theme_preference") // 'light' | 'dark' | null (= default da área)
   createdAt        DateTime  @default(now()) @map("created_at")
   updatedAt        DateTime  @updatedAt @map("updated_at")
 
@@ -142,6 +144,7 @@ model User {
   teacher          Teacher?
   faceDescriptors  FaceDescriptor[]
   placementBookings PlacementBooking[]
+  uploadedAssets   MediaAsset[]    @relation("UploadedMedia")
 
   @@unique([tenantId, email])
   @@index([tenantId])
@@ -468,4 +471,31 @@ model PlacementBooking {
   @@index([userId])
   @@index([classGroupId])
   @@map("placement_bookings")
+}
+
+// ─── MediaAsset (Banco de imagens compartilhado) ─────
+
+model MediaAsset {
+  id           String  @id @default(uuid())
+  tenantId     String  @map("tenant_id")
+  uploadedById String? @map("uploaded_by_id")
+
+  filename  String
+  s3Key     String @unique @map("s3_key")
+  url       String
+  mimeType  String @map("mime_type")
+  sizeBytes Int    @map("size_bytes")
+  width     Int?
+  height    Int?
+
+  category String? // 'cms' | 'modality' | 'teacher' | 'event' | 'general'
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  tenant     Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  uploadedBy User?  @relation("UploadedMedia", fields: [uploadedById], references: [id], onDelete: SetNull)
+
+  @@index([tenantId])
+  @@index([category])
+  @@map("media_assets")
 }

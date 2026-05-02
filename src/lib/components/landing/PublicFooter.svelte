@@ -1,82 +1,76 @@
 <script lang="ts">
   import Logo from './Logo.svelte';
 
-  interface NavLink {
-    href: string;
-    label: string;
-  }
+  let { cms = {} }: { cms?: Record<string, Record<string, string>> } = $props();
 
-  interface Props {
-    navLinks: NavLink[];
-    cms?: Record<string, Record<string, string>>;
-  }
+  const footer = $derived(cms.footer ?? {});
+  const contato = $derived(cms.contato ?? {});
 
-  let { navLinks, cms: cmsData = {} }: Props = $props();
+  const descricao = $derived(footer.descricao || 'Movimento é cura. Dança é encontro. Casa é onde o corpo respira.');
+  const copyright = $derived(footer.copyright || '© 2026 Balança Eu · Todos os direitos reservados');
 
-  function cms(secao: string, chave: string, fallback = ''): string {
-    return cmsData?.[secao]?.[chave] ?? fallback;
-  }
+  const instagramUrl = $derived(contato.instagram_url || '#');
+  const whatsappUrl = $derived(contato.whatsapp_url || '#');
 </script>
 
-<footer class="bg-surface border-t border-primary/10">
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-12 px-12 py-20 max-w-screen-2xl mx-auto">
-    <div class="md:col-span-2">
-      <span class="mb-4 block">
-        <Logo class="h-10 w-auto text-secondary" />
-      </span>
-      <p class="text-stone-500 font-label text-sm leading-relaxed max-w-sm mb-8">
-        {cms('footer', 'descricao', 'Um centro cultural dedicado ao movimento consciente, à arte performática e ao florescimento humano através do corpo.')}
-      </p>
-      <div class="flex gap-6">
-        {#if cms('contato', 'instagram_url')}
-          <a class="text-stone-500 hover:text-primary transition-colors" href={cms('contato', 'instagram_url')} target="_blank" rel="noopener">
-            <span class="material-symbols-outlined">share</span>
+<footer class="footer">
+  <div class="container">
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <div class="footer__logo">
+          <Logo class="footer__logo-svg" />
+        </div>
+        <p class="footer__tagline">{descricao}</p>
+        <div class="footer__socials">
+          <a href={instagramUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6" fill="currentColor"/></svg>
           </a>
-        {/if}
-        {#if cms('contato', 'whatsapp_url')}
-          <a class="text-stone-500 hover:text-primary transition-colors" href={cms('contato', 'whatsapp_url')} target="_blank" rel="noopener">
-            <span class="material-symbols-outlined">chat</span>
+          <a href="#" aria-label="YouTube">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="3"/><polygon points="10 9 15 12 10 15" fill="currentColor" stroke="none"/></svg>
           </a>
-        {/if}
+          <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.5-4.5A8 8 0 1 1 9 20.5L4 20z"/></svg>
+          </a>
+          <a href="#" aria-label="Spotify">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M7 10c3-1 7-1 10 1M7.5 13.5c2.5-.8 5.5-.6 8 .8M8 17c2-.6 4-.4 6 .5"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="footer__col">
+        <h4>Escola</h4>
+        <ul>
+          <li><a href="#filosofia">Filosofia</a></li>
+          <li><a href="#modulos">Módulos</a></li>
+          <li><a href="#professores">Professores</a></li>
+          <li><a href="#galeria">Galeria</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Aulas</h4>
+        <ul>
+          <li><a href="#grade">Grade</a></li>
+          <li><a href="#caminho">Como funciona</a></li>
+          <li><a href="#agenda">Eventos</a></li>
+          <li><a href="#faq">Dúvidas</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Conta</h4>
+        <ul>
+          <li><a href="/login">Portal do aluno</a></li>
+          <li><a href="/login">Portal do professor</a></li>
+          <li><a href="/login">Portal do gestor</a></li>
+          <li><a href="/comecar">Matricule-se</a></li>
+        </ul>
       </div>
     </div>
-
-    <div>
-      <h4 class="font-bold text-on-surface mb-6 uppercase tracking-widest text-xs">Explore</h4>
-      <nav class="flex flex-col gap-4">
-        {#each navLinks as link}
-          <a class="text-stone-500 hover:text-primary underline decoration-from-font transition-all font-label text-sm" href={link.href}>
-            {link.label}
-          </a>
-        {/each}
-      </nav>
+    <div class="footer__bottom">
+      <div>{copyright}</div>
+      <div style="display: flex; gap: 20px;">
+        <a href="#">Privacidade</a>
+        <a href="#">Termos</a>
+        <a href="#">Handbook dos mestres</a>
+      </div>
     </div>
-
-    <div>
-      <h4 class="font-bold text-on-surface mb-6 uppercase tracking-widest text-xs">Conecte-se</h4>
-      <nav class="flex flex-col gap-4">
-        {#if cms('contato', 'instagram')}
-          <a class="text-stone-500 hover:text-primary transition-all font-label text-sm" href={cms('contato', 'instagram_url', '#')} target="_blank" rel="noopener">
-            Instagram ({cms('contato', 'instagram')})
-          </a>
-        {/if}
-        {#if cms('contato', 'whatsapp')}
-          <a class="text-stone-500 hover:text-primary transition-all font-label text-sm" href={cms('contato', 'whatsapp_url', '#')} target="_blank" rel="noopener">
-            WhatsApp
-          </a>
-        {/if}
-        {#if cms('contato', 'email')}
-          <a class="text-stone-500 hover:text-primary transition-all font-label text-sm" href="mailto:{cms('contato', 'email')}">
-            {cms('contato', 'email')}
-          </a>
-        {/if}
-      </nav>
-    </div>
-  </div>
-
-  <div class="px-12 py-8 border-t border-primary/5 text-center">
-    <p class="text-stone-500 font-label text-sm">
-      {cms('footer', 'copyright', '© 2024 Balança Eu. Onde o movimento encontra a alma.')}
-    </p>
   </div>
 </footer>

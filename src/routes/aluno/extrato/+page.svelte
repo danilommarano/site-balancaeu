@@ -1,29 +1,27 @@
-<!-- BalancaEu — Extrato Financeiro (Fase 11) -->
+<!-- BalancaEu — Extrato Financeiro -->
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
 
   let { data } = $props();
 
-  // Filter state (initialized from URL params)
   let filtroTipo = $state(data.filtros.tipo);
   let filtroStatus = $state(data.filtros.status);
   let filtroDe = $state(data.filtros.de);
   let filtroAte = $state(data.filtros.ate);
   let gerandoPdf = $state(false);
 
-  const tipoLabels: Record<string, { label: string; icon: string }> = {
-    MENSALIDADE: { label: 'Mensalidade', icon: 'credit_card' },
-    PARTICULAR: { label: 'Aula Particular', icon: 'event' },
-    EVENTO: { label: 'Evento', icon: 'celebration' },
-    OUTRO: { label: 'Outro', icon: 'receipt' }
+  const tipoLabels: Record<string, string> = {
+    MENSALIDADE: 'Mensalidade',
+    PARTICULAR: 'Aula Particular',
+    EVENTO: 'Evento',
+    OUTRO: 'Outro'
   };
 
-  const statusLabels: Record<string, { label: string; color: string }> = {
-    PAGO: { label: 'Pago', color: 'text-emerald-400 bg-emerald-400/10' },
-    PENDENTE: { label: 'Pendente', color: 'text-amber-400 bg-amber-400/10' },
-    CANCELADO: { label: 'Cancelado', color: 'text-red-400 bg-red-400/10' },
-    REEMBOLSADO: { label: 'Reembolsado', color: 'text-blue-400 bg-blue-400/10' }
+  const statusLabels: Record<string, string> = {
+    PAGO: 'Pago',
+    PENDENTE: 'Pendente',
+    CANCELADO: 'Cancelado',
+    REEMBOLSADO: 'Reembolsado'
   };
 
   function formatDate(iso: string): string {
@@ -31,7 +29,7 @@
   }
 
   function formatCurrency(val: number): string {
-    return `R$ ${val.toFixed(2)}`;
+    return `R$ ${val.toFixed(2).replace('.', ',')}`;
   }
 
   function aplicarFiltros() {
@@ -63,7 +61,6 @@
       const doc = new jsPDF();
       const escola = data.escola;
 
-      // Header
       doc.setFontSize(18);
       doc.setFont('helvetica', 'bold');
       doc.text(escola?.nome ?? 'BalancaEu', 14, 22);
@@ -77,7 +74,6 @@
       if (escola?.endereco) infoLines.push(escola.endereco);
       doc.text(infoLines.join('  |  '), 14, 28);
 
-      // Title
       doc.setTextColor(0);
       doc.setFontSize(13);
       doc.setFont('helvetica', 'bold');
@@ -94,7 +90,6 @@
         doc.text(periodo, 14, 51);
       }
 
-      // Summary
       doc.setTextColor(0);
       doc.setFontSize(10);
       doc.setFont('helvetica', 'bold');
@@ -103,13 +98,12 @@
       doc.text(`Total Pendente: ${formatCurrency(data.resumo.totalPendente)}`, 90, summaryY);
       doc.text(`Transações: ${data.resumo.count}`, 166, summaryY);
 
-      // Table
       const tableData = data.transacoes.map(t => [
         formatDate(t.data),
         t.descricao,
-        tipoLabels[t.tipo]?.label ?? t.tipo,
+        tipoLabels[t.tipo] ?? t.tipo,
         formatCurrency(t.valor),
-        statusLabels[t.status]?.label ?? t.status
+        statusLabels[t.status] ?? t.status
       ]);
 
       autoTable(doc, {
@@ -127,7 +121,6 @@
         margin: { left: 14, right: 14 }
       });
 
-      // Footer
       const pageCount = doc.getNumberOfPages();
       for (let i = 1; i <= pageCount; i++) {
         doc.setPage(i);
@@ -146,143 +139,144 @@
 </script>
 
 <svelte:head>
-  <title>Extrato — BalancaEu</title>
+  <title>Extrato Financeiro — Balança Eu</title>
 </svelte:head>
 
-<div>
-  <div class="flex items-start justify-between mb-6">
-    <div>
-      <h1 class="text-2xl font-bold text-white mb-1">Extrato Financeiro</h1>
-      <p class="text-zinc-500 text-sm">Histórico de pagamentos e transações</p>
-    </div>
-    {#if data.transacoes.length > 0}
-      <button
-        onclick={baixarPdf}
-        disabled={gerandoPdf}
-        class="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors disabled:opacity-50"
-      >
-        <span class="material-symbols-outlined text-[18px]">{gerandoPdf ? 'hourglass_top' : 'picture_as_pdf'}</span>
-        {gerandoPdf ? 'Gerando...' : 'Baixar PDF'}
-      </button>
-    {/if}
+<div class="page-head" style="display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+  <div>
+    <h1 class="page-title">Extrato <em>Financeiro</em></h1>
+    <p class="page-sub">Histórico de pagamentos e transações.</p>
   </div>
-
-  <!-- Resumo Financeiro -->
-  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
-      <span class="text-[10px] text-zinc-500 uppercase tracking-wider">Total Pago</span>
-      <p class="text-lg font-bold text-emerald-400 mt-1">{formatCurrency(data.resumo.totalPago)}</p>
-    </div>
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
-      <span class="text-[10px] text-zinc-500 uppercase tracking-wider">Pendente</span>
-      <p class="text-lg font-bold text-amber-400 mt-1">{formatCurrency(data.resumo.totalPendente)}</p>
-    </div>
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
-      <span class="text-[10px] text-zinc-500 uppercase tracking-wider">Cancelado</span>
-      <p class="text-lg font-bold text-red-400 mt-1">{formatCurrency(data.resumo.totalCancelado)}</p>
-    </div>
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
-      <span class="text-[10px] text-zinc-500 uppercase tracking-wider">Transações</span>
-      <p class="text-lg font-bold text-white mt-1">{data.resumo.count}</p>
-    </div>
-  </div>
-
-  <!-- Filtros -->
-  <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 mb-6">
-    <div class="flex items-center gap-2 mb-3">
-      <span class="material-symbols-outlined text-[18px] text-zinc-400">filter_list</span>
-      <span class="text-xs font-medium text-zinc-400">Filtros</span>
-      {#if temFiltrosAtivos}
-        <button onclick={limparFiltros} class="ml-auto text-[11px] text-zinc-500 hover:text-white transition-colors flex items-center gap-1">
-          <span class="material-symbols-outlined text-[14px]">close</span>
-          Limpar
-        </button>
-      {/if}
-    </div>
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-      <div>
-        <label for="f-tipo" class="block text-[10px] text-zinc-500 mb-1">Tipo</label>
-        <select id="f-tipo" bind:value={filtroTipo} onchange={aplicarFiltros}
-          class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-emerald-500">
-          <option value="">Todos</option>
-          <option value="MENSALIDADE">Mensalidade</option>
-          <option value="PARTICULAR">Aula Particular</option>
-          <option value="EVENTO">Evento</option>
-          <option value="OUTRO">Outro</option>
-        </select>
-      </div>
-      <div>
-        <label for="f-status" class="block text-[10px] text-zinc-500 mb-1">Status</label>
-        <select id="f-status" bind:value={filtroStatus} onchange={aplicarFiltros}
-          class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-emerald-500">
-          <option value="">Todos</option>
-          <option value="PAGO">Pago</option>
-          <option value="PENDENTE">Pendente</option>
-          <option value="CANCELADO">Cancelado</option>
-        </select>
-      </div>
-      <div>
-        <label for="f-de" class="block text-[10px] text-zinc-500 mb-1">De</label>
-        <input id="f-de" type="date" bind:value={filtroDe} onchange={aplicarFiltros}
-          class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-emerald-500" />
-      </div>
-      <div>
-        <label for="f-ate" class="block text-[10px] text-zinc-500 mb-1">Até</label>
-        <input id="f-ate" type="date" bind:value={filtroAte} onchange={aplicarFiltros}
-          class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-emerald-500" />
-      </div>
-    </div>
-  </div>
-
-  <!-- Tabela de Transações -->
-  {#if data.transacoes.length === 0}
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-12 text-center">
-      <span class="material-symbols-outlined text-5xl text-zinc-700 mb-3">receipt_long</span>
-      <h2 class="text-lg font-semibold text-white mb-1">Nenhuma transação</h2>
-      <p class="text-zinc-500 text-sm">
-        {temFiltrosAtivos ? 'Nenhuma transação encontrada com os filtros aplicados.' : 'Seu extrato aparecerá aqui quando houver movimentações.'}
-      </p>
-      {#if temFiltrosAtivos}
-        <button onclick={limparFiltros} class="mt-3 text-emerald-400 text-sm hover:underline">Limpar filtros</button>
-      {/if}
-    </div>
-  {:else}
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm">
-          <thead>
-            <tr class="text-left text-[11px] text-zinc-500 uppercase tracking-wider border-b border-zinc-800">
-              <th class="px-5 py-3">Data</th>
-              <th class="px-5 py-3">Descrição</th>
-              <th class="px-5 py-3">Tipo</th>
-              <th class="px-5 py-3 text-right">Valor</th>
-              <th class="px-5 py-3">Status</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-zinc-800/50">
-            {#each data.transacoes as t}
-              {@const tipo = tipoLabels[t.tipo] ?? tipoLabels.OUTRO}
-              {@const st = statusLabels[t.status] ?? statusLabels.PENDENTE}
-              <tr class="hover:bg-zinc-800/30 transition-colors">
-                <td class="px-5 py-3 text-zinc-400 whitespace-nowrap">{formatDate(t.data)}</td>
-                <td class="px-5 py-3 text-white">{t.descricao}</td>
-                <td class="px-5 py-3">
-                  <span class="flex items-center gap-1.5 text-zinc-400">
-                    <span class="material-symbols-outlined text-[16px]">{tipo.icon}</span>
-                    {tipo.label}
-                  </span>
-                </td>
-                <td class="px-5 py-3 text-right font-medium whitespace-nowrap {t.valor < 0 ? 'text-red-400' : 'text-white'}">
-                  {t.valor < 0 ? '- ' : ''}{formatCurrency(Math.abs(t.valor))}
-                </td>
-                <td class="px-5 py-3">
-                  <span class="text-[11px] font-medium px-2 py-0.5 rounded-full {st.color}">{st.label}</span>
-                </td>
-              </tr>
-            {/each}
-          </tbody>
-        </table>
-      </div>
-    </div>
+  {#if data.transacoes.length > 0}
+    <button type="button" class="btn btn--primary" onclick={baixarPdf} disabled={gerandoPdf}>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+      {gerandoPdf ? 'Gerando...' : 'Baixar PDF'}
+    </button>
   {/if}
 </div>
+
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="stat-card__head">
+      <div class="stat-card__icon is-success">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 6H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      </div>
+      Total Pago
+    </div>
+    <div class="stat-card__value is-success">{formatCurrency(data.resumo.totalPago)}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card__head">
+      <div class="stat-card__icon" style="color: var(--warning); background: rgba(196,138,42,0.12);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      </div>
+      Pendente
+    </div>
+    <div class="stat-card__value is-warning">{formatCurrency(data.resumo.totalPendente)}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card__head">
+      <div class="stat-card__icon" style="color: var(--danger); background: rgba(182,67,52,0.12);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+      </div>
+      Cancelado
+    </div>
+    <div class="stat-card__value is-danger">{formatCurrency(data.resumo.totalCancelado)}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card__head">
+      <div class="stat-card__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l4 4v12a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1z"/><path d="M8 12h8M8 16h6"/></svg>
+      </div>
+      Transações
+    </div>
+    <div class="stat-card__value">{data.resumo.count}</div>
+  </div>
+</div>
+
+<div style="margin-top: 28px;"></div>
+
+<div class="filters-bar">
+  <div class="filters-bar__title">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M6 12h12M10 18h4"/></svg>
+    Filtros
+  </div>
+  <div class="field">
+    <label for="f-tipo">Tipo</label>
+    <select id="f-tipo" bind:value={filtroTipo} onchange={aplicarFiltros}>
+      <option value="">Todos</option>
+      <option value="MENSALIDADE">Mensalidade</option>
+      <option value="PARTICULAR">Aula Particular</option>
+      <option value="EVENTO">Evento</option>
+      <option value="OUTRO">Outro</option>
+    </select>
+  </div>
+  <div class="field">
+    <label for="f-status">Status</label>
+    <select id="f-status" bind:value={filtroStatus} onchange={aplicarFiltros}>
+      <option value="">Todos</option>
+      <option value="PAGO">Pago</option>
+      <option value="PENDENTE">Pendente</option>
+      <option value="CANCELADO">Cancelado</option>
+    </select>
+  </div>
+  <div class="field">
+    <label for="f-de">De</label>
+    <input id="f-de" type="date" bind:value={filtroDe} onchange={aplicarFiltros} />
+  </div>
+  <div class="field">
+    <label for="f-ate">Até</label>
+    <input id="f-ate" type="date" bind:value={filtroAte} onchange={aplicarFiltros} />
+  </div>
+</div>
+
+{#if temFiltrosAtivos}
+  <div style="margin-bottom: 16px;">
+    <button type="button" class="btn--link" onclick={limparFiltros}>Limpar filtros ✕</button>
+  </div>
+{/if}
+
+{#if data.transacoes.length === 0}
+  <div class="placeholder-card" style="padding: 80px 30px;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l4 4v12a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1z"/><path d="M8 12h8M8 16h6M8 8h4"/></svg>
+    <h3>Nenhuma transação</h3>
+    <p>
+      {temFiltrosAtivos
+        ? 'Nenhuma transação encontrada com os filtros aplicados.'
+        : 'Seu extrato aparecerá aqui quando houver movimentações.'}
+    </p>
+  </div>
+{:else}
+  <div class="card">
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+        <thead>
+          <tr style="text-align: left; color: var(--ink-mute); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1px solid var(--line);">
+            <th style="padding: 10px 14px;">Data</th>
+            <th style="padding: 10px 14px;">Descrição</th>
+            <th style="padding: 10px 14px;">Tipo</th>
+            <th style="padding: 10px 14px; text-align: right;">Valor</th>
+            <th style="padding: 10px 14px;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {#each data.transacoes as t}
+            <tr style="border-bottom: 1px solid var(--line);">
+              <td style="padding: 12px 14px; color: var(--ink-soft); white-space: nowrap;">{formatDate(t.data)}</td>
+              <td style="padding: 12px 14px; color: var(--ink);">{t.descricao}</td>
+              <td style="padding: 12px 14px; color: var(--ink-soft);">{tipoLabels[t.tipo] ?? t.tipo}</td>
+              <td style="padding: 12px 14px; text-align: right; font-weight: 600; white-space: nowrap; color: {t.valor < 0 ? 'var(--danger)' : 'var(--ink)'};">
+                {t.valor < 0 ? '- ' : ''}{formatCurrency(Math.abs(t.valor))}
+              </td>
+              <td style="padding: 12px 14px;">
+                <span style="font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: var(--creme-warm); color: var(--ink-soft); border: 1px solid var(--line);">
+                  {statusLabels[t.status] ?? t.status}
+                </span>
+              </td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{/if}

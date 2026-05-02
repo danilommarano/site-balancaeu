@@ -1,159 +1,110 @@
 <!-- BalancaEu — Layout Área do Professor -->
 <script lang="ts">
+  import '$lib/styles/professor.css';
   import { enhance } from '$app/forms';
   import { page } from '$app/stores';
+  import { onMount } from 'svelte';
+  import ThemeToggle from '$lib/components/ThemeToggle.svelte';
+  import { themeStore } from '$lib/stores/theme.svelte';
+  import Logo from '$lib/components/landing/Logo.svelte';
 
   let { children, data } = $props();
-  let mobileOpen = $state(false);
+  let sidebarOpen = $state(false);
 
-  const navSections = [
-    {
-      label: 'Principal',
-      items: [
-        { href: '/professor', label: 'Painel', icon: 'dashboard' },
-      ]
-    },
-    {
-      label: 'Aulas',
-      items: [
-        { href: '/professor/chamada', label: 'Chamada', icon: 'fact_check' },
-        { href: '/professor/agenda', label: 'Agenda', icon: 'calendar_month' },
-        { href: '/professor/particulares', label: 'Particulares', icon: 'person' },
-        { href: '/professor/disponibilidade', label: 'Disponibilidade', icon: 'schedule' },
-      ]
-    },
-    {
-      label: 'Conta',
-      items: [
-        { href: '/professor/perfil', label: 'Perfil', icon: 'settings' },
-      ]
+  onMount(() => {
+    const pref = data.user?.themePreference;
+    if (pref === 'light' || pref === 'dark') {
+      themeStore.hydrate(pref);
     }
-  ];
+  });
 
   function isActive(href: string): boolean {
-    if (href === '/professor') return $page.url.pathname === '/professor';
-    return $page.url.pathname.startsWith(href);
+    const p = $page.url.pathname;
+    if (href === '/professor') return p === '/professor';
+    return p.startsWith(href);
   }
+
+  const initial = $derived((data.user?.nome ?? 'P')[0].toUpperCase());
 </script>
 
-<svelte:head>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" />
-</svelte:head>
+<div class="prof-shell">
+  <div class="app">
+    {#if sidebarOpen}
+      <button class="mobile-overlay" onclick={() => sidebarOpen = false} tabindex="-1" aria-label="Fechar menu"></button>
+    {/if}
 
-<div class="min-h-screen bg-zinc-950 flex">
-  <!-- Sidebar -->
-  <aside class="hidden lg:flex w-64 bg-zinc-900 border-r border-zinc-800 flex-col fixed inset-y-0 left-0 z-30">
-    <div class="p-5 border-b border-zinc-800">
-      <div class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
-          <span class="material-symbols-outlined text-white text-[18px]">school</span>
-        </div>
-        <div>
-          <h1 class="text-sm font-bold text-white">BalancaEu</h1>
-          <p class="text-[10px] text-zinc-500">Professor</p>
+    <aside class="sidebar {sidebarOpen ? 'is-open' : ''}">
+      <div class="sidebar__brand">
+        <a href="/" class="sidebar__logo-link">
+          <Logo class="sidebar__logo-svg" />
+        </a>
+        <div class="sidebar__brand-sub">Professor</div>
+      </div>
+
+      <div class="sidebar__section">Principal</div>
+      <nav class="sidebar__nav">
+        <a class="nav-item {isActive('/professor') ? 'is-active' : ''}" href="/professor" onclick={() => sidebarOpen = false}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+          <span class="nav-item__label">Painel</span>
+        </a>
+      </nav>
+
+      <div class="sidebar__section">Aulas</div>
+      <nav class="sidebar__nav">
+        <a class="nav-item {isActive('/professor/chamada') ? 'is-active' : ''}" href="/professor/chamada" onclick={() => sidebarOpen = false}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          <span class="nav-item__label">Chamada</span>
+        </a>
+        <a class="nav-item {isActive('/professor/agenda') ? 'is-active' : ''}" href="/professor/agenda" onclick={() => sidebarOpen = false}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>
+          <span class="nav-item__label">Agenda</span>
+        </a>
+        <a class="nav-item {isActive('/professor/particulares') ? 'is-active' : ''}" href="/professor/particulares" onclick={() => sidebarOpen = false}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
+          <span class="nav-item__label">Particulares</span>
+        </a>
+        <a class="nav-item {isActive('/professor/disponibilidade') ? 'is-active' : ''}" href="/professor/disponibilidade" onclick={() => sidebarOpen = false}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          <span class="nav-item__label">Disponibilidade</span>
+        </a>
+      </nav>
+
+      <div class="sidebar__section">Conta</div>
+      <nav class="sidebar__nav">
+        <a class="nav-item {isActive('/professor/perfil') ? 'is-active' : ''}" href="/professor/perfil" onclick={() => sidebarOpen = false}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 01-4 0v-.1a1.7 1.7 0 00-1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 010-4h.1a1.7 1.7 0 001.5-1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 014 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 010 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg>
+          <span class="nav-item__label">Perfil</span>
+        </a>
+      </nav>
+
+      <div class="sidebar__user">
+        <div class="sidebar__avatar">{initial}</div>
+        <div class="sidebar__user-info">
+          <div class="sidebar__user-name">{data.user?.nome ?? 'Professor'}</div>
+          <div class="sidebar__user-email">{data.user?.email ?? ''}</div>
         </div>
       </div>
-    </div>
-
-    <nav class="flex-1 p-3 overflow-y-auto">
-      {#each navSections as section}
-        <div class="mb-4">
-          <p class="text-[10px] font-semibold text-zinc-600 uppercase tracking-wider px-3 mb-1.5">{section.label}</p>
-          {#each section.items as item}
-            <a
-              href={item.href}
-              class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all
-                {isActive(item.href) ? 'bg-blue-600/15 text-blue-400 font-medium' : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'}"
-            >
-              <span class="material-symbols-outlined text-[20px]">{item.icon}</span>
-              {item.label}
-            </a>
-          {/each}
-        </div>
-      {/each}
-    </nav>
-
-    <div class="p-4 border-t border-zinc-800">
-      <div class="flex items-center gap-3 mb-3">
-        <div class="w-8 h-8 rounded-full bg-blue-600/20 flex items-center justify-center">
-          <span class="material-symbols-outlined text-blue-400 text-[16px]">person</span>
-        </div>
-        <div class="flex-1 min-w-0">
-          <p class="text-sm text-white font-medium truncate">{data.user?.nome ?? 'Professor'}</p>
-          <p class="text-[10px] text-zinc-500 truncate">{data.user?.email ?? ''}</p>
-        </div>
-      </div>
+      <ThemeToggle />
       <form method="POST" action="/logout" use:enhance>
-        <button type="submit" class="flex items-center gap-2 text-xs text-zinc-500 hover:text-red-400 transition-colors w-full">
-          <span class="material-symbols-outlined text-[16px]">logout</span>
+        <button type="submit" class="sidebar__logout">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>
           Sair
         </button>
       </form>
-    </div>
-  </aside>
-
-  <!-- Mobile header -->
-  <div class="lg:hidden fixed top-0 left-0 right-0 z-30 bg-zinc-900 border-b border-zinc-800 px-4 py-3 flex items-center justify-between">
-    <div class="flex items-center gap-2">
-      <div class="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center">
-        <span class="material-symbols-outlined text-white text-[16px]">school</span>
-      </div>
-      <span class="text-sm font-bold text-white">BalancaEu</span>
-    </div>
-    <button onclick={() => mobileOpen = !mobileOpen} class="text-zinc-400 hover:text-white" aria-label="Menu">
-      <span class="material-symbols-outlined">{mobileOpen ? 'close' : 'menu'}</span>
-    </button>
-  </div>
-
-  <!-- Mobile overlay -->
-  {#if mobileOpen}
-    <button class="lg:hidden fixed inset-0 bg-black/60 z-30" onclick={() => mobileOpen = false} aria-label="Fechar menu"></button>
-    <aside class="lg:hidden fixed inset-y-0 left-0 w-64 bg-zinc-900 border-r border-zinc-800 z-40 flex flex-col">
-      <div class="p-5 border-b border-zinc-800">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
-            <span class="material-symbols-outlined text-white text-[18px]">school</span>
-          </div>
-          <div>
-            <h1 class="text-sm font-bold text-white">BalancaEu</h1>
-            <p class="text-[10px] text-zinc-500">Professor</p>
-          </div>
-        </div>
-      </div>
-      <nav class="flex-1 p-3 overflow-y-auto">
-        {#each navSections as section}
-          <div class="mb-4">
-            <p class="text-[10px] font-semibold text-zinc-600 uppercase tracking-wider px-3 mb-1.5">{section.label}</p>
-            {#each section.items as item}
-              <a
-                href={item.href}
-                onclick={() => mobileOpen = false}
-                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all
-                  {isActive(item.href) ? 'bg-blue-600/15 text-blue-400 font-medium' : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'}"
-              >
-                <span class="material-symbols-outlined text-[20px]">{item.icon}</span>
-                {item.label}
-              </a>
-            {/each}
-          </div>
-        {/each}
-      </nav>
-      <div class="p-4 border-t border-zinc-800">
-        <p class="text-sm text-white font-medium truncate mb-2">{data.user?.nome ?? 'Professor'}</p>
-        <form method="POST" action="/logout" use:enhance>
-          <button type="submit" class="flex items-center gap-2 text-xs text-zinc-500 hover:text-red-400 transition-colors">
-            <span class="material-symbols-outlined text-[16px]">logout</span>
-            Sair
-          </button>
-        </form>
-      </div>
     </aside>
-  {/if}
 
-  <!-- Main content -->
-  <main class="flex-1 lg:ml-64 pt-16 lg:pt-0">
-    <div class="p-6 lg:p-8">
+    <header class="mobile-header">
+      <button onclick={() => sidebarOpen = true} aria-label="Menu">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+      <a href="/" class="mobile-header__logo-link">
+        <Logo class="mobile-header__logo-svg" />
+      </a>
+      <div style="width:24px"></div>
+    </header>
+
+    <main class="main">
       {@render children()}
-    </div>
-  </main>
+    </main>
+  </div>
 </div>

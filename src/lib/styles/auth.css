@@ -1,0 +1,263 @@
+/* ===========================================
+   BalancaEu — Auth Area Styles
+   Scoped under .auth-shell
+   =========================================== */
+
+/* ---- Shell ---- */
+.auth-shell {
+  --bg: #0D0906;
+  --surface: #17120E;
+  --surface-2: #1F1812;
+  --line: #2E2418;
+  --line-soft: #3A2E22;
+  --text: #F2E8DB;
+  --text-soft: #C8B8A5;
+  --text-mute: #7A6B5E;
+  --terracota: #A83A2E;
+  --coral: #F08478;
+  --ocre: #D9A84A;
+  --serif: "Fraunces", Georgia, serif;
+  --italic: "Instrument Serif", serif;
+  --sans: "Plus Jakarta Sans", sans-serif;
+
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 80% 10%, rgba(168, 58, 46, 0.18), transparent 50%),
+    radial-gradient(circle at 10% 90%, rgba(217, 168, 74, 0.12), transparent 50%);
+  pointer-events: none;
+}
+
+/* ---- Container ---- */
+.auth {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 420px;
+  padding: 40px 24px;
+}
+
+/* ---- Brand ---- */
+.auth__brand {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.auth__logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--text);
+}
+
+.auth__logo-mark {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--terracota);
+  display: grid;
+  place-items: center;
+  font-family: var(--italic);
+  font-style: italic;
+  font-size: 22px;
+  color: var(--text);
+}
+
+.auth__title {
+  font-family: var(--serif);
+  font-size: 26px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+.auth__sub {
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--text-soft);
+  line-height: 1.5;
+}
+
+/* ---- Card ---- */
+.auth__card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 32px 28px;
+  box-shadow:
+    0 20px 60px -20px rgba(0, 0, 0, 0.5),
+    0 0 0 1px var(--line);
+}
+
+/* ---- Fields ---- */
+.auth-shell .field {
+  margin-bottom: 18px;
+}
+
+.auth-shell .field__label {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.auth-shell .field__input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  border: 1.5px solid var(--line-soft);
+  color: var(--text);
+  font: inherit;
+  font-size: 15px;
+  transition: border-color 0.3s, background 0.3s;
+}
+
+.auth-shell .field__input::placeholder {
+  color: var(--text-mute);
+}
+
+.auth-shell .field__input:focus {
+  outline: none;
+  border-color: var(--terracota);
+  background: var(--bg);
+}
+
+/* ---- Buttons ---- */
+.auth-shell .btn--primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 16px 24px;
+  border-radius: 10px;
+  background: var(--terracota);
+  color: var(--text);
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 15px;
+  border: 0;
+  cursor: pointer;
+  transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
+  box-shadow: 0 12px 28px -14px rgba(168, 58, 46, 0.55);
+}
+
+.auth-shell .btn--primary:hover {
+  background: #6B1F18;
+  box-shadow: 0 18px 36px -14px rgba(168, 58, 46, 0.7);
+  transform: translateY(-1px);
+}
+
+.auth-shell .btn--social {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 20px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  border: 1.5px solid var(--line-soft);
+  color: var(--text);
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color 0.3s, background 0.3s, transform 0.2s;
+}
+
+.auth-shell .btn--social:hover {
+  border-color: var(--text-mute);
+  background: var(--line);
+  transform: translateY(-1px);
+}
+
+.auth-shell .btn--social + .btn--social {
+  margin-top: 10px;
+}
+
+/* ---- Divider ---- */
+.auth-shell .divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 24px 0;
+  color: var(--text-mute);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.auth-shell .divider::before,
+.auth-shell .divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+/* ---- Footer ---- */
+.auth__foot {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-soft);
+}
+
+.auth__foot a {
+  color: var(--coral);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s;
+}
+
+.auth__foot a:hover {
+  color: var(--ocre);
+}
+
+/* ---- Legal ---- */
+.auth-shell .legal {
+  margin-top: 32px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-mute);
+  line-height: 1.6;
+}
+
+.auth-shell .auth__error {
+  background: rgba(226,90,76,0.1);
+  border: 1px solid rgba(226,90,76,0.2);
+  color: #F08478;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.auth-shell .legal a {
+  color: var(--text-soft);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.2s;
+}
+
+.auth-shell .legal a:hover {
+  color: var(--coral);
+}

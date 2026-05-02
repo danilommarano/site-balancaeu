@@ -7,17 +7,23 @@
 </script>
 
 <svelte:head>
-  <title>Cadastro — BalancaEu</title>
+  <title>Cadastrar — Balança Eu</title>
 </svelte:head>
 
-<div class="min-h-screen bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 flex items-center justify-center px-4">
-  <div class="w-full max-w-md">
-    <div class="text-center mb-8">
-      <h1 class="text-4xl font-bold text-white tracking-tight">BalancaEu</h1>
-      <p class="text-zinc-400 mt-2">Crie sua conta</p>
+<div class="auth-shell">
+  <div class="auth">
+    <div class="auth__brand">
+      <div class="auth__logo">
+        <div class="auth__logo-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>
+        </div>
+      </div>
+      <h1 class="auth__title">Balança<b>Eu</b></h1>
+      <p class="auth__sub">Crie sua conta</p>
     </div>
 
     <form
+      class="auth__card"
       method="POST"
       use:enhance={() => {
         loading = true;
@@ -26,81 +32,37 @@
           await update();
         };
       }}
-      class="bg-zinc-800/50 border border-zinc-700 rounded-2xl p-8 space-y-5"
     >
       {#if form?.error}
-        <div class="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg text-sm">
-          {form.error}
-        </div>
+        <div class="auth__error">{form.error}</div>
       {/if}
 
-      <div>
-        <label for="nome" class="block text-sm font-medium text-zinc-300 mb-2">Nome completo</label>
-        <input
-          type="text"
-          id="nome"
-          name="nome"
-          value={form?.nome ?? ''}
-          required
-          autocomplete="name"
-          class="w-full px-4 py-3 bg-zinc-900 border border-zinc-600 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-white/50 transition-colors"
-          placeholder="Seu nome"
-        />
+      <div class="field">
+        <label class="field__label" for="nome">Nome completo</label>
+        <input class="field__input" id="nome" name="nome" value={form?.nome ?? ''} placeholder="Seu nome" autocomplete="name" required />
+      </div>
+      <div class="field">
+        <label class="field__label" for="email">Email</label>
+        <input class="field__input" id="email" name="email" type="email" value={form?.email ?? ''} placeholder="seu@email.com" autocomplete="email" required />
+      </div>
+      <div class="field">
+        <label class="field__label" for="password">Senha</label>
+        <input class="field__input" id="password" name="password" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password" required minlength="6" />
+      </div>
+      <div class="field" style="margin-bottom: 22px;">
+        <label class="field__label" for="passwordConfirm">Confirmar senha</label>
+        <input class="field__input" id="passwordConfirm" name="passwordConfirm" type="password" placeholder="Repita a senha" autocomplete="new-password" required minlength="6" />
       </div>
 
-      <div>
-        <label for="email" class="block text-sm font-medium text-zinc-300 mb-2">Email</label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          value={form?.email ?? ''}
-          required
-          autocomplete="email"
-          class="w-full px-4 py-3 bg-zinc-900 border border-zinc-600 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-white/50 transition-colors"
-          placeholder="seu@email.com"
-        />
-      </div>
-
-      <div>
-        <label for="password" class="block text-sm font-medium text-zinc-300 mb-2">Senha</label>
-        <input
-          type="password"
-          id="password"
-          name="password"
-          required
-          minlength="6"
-          autocomplete="new-password"
-          class="w-full px-4 py-3 bg-zinc-900 border border-zinc-600 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-white/50 transition-colors"
-          placeholder="Mínimo 6 caracteres"
-        />
-      </div>
-
-      <div>
-        <label for="passwordConfirm" class="block text-sm font-medium text-zinc-300 mb-2">Confirmar senha</label>
-        <input
-          type="password"
-          id="passwordConfirm"
-          name="passwordConfirm"
-          required
-          minlength="6"
-          autocomplete="new-password"
-          class="w-full px-4 py-3 bg-zinc-900 border border-zinc-600 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-white/50 transition-colors"
-          placeholder="Repita a senha"
-        />
-      </div>
-
-      <button
-        type="submit"
-        disabled={loading}
-        class="w-full py-3 bg-white text-zinc-900 font-semibold rounded-lg hover:bg-zinc-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-      >
+      <button class="btn btn--primary" type="submit" disabled={loading}>
         {loading ? 'Cadastrando...' : 'Cadastrar'}
       </button>
 
-      <p class="text-center text-sm text-zinc-500">
-        Já tem conta? <a href="/login" class="text-white hover:underline">Entrar</a>
-      </p>
+      <div class="auth__foot">
+        <p>Já tem conta? <a href="/login">Entrar</a></p>
+      </div>
     </form>
+
+    <p class="legal">Comece sua jornada no movimento.</p>
   </div>
 </div>

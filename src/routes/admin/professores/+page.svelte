@@ -1,24 +1,27 @@
 <!-- BalancaEu — Admin: Professores -->
 <script lang="ts">
   import { enhance } from '$app/forms';
-  import FormFeedback from '$lib/components/admin/FormFeedback.svelte';
+  import ImageUpload from '$lib/components/admin/ImageUpload.svelte';
 
   let { data, form } = $props();
   let showCreateForm = $state(false);
+  let createImagemUrl = $state<string | null>(null);
   let editingId = $state<string | null>(null);
   let editNome = $state('');
   let editEmail = $state('');
   let editTelefone = $state('');
   let editBio = $state('');
+  let editImagemUrl = $state<string | null>(null);
   let editModalidades = $state<string[]>([]);
   let editAtivo = $state(true);
 
-  function startEdit(p: { id: string; nome: string; email: string; telefone: string | null; ativo: boolean; teacher: { bio: string | null; especialidades: string[]; modalities: { id: string; nome: string }[] } | null }) {
+  function startEdit(p: { id: string; nome: string; email: string; telefone: string | null; ativo: boolean; teacher: { bio: string | null; imagemUrl: string | null; especialidades: string[]; modalities: { id: string; nome: string }[] } | null }) {
     editingId = p.id;
     editNome = p.nome;
     editEmail = p.email;
     editTelefone = p.telefone ?? '';
     editBio = p.teacher?.bio ?? '';
+    editImagemUrl = p.teacher?.imagemUrl ?? null;
     editModalidades = p.teacher?.modalities?.map(m => m.id) ?? [];
     editAtivo = p.ativo;
   }
@@ -37,195 +40,150 @@
 </script>
 
 <svelte:head>
-  <title>Professores — Admin — BalancaEu</title>
+  <title>Professores — Admin · Balança Eu</title>
 </svelte:head>
 
-<div>
-  <div class="flex items-center justify-between mb-8">
-    <div>
-      <h1 class="text-2xl font-bold text-white mb-1">Professores</h1>
-      <p class="text-zinc-500 text-sm">{data.professores.length} professor(es) cadastrado(s)</p>
-    </div>
-    <button
-      onclick={() => showCreateForm = !showCreateForm}
-      class="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
-    >
-      <span class="material-symbols-outlined text-[18px]">{showCreateForm ? 'close' : 'add'}</span>
-      {showCreateForm ? 'Cancelar' : 'Novo Professor'}
-    </button>
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Professores</h1>
+    <p class="page-sub">{data.professores.length} professor(es) cadastrado(s)</p>
   </div>
+  <button class="btn btn--primary" onclick={() => showCreateForm = !showCreateForm}>
+    {#if showCreateForm}
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>Cancelar
+    {:else}
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>Novo Professor
+    {/if}
+  </button>
+</div>
 
-  <FormFeedback {form} />
+{#if form?.error}
+  <div class="card" style="border-color: var(--danger); margin-bottom: 16px;">
+    <p style="color: var(--danger); font-size: 13px;">{form.error}</p>
+  </div>
+{/if}
+{#if form?.success}
+  <div class="card" style="border-color: var(--success); margin-bottom: 16px;">
+    <p style="color: var(--success); font-size: 13px;">Operação realizada com sucesso!</p>
+  </div>
+{/if}
 
-  {#if showCreateForm}
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-6">
-      <h2 class="text-sm font-semibold text-white mb-4">Novo Professor</h2>
-      <form method="POST" action="?/create" use:enhance={() => { return async ({ update }) => { await update(); showCreateForm = false; }; }}>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-          <div>
-            <label for="c-nome" class="block text-xs text-zinc-400 mb-1.5">Nome completo</label>
-            <input id="c-nome" name="nome" type="text" required placeholder="Nome do professor"
-              class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary" />
-          </div>
-          <div>
-            <label for="c-email" class="block text-xs text-zinc-400 mb-1.5">Email</label>
-            <input id="c-email" name="email" type="email" required placeholder="email@escola.com"
-              class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary" />
-          </div>
-          <div>
-            <label for="c-senha" class="block text-xs text-zinc-400 mb-1.5">Senha inicial</label>
-            <input id="c-senha" name="senha" type="text" required value="prof123"
-              class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary" />
-          </div>
-          <div>
-            <label for="c-tel" class="block text-xs text-zinc-400 mb-1.5">Telefone</label>
-            <input id="c-tel" name="telefone" type="text" placeholder="(11) 99999-0000"
-              class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary" />
-          </div>
-          <div>
-            <label for="c-bio" class="block text-xs text-zinc-400 mb-1.5">Bio</label>
-            <input id="c-bio" name="bio" type="text" placeholder="Breve biografia"
-              class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary" />
-          </div>
-          <div>
-            <span class="block text-xs text-zinc-400 mb-1.5">Modalidades</span>
-            {#if data.modalidades.length === 0}
-              <p class="text-xs text-zinc-600">Nenhuma modalidade cadastrada.</p>
-            {:else}
-              <div class="flex flex-wrap gap-2">
-                {#each data.modalidades as mod}
-                  <label class="flex items-center gap-1.5 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-zinc-300 cursor-pointer hover:border-zinc-600 has-[:checked]:border-primary has-[:checked]:text-white transition-colors">
-                    <input type="checkbox" name="modalityIds" value={mod.id} class="accent-emerald-500 w-3.5 h-3.5" />
-                    {mod.nome}
-                  </label>
-                {/each}
-              </div>
-            {/if}
-          </div>
+{#if showCreateForm}
+  <div class="form-card" style="margin-bottom: 18px;">
+    <h3>Novo Professor</h3>
+    <form method="POST" action="?/create" use:enhance={() => async ({ update }) => { await update(); showCreateForm = false; createImagemUrl = null; }}>
+      <div class="form-grid">
+        <div class="field"><label for="cp-nome">Nome completo</label><input id="cp-nome" name="nome" type="text" required placeholder="Nome do professor" /></div>
+        <div class="field"><label for="cp-email">Email</label><input id="cp-email" name="email" type="email" required placeholder="email@escola.com" /></div>
+        <div class="field"><label for="cp-senha">Senha inicial</label><input id="cp-senha" name="senha" type="text" required value="prof123" /></div>
+        <div class="field"><label for="cp-tel">Telefone</label><input id="cp-tel" name="telefone" type="text" placeholder="(11) 99999-0000" /></div>
+        <div class="field"><label for="cp-bio">Bio</label><input id="cp-bio" name="bio" type="text" placeholder="Breve biografia" /></div>
+        <div class="field">
+          <ImageUpload bind:value={createImagemUrl} name="imagemUrl" category="teacher" label="Foto do professor" />
         </div>
-        <button type="submit" class="bg-primary text-white px-5 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">Criar Professor</button>
-      </form>
-    </div>
-  {/if}
-
-  <!-- Cards -->
-  {#if data.professores.length === 0}
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-10 text-center">
-      <span class="material-symbols-outlined text-4xl text-zinc-700 mb-3 block">school</span>
-      <p class="text-zinc-500 text-sm">Nenhum professor cadastrado.</p>
-    </div>
-  {:else}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {#each data.professores as prof}
-        <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden hover:border-zinc-700 transition-colors {!prof.ativo ? 'opacity-50' : ''}">
-          {#if editingId === prof.id}
-            <!-- Inline Edit Form -->
-            <form method="POST" action="?/update" use:enhance={() => { return async ({ update }) => { await update(); editingId = null; }; }} class="p-5">
-              <input type="hidden" name="id" value={prof.id} />
-              <input type="hidden" name="ativo" value={editAtivo.toString()} />
-              <div class="space-y-3 mb-4">
-                <div>
-                  <label for="edit-nome" class="block text-[10px] text-zinc-500 mb-1">Nome</label>
-                  <input id="edit-nome" name="nome" type="text" required bind:value={editNome}
-                    class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-primary" />
-                </div>
-                <div>
-                  <label for="edit-email" class="block text-[10px] text-zinc-500 mb-1">Email</label>
-                  <input id="edit-email" name="email" type="email" required bind:value={editEmail}
-                    class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-primary" />
-                </div>
-                <div>
-                  <label for="edit-telefone" class="block text-[10px] text-zinc-500 mb-1">Telefone</label>
-                  <input id="edit-telefone" name="telefone" type="text" bind:value={editTelefone}
-                    class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-primary" />
-                </div>
-                <div>
-                  <label for="edit-bio" class="block text-[10px] text-zinc-500 mb-1">Bio</label>
-                  <textarea id="edit-bio" name="bio" rows="2" bind:value={editBio}
-                    class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-primary resize-none"></textarea>
-                </div>
-                <div>
-                  <span class="block text-[10px] text-zinc-500 mb-1">Modalidades</span>
-                  {#if data.modalidades.length === 0}
-                    <p class="text-[10px] text-zinc-600">Nenhuma modalidade cadastrada.</p>
-                  {:else}
-                    <div class="flex flex-wrap gap-1.5">
-                      {#each data.modalidades as mod}
-                        <label class="flex items-center gap-1 bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-1 text-xs text-zinc-300 cursor-pointer hover:border-zinc-600 has-[:checked]:border-primary has-[:checked]:text-white transition-colors">
-                          <input type="checkbox" name="modalityIds" value={mod.id} checked={editModalidades.includes(mod.id)} onchange={() => toggleEditModalidade(mod.id)} class="accent-emerald-500 w-3 h-3" />
-                          {mod.nome}
-                        </label>
-                      {/each}
-                    </div>
-                  {/if}
-                </div>
-                <label class="flex items-center gap-2 text-xs text-zinc-300 cursor-pointer">
-                  <input type="checkbox" bind:checked={editAtivo} class="accent-emerald-500" />
-                  Ativo
-                </label>
-              </div>
-              <div class="flex gap-2">
-                <button type="submit" class="flex-1 bg-primary text-white py-1.5 rounded-lg text-xs font-medium hover:opacity-90">Salvar</button>
-                <button type="button" onclick={cancelEdit} class="flex-1 bg-zinc-800 text-zinc-400 py-1.5 rounded-lg text-xs hover:bg-zinc-700">Cancelar</button>
-              </div>
-            </form>
+        <div class="field" style="grid-column: span 2;">
+          <label for="cp-mods">Modalidades</label>
+          {#if data.modalidades.length === 0}
+            <p class="muted" style="font-size: 12px;">Nenhuma modalidade cadastrada.</p>
           {:else}
-            <!-- Display Card -->
-            <div class="p-5">
-              <div class="flex items-start justify-between mb-4">
-                <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 bg-amber-500/10 rounded-full flex items-center justify-center">
-                    <span class="material-symbols-outlined text-amber-400">school</span>
-                  </div>
-                  <div>
-                    <p class="text-sm font-medium text-white">{prof.nome}</p>
-                    <p class="text-xs text-zinc-500">{prof.email}</p>
-                  </div>
-                </div>
-                <form method="POST" action="?/toggleActive" use:enhance>
-                  <input type="hidden" name="id" value={prof.id} />
-                  <input type="hidden" name="ativo" value={(!prof.ativo).toString()} />
-                  <button type="submit" class="p-1 rounded text-xs {prof.ativo ? 'text-emerald-400 hover:text-red-400' : 'text-zinc-500 hover:text-emerald-400'}" title={prof.ativo ? 'Desativar' : 'Ativar'}>
-                    <span class="material-symbols-outlined text-[18px]">{prof.ativo ? 'toggle_on' : 'toggle_off'}</span>
-                  </button>
-                </form>
-              </div>
-
-              {#if prof.telefone}
-                <div class="flex items-center gap-2 text-xs text-zinc-500 mb-2">
-                  <span class="material-symbols-outlined text-[14px]">phone</span>
-                  {prof.telefone}
-                </div>
-              {/if}
-
-              {#if prof.teacher?.bio}
-                <p class="text-xs text-zinc-400 mb-3 line-clamp-2">{prof.teacher.bio}</p>
-              {/if}
-
-              <div class="flex items-center justify-between mt-auto pt-3 border-t border-zinc-800">
-                {#if prof.teacher?.modalities && prof.teacher.modalities.length > 0}
-                  <div class="flex flex-wrap gap-1">
-                    {#each prof.teacher.modalities.slice(0, 3) as mod}
-                      <span class="bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded text-[10px]">{mod.nome}</span>
-                    {/each}
-                    {#if prof.teacher.modalities.length > 3}
-                      <span class="text-zinc-600 text-[10px]">+{prof.teacher.modalities.length - 3}</span>
-                    {/if}
-                  </div>
-                {:else}
-                  <span class="text-[10px] text-zinc-600">Sem modalidades</span>
-                {/if}
-                <div class="flex items-center gap-1">
-                  <button onclick={() => startEdit(prof)} class="p-1 rounded text-zinc-500 hover:text-blue-400 transition-colors" title="Editar">
-                    <span class="material-symbols-outlined text-[16px]">edit</span>
-                  </button>
-                  <span class="text-[10px] text-zinc-600">{prof._count.professorClasses} turma(s)</span>
-                </div>
-              </div>
+            <div id="cp-mods" style="display:flex; flex-wrap:wrap; gap:8px;">
+              {#each data.modalidades as mod}
+                <label style="display:flex; align-items:center; gap:6px; cursor:pointer; padding:6px 10px; border:1px solid var(--line); border-radius:8px; font-size:12px; background:var(--surface);">
+                  <input type="checkbox" name="modalityIds" value={mod.id} />
+                  {mod.nome}
+                </label>
+              {/each}
             </div>
           {/if}
         </div>
-      {/each}
-    </div>
-  {/if}
-</div>
+      </div>
+      <div style="margin-top: 16px;">
+        <button type="submit" class="btn btn--primary">Criar Professor</button>
+      </div>
+    </form>
+  </div>
+{/if}
+
+{#if data.professores.length === 0}
+  <div class="empty">
+    <div class="empty__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5L2 10z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/></svg></div>
+    <p>Nenhum professor cadastrado.</p>
+  </div>
+{:else}
+  <div class="cards-grid">
+    {#each data.professores as prof}
+      <div class="prof-card">
+        {#if editingId === prof.id}
+          <form method="POST" action="?/update" use:enhance={() => async ({ update }) => { await update(); editingId = null; }}>
+            <input type="hidden" name="id" value={prof.id} />
+            <input type="hidden" name="ativo" value={editAtivo.toString()} />
+            <div class="form-grid" style="grid-template-columns: 1fr; gap: 10px;">
+              <div class="field"><label for="ep-{prof.id}-nome">Nome</label><input id="ep-{prof.id}-nome" name="nome" type="text" required bind:value={editNome} /></div>
+              <div class="field"><label for="ep-{prof.id}-email">Email</label><input id="ep-{prof.id}-email" name="email" type="email" required bind:value={editEmail} /></div>
+              <div class="field"><label for="ep-{prof.id}-tel">Telefone</label><input id="ep-{prof.id}-tel" name="telefone" type="text" bind:value={editTelefone} /></div>
+              <div class="field"><label for="ep-{prof.id}-bio">Bio</label><textarea id="ep-{prof.id}-bio" name="bio" rows="2" bind:value={editBio}></textarea></div>
+              <div class="field">
+                <ImageUpload bind:value={editImagemUrl} name="imagemUrl" category="teacher" label="Foto do professor" />
+              </div>
+              <div class="field">
+                <label for="ep-{prof.id}-mods">Modalidades</label>
+                <div id="ep-{prof.id}-mods" style="display:flex; flex-wrap:wrap; gap:6px;">
+                  {#each data.modalidades as mod}
+                    <label style="display:flex; align-items:center; gap:4px; cursor:pointer; padding:4px 8px; border:1px solid var(--line); border-radius:6px; font-size:11px; background:var(--surface);">
+                      <input type="checkbox" name="modalityIds" value={mod.id} checked={editModalidades.includes(mod.id)} onchange={() => toggleEditModalidade(mod.id)} />
+                      {mod.nome}
+                    </label>
+                  {/each}
+                </div>
+              </div>
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:12px;">
+                <input type="checkbox" bind:checked={editAtivo} /> Ativo
+              </label>
+            </div>
+            <div style="margin-top:12px; display:flex; gap:8px;">
+              <button type="submit" class="btn btn--primary btn--sm" style="flex:1;">Salvar</button>
+              <button type="button" class="btn btn--ghost btn--sm" style="flex:1;" onclick={cancelEdit}>Cancelar</button>
+            </div>
+          </form>
+        {:else}
+          <div class="prof-card__head">
+            <div class="prof-card__avatar" style={prof.teacher?.imagemUrl ? `background-image:url(${prof.teacher.imagemUrl}); background-size:cover; background-position:center;` : ''}>
+              {#if !prof.teacher?.imagemUrl}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5L2 10z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/></svg>
+              {/if}
+            </div>
+            <div class="prof-card__info">
+              <div class="prof-card__name">{prof.nome}</div>
+              <div class="prof-card__email">{prof.email}</div>
+            </div>
+            <form method="POST" action="?/toggleActive" use:enhance>
+              <input type="hidden" name="id" value={prof.id} />
+              <input type="hidden" name="ativo" value={(!prof.ativo).toString()} />
+              <button type="submit" class="toggle {prof.ativo ? 'is-on' : ''}" aria-label={prof.ativo ? 'Desativar' : 'Ativar'}></button>
+            </form>
+          </div>
+          {#if prof.teacher?.bio}
+            <div class="prof-card__bio">{prof.teacher.bio}</div>
+          {/if}
+          <div class="prof-card__foot">
+            <div class="prof-card__tags">
+              {#if prof.teacher?.modalities && prof.teacher.modalities.length > 0}
+                {#each prof.teacher.modalities as mod}
+                  <span class="badge badge--coral">{mod.nome}</span>
+                {/each}
+              {:else}
+                <span class="muted" style="font-size:11px;">Sem modalidades</span>
+              {/if}
+            </div>
+            <div style="display:flex; gap:10px; align-items:center; color:var(--text-mute); font-size:11.5px;">
+              <button class="btn--icon" onclick={() => startEdit(prof)} aria-label="Editar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:14px; height:14px;"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              </button>
+              {prof._count.professorClasses} turmas
+            </div>
+          </div>
+        {/if}
+      </div>
+    {/each}
+  </div>
+{/if}

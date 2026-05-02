@@ -16,10 +16,10 @@
   let faceApi: any = null;
   let stream: MediaStream | null = null;
 
-  const metodoLabels: Record<string, { label: string; icon: string }> = {
-    QR_CODE: { label: 'QR Code', icon: 'qr_code_2' },
-    MANUAL: { label: 'Manual', icon: 'person' },
-    FACIAL: { label: 'Facial', icon: 'face' }
+  const metodoLabels: Record<string, string> = {
+    QR_CODE: 'QR Code',
+    MANUAL: 'Manual',
+    FACIAL: 'Facial'
   };
 
   function formatDateTime(iso: string): string {
@@ -91,7 +91,6 @@
         return;
       }
 
-      // Draw detection on canvas for feedback
       const ctx = canvasEl.getContext('2d');
       if (ctx) {
         canvasEl.width = videoEl.videoWidth;
@@ -103,7 +102,7 @@
         ctx.strokeRect(box.x, box.y, box.width, box.height);
       }
 
-      descriptors = [...descriptors, Array.from(detection.descriptor)];
+      descriptors = [...descriptors, Array.from(detection.descriptor) as number[]];
       capturedCount = descriptors.length;
       faceStatus = 'ready';
       faceMessage = `Captura ${capturedCount}/5 realizada! ${capturedCount >= 3 ? 'Você já pode salvar ou capturar mais para maior precisão.' : `Capture mais ${3 - capturedCount} foto(s).`}`;
@@ -176,229 +175,158 @@
 </script>
 
 <svelte:head>
-  <title>Check-in — BalancaEu</title>
+  <title>Check-in — Balança Eu</title>
 </svelte:head>
 
-<div>
-  <div class="mb-8">
-    <h1 class="text-2xl font-bold text-white mb-1">Check-in</h1>
-    <p class="text-zinc-500 text-sm">QR Code e reconhecimento facial para entrada na escola</p>
-  </div>
+<div class="page-head">
+  <h1 class="page-title">Check-<em>in</em></h1>
+  <p class="page-sub">QR Code e reconhecimento facial para entrada na escola.</p>
+</div>
 
-  {#if !data.temPlano}
-    <div class="bg-amber-500/10 border border-amber-500/20 rounded-xl p-5 mb-6 flex items-start gap-3">
-      <span class="material-symbols-outlined text-amber-400 text-[22px] mt-0.5">warning</span>
-      <div>
-        <p class="text-sm font-medium text-amber-300">Sem plano ativo</p>
-        <p class="text-xs text-amber-400/70 mt-1">Você precisa de um plano ativo para fazer check-in. <a href="/aluno/plano" class="underline hover:text-amber-300">Ver planos</a></p>
-      </div>
+{#if !data.temPlano}
+  <div class="alert" style="margin-bottom: 20px;">
+    <div class="alert__icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.7 3.86a2 2 0 00-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
     </div>
-  {/if}
-
-  <!-- Tabs -->
-  <div class="flex gap-1 mb-6 bg-zinc-900 border border-zinc-800 rounded-lg p-1 w-fit">
-    <button
-      onclick={() => { activeTab = 'qrcode'; pararCamera(); faceStatus = 'idle'; }}
-      class="px-4 py-2 rounded-md text-sm font-medium transition-all {activeTab === 'qrcode' ? 'bg-emerald-600 text-white' : 'text-zinc-400 hover:text-white'}"
-    >
-      <span class="material-symbols-outlined text-[16px] align-middle mr-1">qr_code_2</span>
-      QR Code
-    </button>
-    <button
-      onclick={() => activeTab = 'facial'}
-      class="px-4 py-2 rounded-md text-sm font-medium transition-all {activeTab === 'facial' ? 'bg-emerald-600 text-white' : 'text-zinc-400 hover:text-white'}"
-    >
-      <span class="material-symbols-outlined text-[16px] align-middle mr-1">face</span>
-      Reconhecimento Facial
-    </button>
+    <div class="alert__body">
+      <strong>Sem plano ativo</strong>
+      <p>Você precisa de um plano ativo para fazer check-in. <a href="/aluno/plano">Ver planos</a></p>
+    </div>
   </div>
+{/if}
 
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <!-- Left: QR or Facial -->
-    {#if activeTab === 'qrcode'}
-      <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-        <div class="p-5 border-b border-zinc-800">
-          <h2 class="text-sm font-semibold text-white flex items-center gap-2">
-            <span class="material-symbols-outlined text-[18px] text-emerald-400">qr_code_2</span>
-            QR Code de Acesso
-          </h2>
+<div class="tabs" style="margin-bottom: 20px;">
+  <button type="button" class="tab {activeTab === 'qrcode' ? 'is-active' : ''}" onclick={() => { activeTab = 'qrcode'; pararCamera(); faceStatus = 'idle'; }}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3M21 14v3M14 21h3M21 18v3h-3"/></svg>
+    QR Code
+  </button>
+  <button type="button" class="tab {activeTab === 'facial' ? 'is-active' : ''}" onclick={() => activeTab = 'facial'}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/><path d="M3 3l3 3M21 3l-3 3M3 21l3-3M21 21l-3-3" opacity=".4"/></svg>
+    Reconhecimento Facial
+  </button>
+</div>
+
+<div class="checkin-grid">
+  {#if activeTab === 'qrcode'}
+    <div class="qr-card">
+      <div class="card__title" style="justify-content: center;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3M21 14v3M14 21h3M21 18v3h-3"/></svg>
+        QR Code de Acesso
+      </div>
+      <div class="qr-frame">
+        <!-- svelte-ignore a11y_missing_attribute -->
+        <img src="/api/qrcode" width="220" height="220" style="display:block;" />
+      </div>
+      {#if data.planoNome}
+        <div class="qr-hint">Plano: <strong>{data.planoNome}</strong></div>
+      {/if}
+      <div class="qr-hint">Mostre este QR Code na recepção da escola.</div>
+    </div>
+  {:else}
+    <div class="card" style="background: var(--creme-warm);">
+      <div class="card__head">
+        <div class="card__title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
+          Cadastro Facial
         </div>
-        <div class="p-8 flex flex-col items-center">
-          <div class="bg-zinc-800 rounded-2xl p-6 mb-4">
-            <!-- svelte-ignore a11y_missing_attribute -->
-            <img src="/api/qrcode" width="200" height="200" class="block" />
+      </div>
+
+      {#if data.temRostoCadastrado && faceStatus === 'idle'}
+        <div class="empty-state">
+          <div class="empty-state__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg>
           </div>
-          {#if data.planoNome}
-            <p class="text-xs text-zinc-500">
-              Plano: <span class="text-emerald-400 font-medium">{data.planoNome}</span>
-            </p>
-          {/if}
-          <p class="text-[10px] text-zinc-600 mt-2 text-center">
-            Mostre este QR Code na recepção da escola.
-          </p>
+          <p><strong>Rosto cadastrado</strong> ({data.totalDescritores} amostra(s))</p>
+          <p style="font-size: 12px; color: var(--ink-mute); margin-top: 6px;">Seu reconhecimento facial está ativo. Ao chegar na escola, basta olhar para a câmera da recepção.</p>
+          <div style="display: flex; gap: 8px; justify-content: center; margin-top: 14px;">
+            <button type="button" class="btn btn--ghost btn--sm" onclick={iniciarRegistroFacial}>Recadastrar</button>
+            <button type="button" class="btn btn--ghost btn--sm" onclick={removerRosto} style="border-color: var(--danger); color: var(--danger);">Remover</button>
+          </div>
         </div>
-      </div>
-
-    {:else}
-      <!-- Facial Recognition Registration -->
-      <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-        <div class="p-5 border-b border-zinc-800">
-          <h2 class="text-sm font-semibold text-white flex items-center gap-2">
-            <span class="material-symbols-outlined text-[18px] text-blue-400">face</span>
-            Cadastro Facial
-          </h2>
-          {#if data.temRostoCadastrado}
-            <p class="text-[10px] text-emerald-400 mt-1 flex items-center gap-1">
-              <span class="material-symbols-outlined text-[12px]">check_circle</span>
-              Rosto cadastrado ({data.totalDescritores} amostra(s))
-            </p>
-          {/if}
+      {:else if faceStatus === 'idle'}
+        <div class="empty-state">
+          <div class="empty-state__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
+          </div>
+          <p><strong>Cadastre seu rosto</strong></p>
+          <p style="font-size: 12px; color: var(--ink-mute); margin-top: 6px;">Com o reconhecimento facial, seu check-in será automático ao chegar na escola.</p>
+          <button type="button" class="btn btn--primary" style="margin-top: 14px;" onclick={iniciarRegistroFacial}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            Iniciar Cadastro
+          </button>
+          <p style="font-size: 11px; color: var(--ink-mute); margin-top: 10px;">Seus dados faciais são armazenados de forma segura e usados apenas para check-in.</p>
         </div>
-
-        <div class="p-5">
-          {#if data.temRostoCadastrado && faceStatus === 'idle'}
-            <!-- Already registered -->
-            <div class="text-center py-4">
-              <div class="w-16 h-16 bg-emerald-600/15 rounded-full flex items-center justify-center mx-auto mb-3">
-                <span class="material-symbols-outlined text-emerald-400 text-3xl">sentiment_satisfied</span>
-              </div>
-              <p class="text-sm text-white font-medium mb-1">Rosto cadastrado</p>
-              <p class="text-xs text-zinc-500 mb-4">Seu reconhecimento facial está ativo. Ao chegar na escola, basta olhar para a câmera da recepção.</p>
-              <div class="flex gap-2 justify-center">
-                <button
-                  onclick={iniciarRegistroFacial}
-                  class="flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300 bg-blue-400/10 px-3 py-1.5 rounded-lg transition-colors"
-                >
-                  <span class="material-symbols-outlined text-[14px]">refresh</span>
-                  Recadastrar
-                </button>
-                <button
-                  onclick={removerRosto}
-                  class="flex items-center gap-1.5 text-xs text-red-400 hover:text-red-300 bg-red-400/10 px-3 py-1.5 rounded-lg transition-colors"
-                >
-                  <span class="material-symbols-outlined text-[14px]">delete</span>
-                  Remover
-                </button>
-              </div>
-            </div>
-
-          {:else if faceStatus === 'idle'}
-            <!-- Not registered -->
-            <div class="text-center py-4">
-              <div class="w-16 h-16 bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-3">
-                <span class="material-symbols-outlined text-zinc-600 text-3xl">face</span>
-              </div>
-              <p class="text-sm text-white font-medium mb-1">Cadastre seu rosto</p>
-              <p class="text-xs text-zinc-500 mb-4">Com o reconhecimento facial, seu check-in será automático ao chegar na escola.</p>
-              <button
-                onclick={iniciarRegistroFacial}
-                class="flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors mx-auto"
-              >
-                <span class="material-symbols-outlined text-[18px]">photo_camera</span>
-                Iniciar Cadastro
-              </button>
-              <p class="text-[10px] text-zinc-600 mt-3">Seus dados faciais são armazenados de forma segura e usados apenas para check-in.</p>
-            </div>
-
-          {:else if faceStatus === 'loading'}
-            <div class="text-center py-8">
-              <span class="material-symbols-outlined text-3xl text-blue-400 animate-spin mb-3">progress_activity</span>
-              <p class="text-sm text-zinc-400">{faceMessage}</p>
-            </div>
-
-          {:else}
-            <!-- Camera active -->
-            <div class="relative rounded-lg overflow-hidden mb-3">
-              <!-- svelte-ignore a11y_media_has_caption -->
-              <video bind:this={videoEl} class="w-full rounded-lg bg-black mirror" playsinline style="transform: scaleX(-1);"></video>
-              <canvas bind:this={canvasEl} class="hidden"></canvas>
-              <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div class="w-40 h-48 border-2 border-blue-400/40 rounded-full"></div>
-              </div>
-              {#if faceStatus === 'capturing' || faceStatus === 'saving'}
-                <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
-                  <span class="material-symbols-outlined text-white text-3xl animate-spin">progress_activity</span>
-                </div>
-              {/if}
-            </div>
-
-            <!-- Progress -->
-            <div class="flex gap-1.5 mb-3">
-              {#each Array(5) as _, i}
-                <div class="flex-1 h-1.5 rounded-full {i < capturedCount ? 'bg-emerald-500' : 'bg-zinc-800'}"></div>
-              {/each}
-            </div>
-
-            <p class="text-xs text-zinc-400 mb-4 text-center">{faceMessage}</p>
-
-            <div class="flex gap-2">
-              <button
-                onclick={capturarRosto}
-                disabled={faceStatus !== 'ready' || capturedCount >= 5}
-                class="flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <span class="material-symbols-outlined text-[16px]">photo_camera</span>
-                Capturar ({capturedCount}/5)
-              </button>
-              {#if capturedCount >= 3}
-                <button
-                  onclick={salvarDescritores}
-                  disabled={faceStatus === 'saving'}
-                  class="flex-1 flex items-center justify-center gap-2 bg-emerald-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors disabled:opacity-50"
-                >
-                  <span class="material-symbols-outlined text-[16px]">save</span>
-                  Salvar
-                </button>
-              {/if}
-            </div>
-
-            <div class="flex gap-2 mt-2">
-              {#if capturedCount > 0}
-                <button onclick={resetarCaptura} class="flex-1 text-xs text-zinc-500 hover:text-white py-1.5 transition-colors">
-                  Recomeçar
-                </button>
-              {/if}
-              <button onclick={() => { pararCamera(); faceStatus = 'idle'; }} class="flex-1 text-xs text-red-400/70 hover:text-red-400 py-1.5 transition-colors">
-                Cancelar
-              </button>
-            </div>
-          {/if}
-        </div>
-      </div>
-    {/if}
-
-    <!-- Right: Check-in history -->
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-      <div class="p-5 border-b border-zinc-800">
-        <h2 class="text-sm font-semibold text-white flex items-center gap-2">
-          <span class="material-symbols-outlined text-[18px] text-blue-400">history</span>
-          Histórico de Check-ins
-        </h2>
-      </div>
-      {#if data.checkins.length === 0}
-        <div class="p-8 text-center">
-          <span class="material-symbols-outlined text-4xl text-zinc-700 mb-2">door_front</span>
-          <p class="text-zinc-500 text-sm">Nenhum check-in registrado.</p>
+      {:else if faceStatus === 'loading'}
+        <div class="empty-state">
+          <p>{faceMessage}</p>
         </div>
       {:else}
-        <div class="divide-y divide-zinc-800/50 max-h-[400px] overflow-y-auto">
-          {#each data.checkins as checkin}
-            {@const met = metodoLabels[checkin.metodo] ?? metodoLabels.MANUAL}
-            <div class="px-5 py-3 flex items-center justify-between hover:bg-zinc-800/30 transition-colors">
-              <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-emerald-600/15 rounded-lg flex items-center justify-center">
-                  <span class="material-symbols-outlined text-emerald-400 text-[16px]">{met.icon}</span>
-                </div>
-                <div>
-                  <p class="text-sm text-white">{formatDateTime(checkin.timestamp)}</p>
-                  <p class="text-[10px] text-zinc-500">{met.label}</p>
-                </div>
-              </div>
-              <span class="text-[10px] text-zinc-600">{formatRelative(checkin.timestamp)}</span>
-            </div>
+        <div style="position: relative; border-radius: 14px; overflow: hidden; margin-bottom: 12px;">
+          <!-- svelte-ignore a11y_media_has_caption -->
+          <video bind:this={videoEl} style="width: 100%; display: block; background: #000; transform: scaleX(-1);" playsinline></video>
+          <canvas bind:this={canvasEl} style="display: none;"></canvas>
+          {#if faceStatus === 'capturing' || faceStatus === 'saving'}
+            <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; color: white;">Processando...</div>
+          {/if}
+        </div>
+
+        <div style="display: flex; gap: 6px; margin-bottom: 12px;">
+          {#each Array(5) as _, i}
+            <div style="flex: 1; height: 6px; border-radius: 3px; background: {i < capturedCount ? 'var(--success)' : 'var(--line)'};"></div>
           {/each}
+        </div>
+
+        <p style="font-size: 12px; color: var(--ink-soft); text-align: center; margin-bottom: 14px;">{faceMessage}</p>
+
+        <div style="display: flex; gap: 8px;">
+          <button type="button" class="btn btn--primary btn--full" onclick={capturarRosto} disabled={faceStatus !== 'ready' || capturedCount >= 5}>
+            Capturar ({capturedCount}/5)
+          </button>
+          {#if capturedCount >= 3}
+            <button type="button" class="btn btn--coral btn--full" onclick={salvarDescritores} disabled={faceStatus === 'saving'}>
+              Salvar
+            </button>
+          {/if}
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-top: 8px;">
+          {#if capturedCount > 0}
+            <button type="button" class="btn btn--ghost btn--sm btn--full" onclick={resetarCaptura}>Recomeçar</button>
+          {/if}
+          <button type="button" class="btn btn--ghost btn--sm btn--full" style="border-color: var(--danger); color: var(--danger);" onclick={() => { pararCamera(); faceStatus = 'idle'; }}>
+            Cancelar
+          </button>
         </div>
       {/if}
     </div>
+  {/if}
+
+  <div class="card" style="background: var(--creme-warm);">
+    <div class="card__head">
+      <div class="card__title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        Histórico de Check-ins
+      </div>
+    </div>
+    {#if data.checkins.length === 0}
+      <div class="empty-state">
+        <div class="empty-state__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        </div>
+        <p>Nenhum check-in registrado.</p>
+      </div>
+    {:else}
+      <div class="upcoming__list">
+        {#each data.checkins as checkin}
+          <div class="upcoming-row">
+            <div class="upcoming-info">
+              <h4>{formatDateTime(checkin.timestamp)}</h4>
+              <p>{metodoLabels[checkin.metodo] ?? checkin.metodo}</p>
+            </div>
+            <div class="upcoming-time">{formatRelative(checkin.timestamp)}</div>
+          </div>
+        {/each}
+      </div>
+    {/if}
   </div>
 </div>

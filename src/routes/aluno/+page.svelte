@@ -1,258 +1,224 @@
 <!-- BalancaEu — Dashboard do Aluno -->
 <script lang="ts">
   import { page } from '$app/stores';
-  import { fly } from 'svelte/transition';
 
   let { data } = $props();
 
-  const diasLabels: Record<string, string> = {
-    SEG: 'Segunda', TER: 'Terça', QUA: 'Quarta', QUI: 'Quinta',
-    SEX: 'Sexta', SAB: 'Sábado', DOM: 'Domingo'
+  const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const DIAS_FULL: Record<string, string> = {
+    SEG: 'Segunda-feira', TER: 'Terça-feira', QUA: 'Quarta-feira', QUI: 'Quinta-feira',
+    SEX: 'Sexta-feira', SAB: 'Sábado', DOM: 'Domingo'
   };
-
-  function formatDate(iso: string): string {
-    return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
-  }
-
-  function formatFullDate(iso: string): string {
-    return new Date(iso).toLocaleDateString('pt-BR', {
-      weekday: 'long', day: '2-digit', month: 'long'
-    });
-  }
+  const MESES_FULL = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 
   function formatTime(iso: string): string {
     return new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   }
 
+  function formatNivLine(iso: string, nivel: string, professor: string, sala: string): string {
+    const d = new Date(iso);
+    const diaSemana = DIAS_FULL[['DOM','SEG','TER','QUA','QUI','SEX','SAB'][d.getDay()]] ?? '';
+    const dia = d.getDate();
+    const mes = MESES_FULL[d.getMonth()];
+    const hora = formatTime(iso);
+    return `${diaSemana}, ${dia} de ${mes} · ${hora} · Nível ${nivel} · Prof. ${professor} · ${sala}`;
+  }
+
   let showWelcome = $state($page.url.searchParams.get('welcome') === '1');
   const nivelamentos = $derived(data.nivelamentos ?? []);
+  const firstName = $derived(data.user?.nome?.split(' ')[0] ?? 'Aluno');
 </script>
 
 <svelte:head>
-  <title>Minha Área — BalancaEu</title>
+  <title>Minha Área — Balança Eu</title>
 </svelte:head>
 
-<div>
-  {#if showWelcome && nivelamentos.length > 0}
-    <div
-      in:fly={{ y: -20, duration: 400 }}
-      class="mb-6 bg-gradient-to-r from-primary/20 to-primary/10 border border-primary/30 rounded-2xl p-5 relative overflow-hidden"
-    >
-      <button
-        onclick={() => showWelcome = false}
-        class="absolute top-3 right-3 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors"
-        aria-label="Fechar"
-      >
-        <span class="material-symbols-outlined text-[18px]">close</span>
-      </button>
-      <div class="flex items-start gap-4">
-        <div class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center shrink-0">
-          <span class="material-symbols-outlined text-zinc-900 dark:text-white">celebration</span>
-        </div>
-        <div>
-          <h2 class="text-lg font-bold text-zinc-900 dark:text-white mb-1">Bem-vindo(a) ao Balança Eu!</h2>
-          <p class="text-sm text-zinc-700 dark:text-zinc-300">
-            Sua conta foi criada e seus nivelamentos estão agendados. Nos vemos em breve! 💃🕺
-          </p>
-        </div>
+{#if showWelcome && nivelamentos.length > 0}
+  <div class="alert" style="margin-bottom: 24px;">
+    <div class="alert__icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 22h20L12 2z"/><path d="M12 10v4M12 18h.01"/></svg>
+    </div>
+    <div class="alert__body">
+      <strong>Bem-vindo(a) ao Balança Eu!</strong>
+      <p>Sua conta foi criada e seus nivelamentos estão agendados. Nos vemos em breve!</p>
+    </div>
+  </div>
+{/if}
+
+{#if nivelamentos.length > 0}
+  <section class="upcoming">
+    <div class="upcoming__head">
+      <div class="upcoming__head-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>
+      </div>
+      <div>
+        <h3>Seus nivelamentos agendados</h3>
+        <p>Compareça às escolas nas datas abaixo para conhecer seu nível e os professores.</p>
       </div>
     </div>
-  {/if}
 
-  <!-- Banner de Nivelamentos Agendados -->
-  {#if nivelamentos.length > 0}
-    <div class="mb-8 bg-white dark:bg-zinc-900 border border-primary/20 rounded-2xl overflow-hidden">
-      <div class="px-6 py-4 bg-primary/10 border-b border-primary/20 flex items-center gap-3">
-        <span class="material-symbols-outlined text-primary">event_available</span>
-        <div class="flex-1">
-          <h2 class="text-sm font-bold text-zinc-900 dark:text-white">
-            Seus nivelamentos agendados
-          </h2>
-          <p class="text-xs text-zinc-400 mt-0.5">
-            Compareça à escola nas datas abaixo para conhecer seu nível e conhecer os professores.
-          </p>
+    <div class="upcoming__list">
+      {#each nivelamentos as niv}
+        {@const d = new Date(niv.dataHora)}
+        <div class="upcoming-row">
+          <div class="upcoming-date">
+            <small>{MESES[d.getMonth()]}</small>
+            <strong>{String(d.getDate()).padStart(2, '0')}</strong>
+          </div>
+          <div class="upcoming-info">
+            <h4>{niv.modalidade}</h4>
+            <p>{formatNivLine(niv.dataHora, niv.nivel, niv.professor, niv.sala)}</p>
+          </div>
+          <div class="upcoming-time">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            {formatTime(niv.dataHora)}
+          </div>
         </div>
+      {/each}
+    </div>
+
+    <div class="upcoming__footer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+      <span>Após o nivelamento você poderá se alocar em uma turma com este horário. Se não se adaptar, você tem direito a <a href="#">uma aula experimental gratuita</a>.</span>
+    </div>
+  </section>
+{/if}
+
+<section style="margin-top: {nivelamentos.length > 0 ? '44px' : '0'};">
+  <h1 class="page-title">Olá, <em>{firstName}!</em></h1>
+  <p class="page-sub">Bem-vindo à sua área.</p>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-card__head">
+        <div class="stat-card__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg>
+        </div>
+        Meu Plano
       </div>
-      <div class="divide-y divide-stone-200 dark:divide-zinc-800">
-        {#each nivelamentos as niv}
-          <div class="px-6 py-4 flex items-center gap-4 hover:bg-stone-100 dark:hover:bg-zinc-800/30 transition-colors">
-            <div class="w-14 h-14 bg-primary/10 rounded-xl flex flex-col items-center justify-center shrink-0">
-              <span class="text-[10px] text-primary uppercase font-bold tracking-tight leading-none">
-                {new Date(niv.dataHora).toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '').toUpperCase()}
-              </span>
-              <span class="text-xl font-bold text-primary leading-none mt-1">
-                {new Date(niv.dataHora).getDate().toString().padStart(2, '0')}
-              </span>
+      {#if data.planoAtual}
+        <div class="stat-card__value is-small">{data.planoAtual.nome}</div>
+        <div class="stat-card__hint">R$ {data.planoAtual.preco.toFixed(2)}/mês</div>
+      {:else}
+        <div class="stat-card__value is-small" style="font-family: var(--italic); font-style: italic; color: var(--ink-soft);">Sem plano</div>
+        <div class="stat-card__hint"><a href="/aluno/plano" style="color: var(--terracota); font-weight: 600;">Escolher plano →</a></div>
+      {/if}
+    </div>
+
+    <div class="stat-card stat-card--coral">
+      <div class="stat-card__head">
+        <div class="stat-card__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><path d="M15 20c0-2 2-4 4-4s2 1 2 2"/></svg>
+        </div>
+        Turmas
+      </div>
+      <div class="stat-card__value">{data.totalTurmas}</div>
+      <div class="stat-card__hint">inscrições ativas</div>
+    </div>
+
+    <div class="stat-card stat-card--ocre">
+      <div class="stat-card__head">
+        <div class="stat-card__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+        </div>
+        Presenças no mês
+      </div>
+      <div class="stat-card__value">{data.presencasMes}</div>
+      <div class="stat-card__hint">aulas com presença</div>
+    </div>
+
+    <div class="stat-card stat-card--plum">
+      <div class="stat-card__head">
+        <div class="stat-card__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>
+        </div>
+        Máx. aulas/sem
+      </div>
+      {#if data.planoAtual}
+        <div class="stat-card__value">{data.planoAtual.maxAulasSemana}</div>
+      {:else}
+        <div class="stat-card__value" style="font-family: var(--italic); font-style: italic; color: var(--ink-mute);">—</div>
+      {/if}
+      <div class="stat-card__hint">permitidas pelo plano</div>
+    </div>
+  </div>
+</section>
+
+<div class="two-col">
+  <div class="card">
+    <div class="card__head">
+      <div class="card__title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><path d="M15 20c0-2 2-4 4-4s2 1 2 2"/></svg>
+        Minhas Turmas
+      </div>
+      <a class="btn--link" href="/aluno/inscricoes">Ver todas →</a>
+    </div>
+    {#if data.turmas.length === 0}
+      <div class="empty-state">
+        <div class="empty-state__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg>
+        </div>
+        <p>Você não está inscrito em nenhuma turma.</p>
+        <a href="/aluno/inscricoes">Explorar turmas</a>
+      </div>
+    {:else}
+      <div class="upcoming__list">
+        {#each data.turmas as turma}
+          <div class="upcoming-row">
+            <div class="upcoming-date">
+              <small>{turma.diaSemana}</small>
+              <strong style="font-size: 16px;">{turma.horarioInicio}</strong>
             </div>
-            <div class="flex-1 min-w-0">
-              <h3 class="text-zinc-900 dark:text-white font-bold truncate">{niv.modalidade}</h3>
-              <p class="text-xs text-zinc-500 mt-0.5 capitalize">
-                {formatFullDate(niv.dataHora)} · {formatTime(niv.dataHora)}
-              </p>
-              <p class="text-[11px] text-zinc-600 mt-0.5">
-                Nível {niv.nivel} · Prof. {niv.professor} · {niv.sala}
-              </p>
+            <div class="upcoming-info">
+              <h4>{turma.modalidade}</h4>
+              <p>{turma.nivel} · Prof. {turma.professor} · {turma.sala}</p>
             </div>
-            <div class="hidden sm:flex items-center gap-1 text-xs text-zinc-500">
-              <span class="material-symbols-outlined text-[16px]">schedule</span>
-              <span>{formatTime(niv.dataHora)}</span>
+            <div class="upcoming-time">
+              {turma.horarioInicio}–{turma.horarioFim}
             </div>
           </div>
         {/each}
       </div>
-      <div class="px-6 py-3 bg-stone-50 dark:bg-zinc-950/50 border-t border-stone-200 dark:border-zinc-800">
-        <p class="text-[11px] text-zinc-500 flex items-start gap-2">
-          <span class="material-symbols-outlined text-[14px] text-amber-500 mt-0.5">info</span>
-          <span>
-            Após o nivelamento você poderá ser alocado em uma turma com outro horário. Se não se adaptar, você tem direito a <strong class="text-zinc-700 dark:text-zinc-300">uma aula experimental gratuita</strong>.
-          </span>
-        </p>
-      </div>
-    </div>
-  {/if}
-
-  <div class="mb-8">
-    <h1 class="text-2xl font-bold text-zinc-900 dark:text-white mb-1">Olá, {data.user?.nome?.split(' ')[0] ?? 'Aluno'}!</h1>
-    <p class="text-zinc-500 text-sm">Bem-vindo à sua área</p>
+    {/if}
   </div>
 
-  <!-- Stats Cards -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-    <div class="bg-white dark:bg-zinc-900 border border-stone-200 dark:border-zinc-800 rounded-xl p-5">
-      <div class="flex items-center gap-3 mb-3">
-        <div class="w-9 h-9 bg-emerald-600/15 rounded-lg flex items-center justify-center">
-          <span class="material-symbols-outlined text-emerald-400 text-[20px]">credit_card</span>
-        </div>
-        <span class="text-xs text-zinc-500 uppercase tracking-wider">Meu Plano</span>
+  <div class="card">
+    <div class="card__head">
+      <div class="card__title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/><circle cx="12" cy="14" r="1.2" fill="currentColor"/></svg>
+        Próximos Eventos
       </div>
-      <p class="text-lg font-bold text-zinc-900 dark:text-white">{data.planoAtual?.nome ?? 'Sem plano'}</p>
-      {#if data.planoAtual}
-        <p class="text-xs text-zinc-500 mt-1">R$ {data.planoAtual.preco.toFixed(2)}/mês</p>
-      {/if}
     </div>
-
-    <div class="bg-white dark:bg-zinc-900 border border-stone-200 dark:border-zinc-800 rounded-xl p-5">
-      <div class="flex items-center gap-3 mb-3">
-        <div class="w-9 h-9 bg-blue-600/15 rounded-lg flex items-center justify-center">
-          <span class="material-symbols-outlined text-blue-400 text-[20px]">groups</span>
+    {#if data.eventos.length === 0}
+      <div class="empty-state">
+        <div class="empty-state__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg>
         </div>
-        <span class="text-xs text-zinc-500 uppercase tracking-wider">Turmas</span>
+        <p>Nenhum evento agendado.</p>
       </div>
-      <p class="text-lg font-bold text-zinc-900 dark:text-white">{data.totalTurmas}</p>
-      <p class="text-xs text-zinc-500 mt-1">inscrição(ões) ativa(s)</p>
-    </div>
-
-    <div class="bg-white dark:bg-zinc-900 border border-stone-200 dark:border-zinc-800 rounded-xl p-5">
-      <div class="flex items-center gap-3 mb-3">
-        <div class="w-9 h-9 bg-amber-600/15 rounded-lg flex items-center justify-center">
-          <span class="material-symbols-outlined text-amber-400 text-[20px]">check_circle</span>
-        </div>
-        <span class="text-xs text-zinc-500 uppercase tracking-wider">Presenças no Mês</span>
-      </div>
-      <p class="text-lg font-bold text-zinc-900 dark:text-white">{data.presencasMes}</p>
-      <p class="text-xs text-zinc-500 mt-1">aula(s) com presença</p>
-    </div>
-
-    <div class="bg-white dark:bg-zinc-900 border border-stone-200 dark:border-zinc-800 rounded-xl p-5">
-      <div class="flex items-center gap-3 mb-3">
-        <div class="w-9 h-9 bg-purple-600/15 rounded-lg flex items-center justify-center">
-          <span class="material-symbols-outlined text-purple-400 text-[20px]">calendar_month</span>
-        </div>
-        <span class="text-xs text-zinc-500 uppercase tracking-wider">Máx. aulas/sem</span>
-      </div>
-      <p class="text-lg font-bold text-zinc-900 dark:text-white">{data.planoAtual?.maxAulasSemana ?? '—'}</p>
-      <p class="text-xs text-zinc-500 mt-1">permitidas pelo plano</p>
-    </div>
-  </div>
-
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- Minhas Turmas -->
-    <div class="lg:col-span-2 bg-white dark:bg-zinc-900 border border-stone-200 dark:border-zinc-800 rounded-xl overflow-hidden">
-      <div class="flex items-center justify-between p-5 border-b border-stone-200 dark:border-zinc-800">
-        <h2 class="text-base font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
-          <span class="material-symbols-outlined text-[20px] text-emerald-400">groups</span>
-          Minhas Turmas
-        </h2>
-        <a href="/aluno/inscricoes" class="text-xs text-emerald-400 hover:underline">Ver todas</a>
-      </div>
-      {#if data.turmas.length === 0}
-        <div class="p-8 text-center">
-          <span class="material-symbols-outlined text-4xl text-stone-300 dark:text-zinc-700 mb-2">event_busy</span>
-          <p class="text-zinc-500 text-sm">Você não está inscrito em nenhuma turma.</p>
-          <a href="/aluno/inscricoes" class="text-emerald-400 text-sm hover:underline mt-2 inline-block">Explorar turmas</a>
-        </div>
-      {:else}
-        <div class="divide-y divide-stone-200 dark:divide-zinc-800">
-          {#each data.turmas as turma}
-            <div class="px-5 py-4 flex items-center justify-between hover:bg-stone-100 dark:hover:bg-zinc-800/30 transition-colors">
-              <div>
-                <p class="text-sm font-medium text-zinc-900 dark:text-white">{turma.modalidade}</p>
-                <p class="text-xs text-zinc-500">{turma.nivel} — Prof. {turma.professor}</p>
-              </div>
-              <div class="text-right">
-                <p class="text-sm text-zinc-700 dark:text-zinc-300">{diasLabels[turma.diaSemana] ?? turma.diaSemana}</p>
-                <p class="text-xs text-zinc-500">{turma.horarioInicio}–{turma.horarioFim} · {turma.sala}</p>
-              </div>
+    {:else}
+      <div class="upcoming__list">
+        {#each data.eventos as evento}
+          {@const d = new Date(evento.data)}
+          <div class="upcoming-row">
+            <div class="upcoming-date">
+              <small>{MESES[d.getMonth()]}</small>
+              <strong>{String(d.getDate()).padStart(2, '0')}</strong>
             </div>
-          {/each}
-        </div>
-      {/if}
-    </div>
-
-    <!-- Próximos Eventos -->
-    <div class="bg-white dark:bg-zinc-900 border border-stone-200 dark:border-zinc-800 rounded-xl overflow-hidden">
-      <div class="p-5 border-b border-stone-200 dark:border-zinc-800">
-        <h2 class="text-base font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
-          <span class="material-symbols-outlined text-[20px] text-purple-400">event</span>
-          Próximos Eventos
-        </h2>
-      </div>
-      {#if data.eventos.length === 0}
-        <div class="p-8 text-center">
-          <span class="material-symbols-outlined text-4xl text-stone-300 dark:text-zinc-700 mb-2">event_busy</span>
-          <p class="text-zinc-500 text-sm">Nenhum evento agendado.</p>
-        </div>
-      {:else}
-        <div class="divide-y divide-stone-200 dark:divide-zinc-800">
-          {#each data.eventos as evento}
-            <div class="px-5 py-4">
-              <div class="flex items-start gap-3">
-                <div class="w-10 h-10 bg-purple-600/15 rounded-lg flex flex-col items-center justify-center shrink-0">
-                  <span class="text-[10px] text-purple-400 leading-none uppercase">{formatDate(evento.data).split(' ')[1]}</span>
-                  <span class="text-sm font-bold text-purple-300 leading-none">{formatDate(evento.data).split(' ')[0]}</span>
-                </div>
-                <div class="min-w-0">
-                  <p class="text-sm font-medium text-zinc-900 dark:text-white truncate">{evento.titulo}</p>
-                  <p class="text-xs text-zinc-500">{evento.horario} · {evento.local}</p>
-                  {#if evento.preco}
-                    <p class="text-xs text-emerald-400 mt-0.5">R$ {evento.preco.toFixed(2)}</p>
-                  {:else}
-                    <p class="text-xs text-emerald-400 mt-0.5">Gratuito</p>
-                  {/if}
-                </div>
-              </div>
+            <div class="upcoming-info">
+              <h4>{evento.titulo}</h4>
+              <p>{evento.horario} · {evento.local}</p>
             </div>
-          {/each}
-        </div>
-      {/if}
-    </div>
+            <div class="upcoming-time">
+              {#if evento.preco}
+                R$ {evento.preco.toFixed(2)}
+              {:else}
+                Gratuito
+              {/if}
+            </div>
+          </div>
+        {/each}
+      </div>
+    {/if}
   </div>
-
-  <!-- Quick Actions -->
-  {#if data.planoAtual}
-    <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-      <a href="/aluno/inscricoes" class="bg-white dark:bg-zinc-900 border border-stone-200 dark:border-zinc-800 rounded-xl p-4 hover:border-emerald-600/40 transition-colors group flex items-center gap-3">
-        <span class="material-symbols-outlined text-zinc-500 group-hover:text-emerald-400 transition-colors">add_circle</span>
-        <span class="text-sm text-zinc-700 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">Inscrever em turma</span>
-      </a>
-      <a href="/aluno/perfil" class="bg-white dark:bg-zinc-900 border border-stone-200 dark:border-zinc-800 rounded-xl p-4 hover:border-emerald-600/40 transition-colors group flex items-center gap-3">
-        <span class="material-symbols-outlined text-zinc-500 group-hover:text-emerald-400 transition-colors">edit</span>
-        <span class="text-sm text-zinc-700 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">Editar perfil</span>
-      </a>
-      <a href="/aluno/extrato" class="bg-white dark:bg-zinc-900 border border-stone-200 dark:border-zinc-800 rounded-xl p-4 hover:border-emerald-600/40 transition-colors group flex items-center gap-3">
-        <span class="material-symbols-outlined text-zinc-500 group-hover:text-emerald-400 transition-colors">receipt_long</span>
-        <span class="text-sm text-zinc-700 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">Ver extrato</span>
-      </a>
-    </div>
-  {/if}
 </div>
