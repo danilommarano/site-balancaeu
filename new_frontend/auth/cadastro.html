@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Cadastrar — Balança Eu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="auth.css" />
+</head>
+<body>
+<div class="auth">
+  <div class="auth__brand">
+    <div class="auth__logo">
+      <div class="auth__logo-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg></div>
+    </div>
+    <h1 class="auth__title">Balança<b>Eu</b></h1>
+
+    <p class="auth__sub">Crie sua conta</p>
+  </div>
+
+  <form class="auth__card" onsubmit="event.preventDefault();">
+    <div class="field">
+      <label class="field__label" for="nome">Nome completo</label>
+      <input class="field__input" id="nome" placeholder="Seu nome" autocomplete="name" />
+    </div>
+    <div class="field">
+      <label class="field__label" for="email">Email</label>
+      <input class="field__input" id="email" type="email" placeholder="seu@email.com" autocomplete="email" />
+    </div>
+    <div class="field">
+      <label class="field__label" for="senha">Senha</label>
+      <input class="field__input" id="senha" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password" />
+    </div>
+    <div class="field" style="margin-bottom: 22px;">
+      <label class="field__label" for="senha2">Confirmar senha</label>
+      <input class="field__input" id="senha2" type="password" placeholder="Repita a senha" autocomplete="new-password" />
+    </div>
+
+    <button class="btn btn--primary" type="submit">Cadastrar</button>
+
+    <div class="auth__foot">
+      <p>Já tem conta? <a href="login.html">Entrar</a></p>
+    </div>
+  </form>
+
+  <p class="legal">Comece sua jornada no movimento.</p>
+</div>
+</body></html>

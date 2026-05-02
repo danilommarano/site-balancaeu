@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>CMS — Forró Pé Descalço — Admin · Balança Eu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar__brand">
+      <div class="sidebar__logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>
+      </div>
+      <div>
+        <div class="sidebar__brand-name">Balança<b>Eu</b></div>
+        <div class="sidebar__brand-sub">Balança Eu</div>
+      </div>
+    </div>
+
+    <div class="sidebar__section">Principal</div>
+    <nav class="sidebar__nav">
+      <a class="nav-item" href="dashboard.html" data-page="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+        <span class="nav-item__label">Dashboard</span>
+      </a>
+      <button class="nav-item" data-toggle="cms">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 12h16M4 19h10"/></svg>
+        <span class="nav-item__label">Conteúdo (CMS)</span>
+        <span class="nav-item__caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M6 9l6 6 6-6"/></svg></span>
+      </button>
+      <div class="nav-sub" id="cms-sub">
+        <a href="cms-landing.html" data-page="cms-landing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>Landing Page</a>
+        <a href="cms-forro-pe-descalco.html" data-page="cms-forro-pe-descalco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><path d="M12 7v6M8 13h8M8 13l-3 8M16 13l3 8"/></svg>Forró Pé Descalço</a>
+        <a href="cms-forro-pe-descalco.html" data-page="cms-forro-pe-descalco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><path d="M12 7v6M8 13h8M8 13l-3 8M16 13l3 8"/></svg>Forró Pé Descalço</a>
+        <a href="#" data-page="cms-samba"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><path d="M12 7v6M8 13h8M8 13l-3 8M16 13l3 8"/></svg>Samba de Gafieira</a>
+        <a href="#" data-page="cms-zumba"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><path d="M12 7v6M8 13h8M8 13l-3 8M16 13l3 8"/></svg>Zumba</a>
+      </div>
+    </nav>
+
+    <div class="sidebar__section">Escola</div>
+    <nav class="sidebar__nav">
+      <a class="nav-item" href="modalidades.html" data-page="modalidades"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><path d="M12 7v6M8 13h8M8 13l-3 8M16 13l3 8"/></svg><span class="nav-item__label">Modalidades</span></a>
+      <a class="nav-item" href="turmas.html" data-page="turmas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><path d="M15 20c0-2 2-4 4-4s2 1 2 2"/></svg><span class="nav-item__label">Turmas</span></a>
+      <a class="nav-item" href="professores.html" data-page="professores"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5L2 10z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/></svg><span class="nav-item__label">Professores</span></a>
+      <a class="nav-item" href="alunos.html" data-page="alunos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg><span class="nav-item__label">Alunos</span></a>
+    </nav>
+
+    <div class="sidebar__section">Gestão</div>
+    <nav class="sidebar__nav">
+      <a class="nav-item" href="planos.html" data-page="planos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg><span class="nav-item__label">Planos</span></a>
+      <a class="nav-item" href="eventos.html" data-page="eventos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg><span class="nav-item__label">Eventos</span></a>
+      <a class="nav-item" href="financeiro.html" data-page="financeiro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h18M5 6h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2z"/><path d="M7 15h4"/></svg><span class="nav-item__label">Financeiro</span></a>
+      <a class="nav-item" href="checkin.html" data-page="checkin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3M21 14v3M14 21h3M21 18v3h-3"/></svg><span class="nav-item__label">Check-in</span></a>
+      <a class="nav-item" href="presenca.html" data-page="presenca"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span class="nav-item__label">Presença</span></a>
+    </nav>
+
+    <div class="sidebar__user">
+      <div class="sidebar__avatar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
+      </div>
+      <div class="sidebar__user-info">
+        <div class="sidebar__user-name">Administrador</div>
+        <div class="sidebar__user-email">admin@balancaeu.com.br</div>
+      </div>
+    </div>
+    <a class="sidebar__logout" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>
+      Sair
+    </a>
+  </aside>
+
+  <main class="main">
+
+    <div class="crumbs"><a href="cms-landing.html">CMS</a><span>›</span>Módulo</div>
+    <div class="page-head">
+      <div>
+        <h1 class="page-title">Forró Pé <em>Descalço</em></h1>
+        <p class="page-sub">Edite os textos e imagens da página <span class="slug-pill">/modulo/forro-pe-descalco</span></p>
+      </div>
+      <button class="btn btn--ghost">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+        Preview
+      </button>
+    </div>
+    <div class="cms-layout">
+      <div class="accordion">
+        
+          <div class="acc-item">
+            <button class="acc-item__head">
+              <div class="acc-item__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg></div>
+              <div class="acc-item__body">
+                <div class="acc-item__title">Hero (Topo da Página)</div>
+                <div class="acc-item__meta">Não configurado</div>
+              </div>
+              <div class="acc-item__caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div>
+            </button>
+          </div>
+          <div class="acc-item">
+            <button class="acc-item__head">
+              <div class="acc-item__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg></div>
+              <div class="acc-item__body">
+                <div class="acc-item__title">Sobre a Modalidade</div>
+                <div class="acc-item__meta">Não configurado</div>
+              </div>
+              <div class="acc-item__caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div>
+            </button>
+          </div>
+          <div class="acc-item">
+            <button class="acc-item__head">
+              <div class="acc-item__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg></div>
+              <div class="acc-item__body">
+                <div class="acc-item__title">Cards de Benefícios</div>
+                <div class="acc-item__meta">Não configurado</div>
+              </div>
+              <div class="acc-item__caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div>
+            </button>
+          </div>
+          <div class="acc-item">
+            <button class="acc-item__head">
+              <div class="acc-item__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg></div>
+              <div class="acc-item__body">
+                <div class="acc-item__title">Seção de Professores</div>
+                <div class="acc-item__meta">Não configurado</div>
+              </div>
+              <div class="acc-item__caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div>
+            </button>
+          </div>
+          <div class="acc-item">
+            <button class="acc-item__head">
+              <div class="acc-item__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg></div>
+              <div class="acc-item__body">
+                <div class="acc-item__title">Seção de Horários</div>
+                <div class="acc-item__meta">Não configurado</div>
+              </div>
+              <div class="acc-item__caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div>
+            </button>
+          </div>
+          <div class="acc-item">
+            <button class="acc-item__head">
+              <div class="acc-item__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg></div>
+              <div class="acc-item__body">
+                <div class="acc-item__title">CTA Final</div>
+                <div class="acc-item__meta">Não configurado</div>
+              </div>
+              <div class="acc-item__caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div>
+            </button>
+          </div>
+      </div>
+      
+      <div class="preview-pane">
+        <div class="preview-pane__head">
+          <div class="preview-pane__title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8h20"/></svg>Preview — Forró Pé Descalço</div>
+          <div class="preview-pane__actions"><button class="btn btn--ghost btn--sm">Abrir inteira <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M21 3l-7 7"/></svg></button></div>
+        </div>
+        <div class="preview-pane__frame">
+          <div class="preview-fake-nav">
+            <div class="preview-fake-nav__logo">balançaEu.</div>
+            <div class="preview-fake-nav__menu"><span>Início</span><span>Raiz</span><span>Sobre</span><span>Módulos</span></div>
+            <div class="preview-fake-nav__btn">Começar Jornada</div>
+          </div>
+          <div class="preview-module">
+            <div class="preview-module__label">Módulo</div>
+            <div class="preview-module__title">Forró Pé Descalço</div>
+            <div class="preview-module__sub">Método progressivo de ensino de forró, com graduações para todos os níveis.</div>
+            <div class="preview-module__art">
+              <svg viewBox="0 0 200 200" fill="none" stroke="#A83A2E" stroke-width="1.4" stroke-linecap="round">
+                <circle cx="100" cy="50" r="10"/>
+                <path d="M100 60v60M70 100l30-20 30 20M100 120l-30 80M100 120l30 80M100 120l-40 60M100 120l40 60M100 120l-50 40M100 120l50 40M100 120l-60 20M100 120l60 20M100 120l-60 0M100 120l60 0"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const page = 'cms-forro-pe-descalco';
+    const cmsOpen = true;
+    document.querySelectorAll('[data-page]').forEach(a => {
+      if (a.dataset.page === page) a.classList.add('is-active');
+    });
+    const cmsBtn = document.querySelector('[data-toggle="cms"]');
+    const cmsSub = document.getElementById('cms-sub');
+    if (cmsOpen) { cmsBtn.classList.add('is-open', 'is-active'); cmsSub.style.display = 'flex'; }
+    else cmsSub.style.display = 'none';
+    cmsBtn.addEventListener('click', () => {
+      cmsBtn.classList.toggle('is-open');
+      cmsSub.style.display = cmsBtn.classList.contains('is-open') ? 'flex' : 'none';
+    });
+  });
+</script>
+</body>
+</html>
